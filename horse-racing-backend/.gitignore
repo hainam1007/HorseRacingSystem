@@ -1,0 +1,15 @@
+.env
+node_modules/
+test.md
+AGENT.md
+docs/TEST_EPIC_1_2.md
+docs/TEST_EPIC_3.md
+docs/TEST_HORSE_OWNER_JOCKEY_FLOW.md
+docs/TEST_RACE_REFEREE_FULL_RACE_DAY_FLOW.md
+docs/TEST_ROLE_APPLICATION_FLOW.md
+_reference/
+.tmp/
+.local-codex/
+app_probability_engine_history_v1_runtime/
+__pycache__/
+*.pyc

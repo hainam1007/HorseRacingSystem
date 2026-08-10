@@ -1,0 +1,99 @@
+{
+  "assertions": [
+    "Race room rendered five pixel-horse runners",
+    "Accepted bet updated wallet from 1,280 pts to 1,080 pts",
+    "Duplicate client_request_id returned the original bet without a second wallet deduction",
+    "stop_betting disabled all 13 betting controls immediately",
+    "Five runners advanced between sampled animation frames",
+    "Finished state rendered five ranking rows and the official Top 3 overlay"
+  ],
+  "screenshots": [
+    "spectator-race-desktop-1440x900.png",
+    "spectator-race-mobile-390x844.png"
+  ],
+  "viewportAudits": {
+    "desktop": {
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "documentOverflow": 0,
+      "track": {
+        "width": 795.375,
+        "height": 447.390625
+      },
+      "visibleRunners": 5,
+      "runnersInsideTrack": 5
+    },
+    "mobile": {
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "clientWidth": 390,
+      "documentOverflow": 0,
+      "track": {
+        "width": 300,
+        "height": 270
+      },
+      "podium": {
+        "width": 258,
+        "left": 70,
+        "right": 328
+      },
+      "overflowingText": 0,
+      "offenders": [
+        {
+          "tag": "BUTTON",
+          "className": "",
+          "left": 386.671875,
+          "right": 487.828125,
+          "width": 101.15625
+        },
+        {
+          "tag": "BUTTON",
+          "className": "",
+          "left": 493.828125,
+          "right": 544.234375,
+          "width": 50.40625
+        },
+        {
+          "tag": "BUTTON",
+          "className": "live-race-dev-controls__restart",
+          "left": 550.234375,
+          "right": 584.234375,
+          "width": 34
+        },
+        {
+          "tag": "svg",
+          "className": "[object SVGAnimatedString]",
+          "left": 559.734375,
+          "right": 574.734375,
+          "width": 15
+        },
+        {
+          "tag": "path",
+          "className": "[object SVGAnimatedString]",
+          "left": 561.609375,
+          "right": 572.859375,
+          "width": 11.25
+        },
+        {
+          "tag": "path",
+          "className": "[object SVGAnimatedString]",
+          "left": 561.609375,
+          "right": 564.734375,
+          "width": 3.125
+        }
+      ]
+    }
+  },
+  "stage": "complete",
+  "initialTarget": {
+    "href": "http://127.0.0.1:5184/",
+    "origin": "http://127.0.0.1:5184",
+    "readyState": "interactive",
+    "body": ""
+  },
+  "passed": true
+}

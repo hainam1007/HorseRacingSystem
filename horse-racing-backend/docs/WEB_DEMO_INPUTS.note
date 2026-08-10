@@ -1,0 +1,1015 @@
+# WEB DEMO INPUTS
+
+Copy the values below into the matching fields on the website.
+
+Demo timeline:
+
+```text
+Tournament start: July 30, 2026
+Tournament end:   July 31, 2026
+Primary meeting:  July 31, 2026 - 09:00 AM
+Backup meeting:   July 31, 2026 - 10:30 AM
+Race time:        July 31, 2026 - 03:00 PM
+```
+
+If these times have passed, move all meeting and race times forward together.
+An appointment must be in the future and earlier than the race time.
+
+-------------------------------------------------------------------------------
+1. CREATE TOURNAMENT
+-------------------------------------------------------------------------------
+
+```text
+Name
+Saigon Summer Racing Cup
+
+Description
+A summer racing event featuring competitive sprint races in Ho Chi Minh City.
+
+Location
+Phu Tho Racecourse, District 11, Ho Chi Minh City
+
+Start date
+07/30/2026
+
+End date
+07/31/2026
+
+Status
+Active
+```
+
+Image:
+
+```text
+Upload a horse racing event image.
+```
+
+-------------------------------------------------------------------------------
+2. CREATE ROUND
+-------------------------------------------------------------------------------
+
+```text
+Name
+Opening Round
+
+Round order
+1
+
+Description
+The opening round of the Saigon Summer Racing Cup.
+
+Status
+Active
+```
+
+Tournament:
+
+```text
+Saigon Summer Racing Cup
+```
+
+-------------------------------------------------------------------------------
+3. CREATE RACE
+-------------------------------------------------------------------------------
+
+```text
+Race name
+Independence Sprint
+
+Race number
+1
+
+Race date and time
+07/31/2026 03:00 PM
+
+Distance
+1200
+
+Maximum participants
+6
+
+Location
+Phu Tho Racecourse, District 11, Ho Chi Minh City
+
+Venue code
+ST
+
+Course
+B+2
+
+Race class
+4
+
+Going
+Good
+
+Surface
+Turf
+
+Entry fee
+50000
+
+Entry fee currency
+VND
+
+Prize pool
+100000000
+
+Prize currency
+VND
+
+Status
+Scheduled
+```
+
+Select:
+
+```text
+Tournament
+Saigon Summer Racing Cup
+
+Round
+Opening Round
+
+Referee
+Select an approved active referee.
+```
+
+Image:
+
+```text
+Upload a clear racecourse image.
+```
+
+-------------------------------------------------------------------------------
+4. CONFIGURE RACE PRIZE
+-------------------------------------------------------------------------------
+
+```text
+Prize pool
+100000000
+
+Currency
+VND
+```
+
+Prize distribution:
+
+```text
+Position 1
+60%
+Champion
+
+Position 2
+20%
+Runner-up
+
+Position 3
+11%
+Third Place
+
+Position 4
+6%
+Fourth Place
+
+Position 5
+3%
+Fifth Place
+```
+
+-------------------------------------------------------------------------------
+5. CREATE HORSE
+-------------------------------------------------------------------------------
+
+```text
+Horse name
+Saigon Thunder
+
+Breed
+Thoroughbred
+
+Gender
+Male
+
+Date of birth
+03/16/2021
+
+Color
+Bay
+
+Weight
+478
+
+Health status
+Healthy
+
+Registration number
+VN-HCM-2026-071
+
+Default gear
+Blinkers (B)
+Tongue Tie (TT)
+
+Status
+Active
+```
+
+Image:
+
+```text
+Upload a clear side-profile horse image.
+```
+
+Alternative horse names for other entries:
+
+```text
+Mekong Star
+Golden Lotus
+Red River Spirit
+Dragon Wind
+Emerald Victory
+```
+
+Alternative registration numbers:
+
+```text
+VN-HCM-2026-072
+VN-HCM-2026-073
+VN-HCM-2026-074
+VN-HCM-2026-075
+VN-HCM-2026-076
+```
+
+-------------------------------------------------------------------------------
+6. REGISTER HORSE FOR RACE
+-------------------------------------------------------------------------------
+
+Select:
+
+```text
+Tournament
+Saigon Summer Racing Cup
+
+Race
+Independence Sprint
+
+Horse
+Saigon Thunder
+
+Gear
+Blinkers (B)
+Tongue Tie (TT)
+
+Payment method
+VNPay
+```
+
+```text
+Registration note
+Register Saigon Thunder for the Independence Sprint.
+```
+
+Expected entry fee:
+
+```text
+50,000 VND
+```
+
+-------------------------------------------------------------------------------
+7. PRIMARY JOCKEY INVITATION
+-------------------------------------------------------------------------------
+
+Select:
+
+```text
+Race entry
+Saigon Thunder - Independence Sprint
+
+Assignment type
+Primary
+
+Jockey
+Select an available approved jockey.
+```
+
+Invitation:
+
+```text
+Invitation message
+We would like to invite you to ride Saigon Thunder in the Independence Sprint.
+```
+
+Offline appointment:
+
+```text
+Appointment title
+Primary Jockey Contract Discussion
+
+Appointment time
+07/31/2026 09:00 AM
+
+Location name
+Saigon Racing Operations Office
+
+Address
+125 Le Dai Hanh Street, Ward 13, District 11
+
+City
+Ho Chi Minh City
+
+District
+District 11
+
+Ward
+Ward 13
+
+Map URL
+https://maps.google.com/?q=Le+Dai+Hanh+District+11
+
+Contact name
+Michael Nguyen
+
+Contact phone
+0903123456
+
+Appointment note
+Please arrive 15 minutes early and bring your racing license.
+```
+
+-------------------------------------------------------------------------------
+8. PRIMARY JOCKEY ACCEPTS APPOINTMENT
+-------------------------------------------------------------------------------
+
+```text
+Response message
+I confirm that I will attend the appointment at the scheduled time.
+```
+
+-------------------------------------------------------------------------------
+9. PRIMARY JOCKEY TERMS
+-------------------------------------------------------------------------------
+
+Horse Owner enters:
+
+```text
+Agreed terms
+The jockey will ride Saigon Thunder in the Independence Sprint, arrive at least 90 minutes before the race, follow all referee instructions, and comply with race safety regulations. Service fees and responsibilities are stated in the attached contract.
+
+Meeting note
+Both parties reviewed the race schedule, equipment, safety responsibilities, and contract terms.
+
+Agreed at
+07/31/2026 10:00 AM
+```
+
+Jockey confirmation:
+
+```text
+Response message
+I have reviewed and accepted the agreed riding terms.
+```
+
+-------------------------------------------------------------------------------
+10. PRIMARY JOCKEY CONTRACT
+-------------------------------------------------------------------------------
+
+```text
+Contract number
+JOC-HCM-2026-071
+
+Contract title
+Saigon Thunder Primary Riding Contract
+
+File name
+saigon-thunder-primary-contract.pdf
+
+File type
+PDF
+
+Signed at
+07/31/2026 10:15 AM
+
+Contract note
+Signed primary riding contract for the Independence Sprint.
+```
+
+File:
+
+```text
+Upload a PDF or image of the signed contract.
+```
+
+Jockey confirmation:
+
+```text
+Response message
+I have reviewed the uploaded contract and confirm my participation as the primary jockey.
+```
+
+Expected final status:
+
+```text
+Accepted
+```
+
+-------------------------------------------------------------------------------
+11. BACKUP JOCKEY INVITATION
+-------------------------------------------------------------------------------
+
+Create this invitation only after the Primary Jockey reaches `Accepted`.
+
+Select:
+
+```text
+Race entry
+Saigon Thunder - Independence Sprint
+
+Assignment type
+Backup
+
+Backup priority
+1
+
+Jockey
+Select another available approved jockey.
+```
+
+Invitation:
+
+```text
+Invitation message
+We would like to invite you to serve as the backup jockey for Saigon Thunder.
+```
+
+Offline appointment:
+
+```text
+Appointment title
+Backup Jockey Standby Discussion
+
+Appointment time
+07/31/2026 10:30 AM
+
+Location name
+Saigon Racing Operations Office
+
+Address
+125 Le Dai Hanh Street, Ward 13, District 11
+
+City
+Ho Chi Minh City
+
+District
+District 11
+
+Ward
+Ward 13
+
+Map URL
+https://maps.google.com/?q=Le+Dai+Hanh+District+11
+
+Contact name
+Michael Nguyen
+
+Contact phone
+0903123456
+
+Appointment note
+This meeting covers standby availability and emergency replacement responsibilities.
+```
+
+-------------------------------------------------------------------------------
+12. BACKUP JOCKEY ACCEPTS APPOINTMENT
+-------------------------------------------------------------------------------
+
+```text
+Response message
+I confirm that I will attend the backup jockey appointment.
+```
+
+-------------------------------------------------------------------------------
+13. BACKUP JOCKEY TERMS
+-------------------------------------------------------------------------------
+
+Horse Owner enters:
+
+```text
+Agreed terms
+The backup jockey will arrive at least 90 minutes before the race and remain available to replace the primary jockey when officially requested.
+
+Meeting note
+Both parties confirmed that this is a standby role and not an active primary riding contract.
+
+Agreed at
+07/31/2026 11:00 AM
+```
+
+Backup Jockey confirmation:
+
+```text
+Response message
+I accept the standby terms and confirm my availability as the backup jockey.
+```
+
+Expected final status:
+
+```text
+Standby Confirmed
+```
+
+Do not upload a riding contract for a Backup Jockey.
+
+-------------------------------------------------------------------------------
+14. PRIMARY OR BACKUP CANCELLATION
+-------------------------------------------------------------------------------
+
+Cancellation request:
+
+```text
+Reason
+The agreed race-day schedule can no longer be fulfilled.
+```
+
+Other party approves:
+
+```text
+Decision
+Approve
+
+Response message
+I agree to end the assignment before the race begins.
+```
+
+Other party rejects:
+
+```text
+Decision
+Reject
+
+Response message
+I do not agree to cancel the confirmed assignment at this time.
+```
+
+Promote Backup to Primary:
+
+```text
+Reason
+The original primary jockey is unavailable, so the confirmed backup jockey will be promoted to primary.
+```
+
+-------------------------------------------------------------------------------
+15. FINALIZE ENTRIES AND ADJUST ODDS
+-------------------------------------------------------------------------------
+
+Admin entry correction example:
+
+```text
+Horse number
+1
+
+Draw
+1
+
+Declared weight
+54.5
+
+Gear
+Blinkers (B)
+Tongue Tie (TT)
+```
+
+Admin odds adjustment:
+
+```text
+Saigon Thunder
+3.25
+
+Mekong Star
+4.10
+
+Golden Lotus
+5.50
+
+Red River Spirit
+6.20
+
+Dragon Wind
+7.40
+
+Emerald Victory
+8.10
+
+Adjustment note
+Final market review completed before betting opens.
+```
+
+Betting market:
+
+```text
+Minimum stake
+5
+
+Maximum stake
+500
+
+Currency
+TOKEN
+```
+
+-------------------------------------------------------------------------------
+16. SPECTATOR BET
+-------------------------------------------------------------------------------
+
+Select:
+
+```text
+Race
+Independence Sprint
+
+Horse
+Saigon Thunder
+
+Stake
+20
+```
+
+Bet type:
+
+```text
+Win
+```
+
+-------------------------------------------------------------------------------
+17. REFEREE PRE-RACE CHECK - PASSED
+-------------------------------------------------------------------------------
+
+Select:
+
+```text
+Horse
+Saigon Thunder
+
+Status
+Passed
+```
+
+Checklist:
+
+```text
+Identity verified
+Checked
+
+Registration valid
+Checked
+
+Jockey assigned
+Checked
+
+Jockey contract confirmed
+Checked
+
+Horse health status acceptable
+Checked
+
+No visible lameness
+Checked
+
+No visible injury
+Checked
+
+Normal gait
+Checked
+
+Normal breathing
+Checked
+
+Equipment acceptable
+Checked
+
+Fit to race
+Checked
+```
+
+Other fields:
+
+```text
+Health status
+Healthy
+
+Weight
+478
+
+Eligible
+Yes
+
+Check note
+Identity, registration, health, gait, breathing, and equipment were verified. The horse is fit to race.
+```
+
+-------------------------------------------------------------------------------
+18. REFEREE PRE-RACE CHECK - FAILED EXAMPLE
+-------------------------------------------------------------------------------
+
+Use this only when demonstrating a horse excluded before the race.
+
+```text
+Status
+Failed
+
+Health status
+Not Fit
+
+Eligible
+No
+
+Issue
+Visible lameness detected in the left front leg.
+
+Check note
+The horse is not fit to race and must be excluded from the participant list.
+```
+
+Checklist:
+
+```text
+Identity verified
+Checked
+
+Registration valid
+Checked
+
+Jockey assigned
+Checked
+
+Horse health status acceptable
+Not checked
+
+No visible lameness
+Not checked
+
+No visible injury
+Checked
+
+Normal gait
+Not checked
+
+Normal breathing
+Checked
+
+Equipment acceptable
+Checked
+
+Fit to race
+Not checked
+```
+
+Do not perform during-race or post-race checks for this horse.
+
+-------------------------------------------------------------------------------
+19. DURING-RACE MAJOR VIOLATION
+-------------------------------------------------------------------------------
+
+This example visibly adds three seconds to the horse's result.
+
+Select:
+
+```text
+Horse
+Saigon Thunder
+
+Status
+Incident Recorded
+
+Event type
+Lane Violation
+
+Severity
+Major
+
+Create violation
+Checked
+```
+
+Incident details:
+
+```text
+Time marker
+00:00:48
+
+Description
+The jockey allowed the horse to leave its lane and interfere with another runner at the second turn.
+```
+
+Evidence:
+
+```text
+Upload a race camera image or short MP4 video.
+```
+
+Expected suggested penalty:
+
+```text
+Penalty type
+Time Penalty
+
+Penalty value
+3 seconds
+```
+
+-------------------------------------------------------------------------------
+20. REFEREE CONFIRMS THE MAJOR PENALTY
+-------------------------------------------------------------------------------
+
+To accept the system suggestion:
+
+```text
+Decision
+Video review confirms that the jockey committed a major lane violation at the 48-second mark.
+
+Penalty type
+Time Penalty
+
+Time penalty
+3
+
+Deviation reason
+Leave empty because the suggested penalty is being used.
+```
+
+To demonstrate a referee adjustment:
+
+```text
+Decision
+Video review confirms the lane violation.
+
+Penalty type
+Time Penalty
+
+Time penalty
+2
+
+Deviation reason
+The horse was partially forced outward by another runner, so the suggested three-second penalty was reduced to two seconds.
+```
+
+Expected calculation:
+
+```text
+Raw finish time
+72.450 seconds
+
+Penalty
+3.000 seconds
+
+Final finish time
+75.450 seconds
+```
+
+-------------------------------------------------------------------------------
+21. REFEREE POST-RACE CHECK
+-------------------------------------------------------------------------------
+
+Select:
+
+```text
+Horse
+Saigon Thunder
+
+Status
+Normal
+```
+
+Checklist:
+
+```text
+Horse finished safely
+Checked
+
+Post-race lameness check
+Checked
+
+Post-race injury check
+Checked
+
+Breathing recovered
+Checked
+
+Heart rate recovered
+Checked
+
+Bleeding check
+Checked
+
+Medical follow-up required
+Not checked
+```
+
+Other fields:
+
+```text
+Health status
+Stable
+
+Check note
+The horse finished safely and showed no visible injury or abnormal recovery signs.
+```
+
+-------------------------------------------------------------------------------
+22. REFEREE REPORT
+-------------------------------------------------------------------------------
+
+```text
+Report title
+Official Referee Report - Independence Sprint
+
+Report content
+The 1200-meter race was completed successfully. At the 48-second mark, Saigon Thunder left its lane and interfered with another runner. The incident was reviewed using race camera evidence.
+
+Race condition
+Completed with Confirmed Incident
+
+Weather
+Sunny with light wind
+
+Track condition
+Dry turf with good grip
+
+Conclusion
+One major lane violation was confirmed. A three-second time penalty was applied to Saigon Thunder before the final ranking was calculated.
+```
+
+Submit the report after all details have been reviewed.
+
+-------------------------------------------------------------------------------
+23. ADMIN REQUESTS RESULT CORRECTION
+-------------------------------------------------------------------------------
+
+```text
+Correction note
+Please verify the incident time marker and review the camera evidence from the second turn before resubmitting the results.
+```
+
+Referee result note after correction:
+
+```text
+Result note
+The incident time and camera evidence were reviewed again as requested by the administrator.
+```
+
+-------------------------------------------------------------------------------
+24. REGISTRATION CANCELLATION AND REFUND
+-------------------------------------------------------------------------------
+
+Owner cancellation request:
+
+```text
+Reason
+The horse requires additional recovery time following a veterinary recommendation.
+```
+
+Admin approval:
+
+```text
+Admin note
+Cancellation approved before the race start after reviewing the registration and payment details.
+```
+
+Admin records refund:
+
+```text
+Refund reference
+VNPAY-REFUND-20260731-001
+
+Admin note
+The entry fee of 50,000 VND was returned to the original payment account.
+```
+
+Owner confirms receipt:
+
+```text
+Confirmation note
+The full refund of 50,000 VND has been received.
+```
+
+-------------------------------------------------------------------------------
+25. QUICK DEMO ORDER
+-------------------------------------------------------------------------------
+
+```text
+1. Create Tournament, Round, Race, and Prize.
+2. Create Horse and register it for the Race through VNPay.
+3. Complete the Primary Jockey appointment, terms, and contract.
+4. Complete the Backup Jockey appointment and standby terms.
+5. Finalize entries, generate odds, and open betting.
+6. Place a Spectator Win bet.
+7. Pass all participating horses through pre-race checks.
+8. Start the Race.
+9. Record one Major Lane Violation for Saigon Thunder.
+10. Confirm the suggested three-second penalty.
+11. Complete the Race and all post-race checks.
+12. Submit the Referee Report.
+13. Apply confirmed penalties and submit results for Admin review.
+14. Admin confirms and publishes the results.
+15. Review final results, prize awards, and settled bets.
+```

@@ -1,0 +1,5203 @@
+﻿/* Admin operational design system - shared shell and dashboard foundation */
+.admin-page {
+  --admin-bg: var(--racing-ink);
+  --admin-surface: var(--racing-surface);
+  --admin-surface-raised: var(--racing-surface-raised);
+  --admin-surface-soft: rgba(var(--racing-contrast-rgb), 0.055);
+  --admin-line: rgba(var(--racing-contrast-rgb), 0.15);
+  --admin-line-strong: rgba(var(--racing-contrast-rgb), 0.27);
+  --admin-text: var(--racing-text-strong);
+  --admin-copy: var(--racing-text-soft);
+  --admin-muted: var(--racing-text-muted);
+  --admin-accent: var(--racing-accent);
+  --admin-accent-strong: var(--racing-accent-strong);
+  min-height: 100dvh;
+  padding: 0;
+  background:
+    linear-gradient(rgba(var(--racing-contrast-rgb), 0.018) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(var(--racing-contrast-rgb), 0.018) 1px, transparent 1px),
+    var(--admin-bg);
+  background-size: 32px 32px;
+  color: var(--admin-text);
+}
+
+.admin-page *,
+.admin-page *::before,
+.admin-page *::after {
+  box-sizing: border-box;
+}
+
+.admin-page :focus-visible {
+  outline: 2px solid var(--admin-accent);
+  outline-offset: 3px;
+}
+
+.admin-page .sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.admin-skip-link {
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  z-index: 80;
+  padding: 10px 14px;
+  border-radius: 4px;
+  background: var(--admin-text);
+  color: var(--admin-bg);
+  font-weight: 800;
+  transform: translateY(-150%);
+  transition: transform 180ms ease;
+}
+
+.admin-skip-link:focus {
+  transform: translateY(0);
+}
+
+.admin-shell {
+  width: min(100%, 1680px);
+  min-height: 100dvh;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 248px minmax(0, 1fr);
+  gap: 0;
+}
+
+.admin-sidebar,
+.admin-content {
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  backdrop-filter: none;
+}
+
+.admin-sidebar {
+  position: sticky;
+  top: 0;
+  height: 100dvh;
+  padding: 24px 18px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  overflow-y: auto;
+  border-right: 1px solid var(--admin-line);
+  background: rgba(13, 20, 16, 0.96);
+}
+
+.admin-brand {
+  display: grid;
+  gap: 14px;
+}
+
+.admin-brand__link {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  color: var(--admin-text);
+}
+
+.admin-brand__mark {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  border: 1px solid var(--admin-accent);
+  border-radius: 4px;
+  color: var(--admin-accent);
+  font-family: "Sora", sans-serif;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.admin-brand__copy {
+  display: grid;
+  min-width: 0;
+  gap: 2px;
+}
+
+.admin-brand__copy strong {
+  font-family: "Sora", sans-serif;
+  font-size: 0.94rem;
+  letter-spacing: -0.02em;
+}
+
+.admin-brand__copy small {
+  color: var(--admin-muted);
+  font-size: 0.7rem;
+}
+
+.admin-system-state {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--admin-copy);
+  font-size: 0.72rem;
+  font-weight: 650;
+}
+
+.admin-system-state i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--racing-success);
+  box-shadow: 0 0 0 4px rgba(102, 189, 124, 0.1);
+}
+
+.admin-nav {
+  display: grid;
+  gap: 19px;
+}
+
+.admin-nav__group,
+.admin-nav__links {
+  display: grid;
+  gap: 4px;
+}
+
+.admin-nav__label {
+  margin: 0 0 5px;
+  padding: 0 9px;
+  color: var(--racing-muted-warm);
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.admin-nav a {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 39px;
+  padding: 8px 10px;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  color: var(--admin-muted);
+  font-size: 0.82rem;
+  font-weight: 620;
+  transition: color 180ms ease, background 180ms ease, border-color 180ms ease, transform 180ms ease;
+}
+
+.admin-nav a:hover {
+  background: var(--admin-surface-soft);
+  color: var(--admin-text);
+  transform: translateX(2px);
+}
+
+.admin-nav a.active {
+  border-color: rgba(var(--racing-accent-rgb), 0.25);
+  background: rgba(var(--racing-accent-rgb), 0.09);
+  color: var(--admin-text);
+}
+
+.admin-nav a.active::before {
+  position: absolute;
+  top: 8px;
+  bottom: 8px;
+  left: -19px;
+  width: 3px;
+  background: var(--admin-accent);
+  content: "";
+}
+
+.admin-nav a.active svg {
+  color: var(--admin-accent);
+}
+
+.admin-user-row {
+  width: 100%;
+  margin-top: auto;
+  padding: 12px 0 0;
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr) 34px;
+  align-items: center;
+  gap: 10px;
+  border: 0;
+  border-top: 1px solid var(--admin-line);
+  border-radius: 0;
+  background: transparent;
+}
+
+.admin-user-avatar {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(var(--racing-accent-rgb), 0.4);
+  border-radius: 5px;
+  background: rgba(var(--racing-accent-rgb), 0.1);
+  color: var(--admin-accent);
+}
+
+.admin-user-info {
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+
+.admin-user-info > span {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin-user-name {
+  color: var(--admin-text);
+  font-size: 0.8rem;
+}
+
+.admin-user-role {
+  color: var(--racing-muted-warm);
+  font-size: 0.68rem;
+}
+
+.admin-logout-btn {
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--admin-line-strong);
+  border-radius: 4px;
+  background: transparent;
+  color: var(--admin-muted);
+}
+
+.admin-logout-btn:hover:not(:disabled) {
+  border-color: rgba(229, 169, 97, 0.5);
+  color: var(--racing-text-strong);
+}
+
+.admin-logout-btn:disabled {
+  cursor: progress;
+  opacity: 0.72;
+}
+
+.admin-content {
+  width: 100%;
+  min-width: 0;
+  padding: 28px clamp(22px, 3.2vw, 48px) 56px;
+  display: grid;
+  align-content: start;
+  gap: 20px;
+  overflow: hidden;
+  background: linear-gradient(135deg, rgba(var(--racing-contrast-rgb), 0.018), transparent 40%);
+}
+
+.admin-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 22px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--admin-line);
+}
+
+.admin-header__copy {
+  max-width: 800px;
+}
+
+.admin-header__eyebrow,
+.admin-panel__eyebrow {
+  margin: 0;
+  color: var(--admin-accent);
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.admin-header h1 {
+  max-width: 760px;
+  margin: 6px 0 0;
+  color: var(--admin-text);
+  font-family: "Sora", sans-serif;
+  font-size: clamp(1.8rem, 3vw, 3.2rem);
+  line-height: 1;
+  letter-spacing: -0.045em;
+  text-wrap: balance;
+}
+
+.admin-header__description {
+  max-width: 67ch;
+  margin: 10px 0 0;
+  color: var(--admin-copy);
+  font-size: 0.94rem;
+  line-height: 1.55;
+  text-wrap: pretty;
+}
+
+.admin-header__actions {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 9px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.admin-sidebar__button,
+.admin-header__button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 42px;
+  padding: 0 15px;
+  border: 1px solid var(--admin-accent-strong);
+  border-radius: 5px;
+  background: var(--admin-accent-strong);
+  box-shadow: none;
+  color: var(--racing-text-strong);
+  font-size: 0.8rem;
+  font-weight: 760;
+  transition: background 180ms ease, border-color 180ms ease, color 180ms ease, transform 180ms ease;
+}
+
+.admin-sidebar__button:hover,
+.admin-header__button:hover {
+  filter: none;
+  background: var(--racing-accent-strong);
+  transform: translateY(-1px);
+}
+
+.admin-header__button:active {
+  transform: translateY(1px);
+}
+
+.admin-header__button--ghost {
+  border-color: var(--admin-line-strong);
+  background: transparent;
+  color: var(--admin-copy);
+}
+
+.admin-header__button--ghost:hover {
+  border-color: var(--admin-accent);
+  background: rgba(var(--racing-accent-rgb), 0.07);
+  color: var(--admin-text);
+}
+
+.admin-header__button:disabled,
+.admin-header__button:disabled:hover {
+  opacity: 0.48;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.admin-panel,
+.admin-metric-card {
+  border: 1px solid var(--admin-line);
+  border-radius: 7px;
+  background: var(--admin-surface-soft);
+  box-shadow: none;
+}
+
+.admin-panel {
+  padding: 20px;
+}
+
+.admin-panel__header h2 {
+  color: var(--admin-text);
+  letter-spacing: -0.035em;
+}
+
+.admin-panel p,
+.admin-list li,
+.admin-flow__step p,
+.admin-metric-card__note {
+  color: var(--admin-copy);
+}
+
+.admin-panel {
+  display: grid;
+  gap: 12px;
+}
+
+.admin-panel__header {
+  display: grid;
+  gap: 4px;
+}
+
+.admin-panel__header h2 {
+  margin: 0;
+  font-family: "Sora", sans-serif;
+}
+
+.admin-data-table__wrap {
+  width: 100%;
+  border: 1px solid var(--admin-line);
+  border-radius: 5px;
+  overflow-x: auto;
+}
+
+.admin-data-table {
+  width: 100%;
+  min-width: 720px;
+  border-collapse: collapse;
+  background: transparent;
+}
+
+.admin-data-table th,
+.admin-data-table td {
+  padding: 13px 14px;
+  border-bottom: 1px solid var(--admin-line);
+  text-align: left;
+}
+
+.admin-data-table th {
+  background: rgba(var(--racing-contrast-rgb), 0.04);
+  color: var(--admin-muted);
+  font-size: 0.68rem;
+  font-weight: 750;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.admin-data-table td {
+  color: var(--admin-copy);
+  font-size: 0.82rem;
+}
+
+.admin-data-table tbody tr {
+  transition: background 150ms ease;
+}
+
+.admin-data-table tbody tr:hover {
+  background: rgba(var(--racing-accent-rgb), 0.055);
+}
+
+.admin-field input,
+.admin-field select,
+.admin-field textarea {
+  border-radius: 5px;
+  border-color: var(--admin-line-strong);
+  background: rgba(9, 15, 11, 0.48);
+  color: var(--admin-text);
+  width: 100%;
+  min-height: 42px;
+  padding: 0 12px;
+}
+
+.admin-field {
+  display: grid;
+  gap: 6px;
+}
+
+.admin-field > span {
+  color: var(--admin-muted);
+  font-size: 0.76rem;
+  font-weight: 650;
+}
+
+.admin-field textarea {
+  min-height: 96px;
+  padding: 10px 12px;
+  resize: vertical;
+}
+
+.admin-field select option {
+  background: var(--admin-surface);
+  color: var(--admin-text);
+}
+
+.admin-field input::placeholder,
+.admin-field textarea::placeholder {
+  color: var(--racing-muted-warm);
+}
+
+.admin-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  padding: 18px;
+  background: rgba(3, 8, 5, 0.68);
+  backdrop-filter: blur(7px);
+}
+
+.admin-modal__card {
+  width: min(640px, 100%);
+  max-height: min(86dvh, 820px);
+  overflow-y: auto;
+  padding: 20px;
+  border-radius: 7px;
+  border-color: var(--admin-line-strong);
+  background: var(--racing-surface);
+  box-shadow: 0 28px 72px rgba(3, 8, 5, 0.52);
+}
+
+.admin-form-grid,
+.admin-modal__body {
+  display: grid;
+  gap: 12px;
+}
+
+.admin-tool-card__footer {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.admin-status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 8px;
+  border: 1px solid var(--admin-line);
+  border-radius: 3px;
+  font-size: 0.68rem;
+  font-weight: 750;
+  white-space: nowrap;
+}
+
+.admin-status-badge--green { border-color: rgba(102, 189, 124, 0.34); background: rgba(102, 189, 124, 0.1); color: var(--racing-success-soft); }
+.admin-status-badge--amber { border-color: rgba(224, 165, 94, 0.38); background: rgba(224, 165, 94, 0.1); color: var(--racing-accent-soft); }
+.admin-status-badge--red { border-color: rgba(218, 104, 94, 0.38); background: rgba(218, 104, 94, 0.1); color: var(--racing-danger); }
+.admin-status-badge--blue { border-color: rgba(116, 158, 184, 0.38); background: rgba(116, 158, 184, 0.1); color: var(--racing-text-soft); }
+.admin-status-badge--gray { border-color: var(--admin-line); background: rgba(var(--racing-contrast-rgb), 0.045); color: var(--admin-muted); }
+
+.admin-live-state {
+  display: flex;
+  align-items: center;
+  min-height: 42px;
+  padding: 10px 12px;
+  border: 1px solid rgba(102, 189, 124, 0.32);
+  border-radius: 5px;
+  background: rgba(102, 189, 124, 0.09);
+  color: var(--racing-success-soft);
+  font-size: 0.78rem;
+  font-weight: 680;
+}
+
+.admin-live-state--warning {
+  border-color: rgba(224, 165, 94, 0.38);
+  background: rgba(224, 165, 94, 0.1);
+  color: var(--racing-accent-soft);
+}
+
+.admin-header__button--red {
+  border-color: rgba(218, 104, 94, 0.45);
+  background: rgba(166, 67, 60, 0.2);
+  color: var(--racing-danger-soft);
+}
+
+.admin-header__button--red:hover {
+  border-color: rgba(218, 104, 94, 0.65);
+  background: rgba(166, 67, 60, 0.3);
+}
+
+/* Dashboard */
+.admin-command-strip {
+  display: grid;
+  grid-template-columns: 1.1fr 0.8fr 1.1fr;
+  border: 1px solid var(--admin-line);
+  border-radius: 5px;
+  background: rgba(var(--racing-contrast-rgb), 0.025);
+}
+
+.admin-command-strip > div {
+  display: grid;
+  min-width: 0;
+  gap: 4px;
+  padding: 13px 16px;
+  border-right: 1px solid var(--admin-line);
+}
+
+.admin-command-strip > div:first-child {
+  grid-template-columns: auto 1fr;
+  align-items: center;
+}
+
+.admin-command-strip > div:last-child {
+  border-right: 0;
+}
+
+.admin-command-strip svg {
+  grid-row: 1 / 3;
+  color: var(--racing-success);
+}
+
+.admin-command-strip span {
+  color: var(--admin-muted);
+  font-size: 0.66rem;
+  font-weight: 750;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.admin-command-strip strong {
+  overflow: hidden;
+  color: var(--admin-copy);
+  font-size: 0.78rem;
+  font-weight: 680;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin-deposit-workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(330px, 0.36fr);
+  gap: 14px;
+  align-items: start;
+}
+
+.admin-deposit-subline {
+  display: block;
+  margin-top: 4px;
+  color: var(--admin-muted);
+  font-size: 0.72rem;
+}
+
+.admin-deposit-editor {
+  position: sticky;
+  top: 18px;
+}
+
+.admin-deposit-editor__split {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.admin-deposit-switch {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  color: var(--admin-copy);
+  font-size: 0.8rem;
+  font-weight: 720;
+}
+
+.admin-deposit-switch input {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--admin-accent);
+}
+
+.admin-deposit-preview {
+  display: grid;
+  gap: 5px;
+  padding: 13px;
+  border: 1px solid rgba(var(--racing-accent-rgb), 0.28);
+  border-radius: 5px;
+  background: rgba(var(--racing-accent-rgb), 0.08);
+}
+
+.admin-deposit-preview span,
+.admin-deposit-preview small {
+  color: var(--admin-muted);
+  font-size: 0.72rem;
+  font-weight: 720;
+}
+
+.admin-deposit-preview strong {
+  color: var(--racing-accent-soft);
+  font-family: "Sora", sans-serif;
+  font-size: 1.45rem;
+}
+
+.admin-deposit-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.admin-rewards-workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(340px, 0.36fr);
+  gap: 14px;
+  align-items: start;
+}
+
+.admin-rewards-metrics article svg {
+  color: var(--admin-accent);
+}
+
+.admin-rewards-toolbar {
+  display: grid;
+  grid-template-columns: minmax(260px, 1fr) minmax(130px, 0.28fr) minmax(140px, 0.28fr) auto;
+  gap: 9px;
+  padding: 12px;
+  border-bottom: 1px solid var(--admin-line);
+}
+
+.admin-rewards-toolbar--compact {
+  grid-template-columns: minmax(160px, 240px) auto;
+}
+
+.admin-rewards-toolbar label {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 42px;
+  padding: 0 11px;
+  border: 1px solid var(--admin-line-strong);
+  border-radius: 5px;
+  background: rgba(9, 15, 11, 0.48);
+  color: var(--admin-muted);
+}
+
+.admin-rewards-toolbar input,
+.admin-rewards-toolbar select {
+  width: 100%;
+  min-height: 42px;
+  border: 1px solid var(--admin-line-strong);
+  border-radius: 5px;
+  background: rgba(9, 15, 11, 0.48);
+  color: var(--admin-text);
+}
+
+.admin-rewards-toolbar label input {
+  min-height: auto;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.admin-rewards-toolbar select {
+  padding: 0 10px;
+}
+
+.admin-rewards-subline {
+  display: block;
+  max-width: 42ch;
+  margin-top: 4px;
+  overflow: hidden;
+  color: var(--admin-muted);
+  font-size: 0.72rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin-rewards-prize-cell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.admin-rewards-prize-cell > span:last-child {
+  min-width: 0;
+}
+
+.admin-rewards-thumb {
+  width: 42px;
+  height: 42px;
+  flex: 0 0 42px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border: 1px solid rgba(var(--racing-accent-rgb), 0.2);
+  border-radius: 6px;
+  background: rgba(10, 16, 12, 0.74);
+  color: var(--admin-accent);
+}
+
+.admin-rewards-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.admin-rewards-row-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.admin-rewards-row-actions .admin-command-review {
+  min-height: 31px;
+  padding: 0 9px;
+  text-transform: capitalize;
+}
+
+.admin-rewards-row-actions__danger {
+  border-color: rgba(218, 104, 94, 0.42) !important;
+  color: var(--racing-danger-soft) !important;
+}
+
+.admin-rewards-terminal {
+  color: var(--admin-muted);
+  font-size: 0.74rem;
+  font-weight: 720;
+}
+
+.admin-rewards-editor {
+  position: sticky;
+  top: 18px;
+}
+
+.admin-rewards-editor .admin-panel__header {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+}
+
+.admin-rewards-editor__split {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.admin-rewards-image-field {
+  gap: 8px;
+}
+
+.admin-rewards-image-picker {
+  display: grid;
+  grid-template-columns: 104px minmax(0, 1fr);
+  gap: 10px;
+  align-items: center;
+  padding: 10px;
+  border: 1px solid var(--admin-line-strong);
+  border-radius: 6px;
+  background: rgba(8, 14, 10, 0.52);
+}
+
+.admin-rewards-image-preview {
+  aspect-ratio: 1 / 1;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border: 1px solid rgba(var(--racing-accent-rgb), 0.24);
+  border-radius: 6px;
+  background: rgba(4, 9, 6, 0.74);
+  color: var(--admin-accent);
+}
+
+.admin-rewards-image-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.admin-rewards-image-picker > div:last-child {
+  min-width: 0;
+  display: grid;
+  gap: 8px;
+  justify-items: start;
+}
+
+.admin-rewards-image-picker small {
+  max-width: 100%;
+  overflow: hidden;
+  color: var(--admin-muted);
+  font-size: 0.72rem;
+  font-weight: 720;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin-rewards-upload-button {
+  position: relative;
+  min-height: 36px;
+  cursor: pointer;
+}
+
+.admin-rewards-upload-button input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.admin-rewards-stock {
+  margin-top: 4px;
+  padding-top: 14px;
+  display: grid;
+  gap: 11px;
+  border-top: 1px solid var(--admin-line);
+}
+
+.admin-rewards-stock > div {
+  display: grid;
+  gap: 4px;
+}
+
+.admin-rewards-stock p,
+.admin-rewards-stock strong {
+  margin: 0;
+}
+
+.admin-rewards-stock strong {
+  color: var(--admin-text);
+  font-family: "Sora", sans-serif;
+}
+
+.admin-dashboard-section {
+  display: grid;
+  gap: 14px;
+}
+
+.admin-section-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.admin-section-heading > div {
+  display: grid;
+  gap: 4px;
+}
+
+.admin-section-heading p {
+  margin: 0;
+  color: var(--admin-accent);
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+.admin-section-heading h2,
+.admin-race-protocol h2 {
+  margin: 0;
+  color: var(--admin-text);
+  font-family: "Sora", sans-serif;
+  font-size: clamp(1.35rem, 2.2vw, 2rem);
+  line-height: 1.1;
+  letter-spacing: -0.045em;
+}
+
+.admin-section-heading > span {
+  max-width: 38ch;
+  color: var(--admin-muted);
+  font-size: 0.76rem;
+  line-height: 1.5;
+  text-align: right;
+}
+
+.admin-section-heading--compact {
+  align-items: center;
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--admin-line);
+}
+
+.admin-section-heading--compact h2 {
+  font-size: 1.25rem;
+}
+
+.admin-control-grid {
+  display: grid;
+  grid-template-columns: 1.12fr 1fr 1fr;
+  gap: 10px;
+}
+
+.admin-control-card {
+  position: relative;
+  min-height: 284px;
+  padding: 19px;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--admin-line);
+  border-radius: 7px;
+  background: var(--admin-surface);
+  overflow: hidden;
+  transition: border-color 180ms ease, transform 180ms ease, background 180ms ease;
+}
+
+.admin-control-card:hover {
+  border-color: var(--admin-line-strong);
+  background: var(--admin-surface-raised);
+  transform: translateY(-2px);
+}
+
+.admin-control-card--signal {
+  background:
+    linear-gradient(150deg, rgba(var(--racing-accent-rgb), 0.13), transparent 54%),
+    var(--admin-surface-raised);
+  border-color: rgba(var(--racing-accent-rgb), 0.34);
+}
+
+.admin-control-card__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 26px;
+}
+
+.admin-control-card__top span {
+  color: var(--admin-muted);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.72rem;
+}
+
+.admin-control-card__top svg {
+  color: var(--admin-accent);
+}
+
+.admin-control-card > p:not(.admin-control-card__description) {
+  margin: 0 0 7px;
+  color: var(--admin-accent);
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.admin-control-card h3 {
+  max-width: 12ch;
+  margin: 0;
+  color: var(--admin-text);
+  font-family: "Sora", sans-serif;
+  font-size: clamp(1.3rem, 2.1vw, 1.9rem);
+  line-height: 1.08;
+  letter-spacing: -0.045em;
+  text-wrap: balance;
+}
+
+.admin-control-card__rule {
+  width: 44px;
+  height: 2px;
+  margin: 18px 0 14px;
+  background: var(--admin-accent-strong);
+}
+
+.admin-control-card .admin-control-card__description {
+  max-width: 42ch;
+  margin: 0 0 18px;
+  color: var(--admin-muted);
+  font-size: 0.79rem;
+  line-height: 1.55;
+}
+
+.admin-control-card > a,
+.admin-race-protocol > a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: auto;
+  padding-top: 13px;
+  border-top: 1px solid var(--admin-line);
+  color: var(--admin-copy);
+  font-size: 0.77rem;
+  font-weight: 750;
+}
+
+.admin-control-card > a:hover,
+.admin-race-protocol > a:hover {
+  color: var(--admin-accent);
+}
+
+.admin-dashboard-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.55fr) minmax(290px, 0.65fr);
+  gap: 10px;
+  align-items: start;
+}
+
+.admin-module-ledger,
+.admin-race-protocol {
+  border: 1px solid var(--admin-line);
+  border-radius: 7px;
+  background: rgba(var(--racing-contrast-rgb), 0.025);
+}
+
+.admin-module-list {
+  display: grid;
+}
+
+.admin-module-row {
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  min-height: 67px;
+  padding: 10px 17px;
+  border-bottom: 1px solid var(--admin-line);
+  color: var(--admin-copy);
+  transition: background 160ms ease, color 160ms ease;
+}
+
+/* Live command modules */
+.admin-command-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  border: 1px solid var(--admin-line);
+  border-radius: 6px;
+  background: rgba(var(--racing-contrast-rgb), 0.025);
+}
+
+.admin-command-metrics article {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 12px;
+  min-height: 82px;
+  padding: 14px 16px;
+  border-right: 1px solid var(--admin-line);
+}
+
+.admin-command-metrics article:last-child {
+  border-right: 0;
+}
+
+.admin-command-metrics article > span {
+  color: var(--racing-muted-warm);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.65rem;
+}
+
+.admin-command-metrics article > div {
+  display: grid;
+  gap: 4px;
+}
+
+.admin-command-metrics strong {
+  color: var(--admin-text);
+  font-family: "Sora", sans-serif;
+  font-size: 1.45rem;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.admin-command-metrics small {
+  color: var(--admin-muted);
+  font-size: 0.7rem;
+}
+
+.admin-command-metrics em,
+.admin-dashboard-domain-grid em {
+  color: var(--racing-muted-warm);
+  font-size: 0.66rem;
+  font-style: normal;
+}
+
+.admin-command-metrics b,
+.admin-dashboard-domain-grid b {
+  width: max-content;
+  padding: 2px 6px;
+  border: 1px solid rgba(224, 165, 94, 0.38);
+  border-radius: 3px;
+  background: rgba(224, 165, 94, 0.1);
+  color: var(--racing-accent-soft);
+  font-size: 0.58rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.admin-command-metrics__source svg {
+  color: var(--admin-accent);
+}
+
+.admin-dashboard-metrics {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.admin-dashboard-grid--wide {
+  grid-template-columns: minmax(0, 1.45fr) minmax(315px, 0.55fr);
+}
+
+.admin-dashboard-queue-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0;
+}
+
+.admin-dashboard-queue {
+  min-width: 0;
+  border-right: 1px solid var(--admin-line);
+  border-bottom: 1px solid var(--admin-line);
+}
+
+.admin-dashboard-queue:nth-child(2n) {
+  border-right: 0;
+}
+
+.admin-dashboard-queue:nth-last-child(-n + 2) {
+  border-bottom: 0;
+}
+
+.admin-dashboard-queue > header {
+  min-height: 56px;
+  padding: 11px 14px;
+  border-bottom: 1px solid var(--admin-line);
+}
+
+.admin-dashboard-queue > header > div {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.admin-dashboard-queue > header svg {
+  color: var(--admin-accent);
+}
+
+.admin-dashboard-queue > header span {
+  display: grid;
+  gap: 3px;
+}
+
+.admin-dashboard-queue > header strong {
+  color: var(--admin-text);
+  font-size: 0.78rem;
+}
+
+.admin-dashboard-queue > header small {
+  color: var(--admin-muted);
+  font-size: 0.66rem;
+}
+
+.admin-dashboard-queue .admin-module-row {
+  min-height: 61px;
+  padding: 9px 13px;
+}
+
+.admin-dashboard-queue__meta {
+  display: grid;
+  justify-items: end;
+  gap: 4px;
+  color: var(--admin-muted);
+  font-size: 0.66rem;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.admin-dashboard-queue__meta small {
+  color: var(--admin-accent);
+  font-size: 0.6rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.admin-dashboard-empty {
+  min-height: 80px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px;
+  color: var(--admin-muted);
+  font-size: 0.76rem;
+}
+
+.admin-dashboard-empty svg {
+  color: var(--racing-success);
+}
+
+.admin-dashboard-domain-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  border: 1px solid var(--admin-line);
+  border-radius: 6px;
+  background: rgba(var(--racing-contrast-rgb), 0.025);
+  overflow: hidden;
+}
+
+.admin-dashboard-domain-grid article {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 12px;
+  min-height: 88px;
+  padding: 14px 16px;
+  border-right: 1px solid var(--admin-line);
+  border-bottom: 1px solid var(--admin-line);
+}
+
+.admin-dashboard-domain-grid article:nth-child(4n) {
+  border-right: 0;
+}
+
+.admin-dashboard-domain-grid article:nth-last-child(-n + 4) {
+  border-bottom: 0;
+}
+
+.admin-dashboard-domain-grid article > span {
+  color: var(--racing-muted-warm);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.65rem;
+}
+
+.admin-dashboard-domain-grid article > div {
+  display: grid;
+  gap: 4px;
+}
+
+.admin-dashboard-domain-grid strong {
+  color: var(--admin-text);
+  font-family: "Sora", sans-serif;
+  font-size: 1.35rem;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.admin-dashboard-domain-grid small {
+  color: var(--admin-muted);
+  font-size: 0.68rem;
+}
+
+.admin-dashboard-missing {
+  border: 1px solid var(--admin-line);
+  border-radius: 7px;
+  background: rgba(var(--racing-contrast-rgb), 0.025);
+  overflow: hidden;
+}
+
+.admin-command-notice {
+  gap: 9px;
+}
+
+.admin-command-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  padding: 11px;
+  border: 1px solid var(--admin-line);
+  border-radius: 6px;
+  background: rgba(var(--racing-contrast-rgb), 0.025);
+}
+
+.admin-command-toolbar > label {
+  display: flex;
+  flex: 1 1 310px;
+  align-items: center;
+  gap: 9px;
+  min-width: 200px;
+  min-height: 40px;
+  padding: 0 11px;
+  border: 1px solid var(--admin-line-strong);
+  border-radius: 4px;
+  background: rgba(8, 14, 10, 0.42);
+  color: var(--admin-muted);
+}
+
+.admin-command-toolbar input {
+  width: 100%;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--admin-text);
+  font: inherit;
+  font-size: 0.8rem;
+}
+
+.admin-command-toolbar input::placeholder {
+  color: var(--racing-muted-warm);
+}
+
+.admin-command-filters {
+  display: flex;
+  gap: 3px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.admin-command-filters::-webkit-scrollbar {
+  display: none;
+}
+
+.admin-command-filters button,
+.admin-command-reset {
+  flex: 0 0 auto;
+  min-height: 36px;
+  padding: 0 11px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--admin-muted);
+  font-size: 0.72rem;
+  font-weight: 700;
+  transition: color 150ms ease, border-color 150ms ease, background 150ms ease;
+}
+
+.admin-command-filters button:hover,
+.admin-command-filters button.active {
+  border-color: rgba(var(--racing-accent-rgb), 0.28);
+  background: rgba(var(--racing-accent-rgb), 0.08);
+  color: var(--admin-text);
+}
+
+.admin-command-reset {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.admin-command-reset:hover {
+  color: var(--admin-accent);
+}
+
+.admin-command-workspace {
+  min-width: 0;
+}
+
+.admin-command-workspace--detail {
+  display: grid;
+  grid-template-columns: minmax(0, 1.45fr) minmax(330px, 0.55fr);
+  gap: 12px;
+  align-items: start;
+}
+
+.admin-command-ledger {
+  min-width: 0;
+  border: 1px solid var(--admin-line);
+  border-radius: 6px;
+  background: rgba(var(--racing-contrast-rgb), 0.025);
+}
+
+.admin-command-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  padding: 28px;
+  display: grid;
+  place-items: center;
+  background: rgba(5, 9, 7, 0.72);
+  backdrop-filter: blur(8px);
+}
+
+.admin-command-ledger > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  min-height: 62px;
+  padding: 11px 15px;
+  border-bottom: 1px solid var(--admin-line);
+}
+
+.admin-command-ledger > header > div {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.admin-command-ledger > header svg {
+  color: var(--admin-accent);
+}
+
+.admin-command-ledger > header div > span {
+  display: grid;
+  gap: 3px;
+}
+
+.admin-command-ledger > header strong {
+  color: var(--admin-text);
+  font-size: 0.83rem;
+}
+
+.admin-command-ledger > header small,
+.admin-command-ledger > header > span {
+  color: var(--admin-muted);
+  font-size: 0.68rem;
+}
+
+.admin-command-ledger .admin-data-table__wrap {
+  border: 0;
+  border-radius: 0;
+}
+
+.admin-command-ledger .admin-data-table {
+  min-width: 760px;
+}
+
+.admin-command-ledger .admin-data-table th,
+.admin-command-ledger .admin-data-table td {
+  padding: 12px 13px;
+}
+
+.admin-command-ledger .admin-data-table th {
+  font-size: 0.67rem;
+  letter-spacing: 0.1em;
+}
+
+.admin-command-ledger .admin-data-table td {
+  font-size: 0.79rem;
+}
+
+.admin-command-id {
+  display: inline-block;
+  max-width: 108px;
+  overflow: hidden;
+  color: var(--admin-muted);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.67rem;
+  text-overflow: ellipsis;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.admin-command-review {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 32px;
+  padding: 0 9px;
+  border: 1px solid var(--admin-line);
+  border-radius: 4px;
+  background: transparent;
+  color: var(--admin-copy);
+  font-size: 0.7rem;
+  font-weight: 750;
+  white-space: nowrap;
+}
+
+.admin-command-review:hover {
+  border-color: rgba(var(--racing-accent-rgb), 0.42);
+  color: var(--admin-accent);
+}
+
+.admin-command-row--selected {
+  background: rgba(var(--racing-accent-rgb), 0.07);
+}
+
+.admin-command-empty {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 190px;
+  padding: 28px;
+  color: var(--admin-muted);
+}
+
+.admin-command-empty h3,
+.admin-command-empty p {
+  margin: 0;
+}
+
+.admin-command-empty h3 {
+  color: var(--admin-text);
+  font-family: "Sora", sans-serif;
+  font-size: 1rem;
+}
+
+.admin-command-empty p {
+  margin-top: 4px;
+  font-size: 0.78rem;
+}
+
+.admin-command-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 11px 14px;
+  border-top: 1px solid var(--admin-line);
+}
+
+.admin-command-pagination > span {
+  color: var(--admin-muted);
+  font-size: 0.7rem;
+}
+
+.admin-command-pagination > div {
+  display: flex;
+  gap: 4px;
+}
+
+.admin-command-pagination button {
+  min-width: 31px;
+  min-height: 31px;
+  padding: 0 8px;
+  border: 1px solid var(--admin-line);
+  border-radius: 4px;
+  background: transparent;
+  color: var(--admin-muted);
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+
+.admin-command-pagination button:hover:not(:disabled),
+.admin-command-pagination button.active {
+  border-color: var(--admin-accent-strong);
+  background: rgba(var(--racing-accent-rgb), 0.09);
+  color: var(--admin-text);
+}
+
+.admin-command-pagination button:disabled {
+  opacity: 0.36;
+  cursor: not-allowed;
+}
+
+.admin-command-detail {
+  width: min(1120px, 100%);
+  max-height: min(86vh, 920px);
+  min-width: 0;
+  overflow: auto;
+  border: 1px solid var(--admin-line);
+  border-radius: 8px;
+  background: var(--racing-ink);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.44);
+}
+
+.admin-command-detail > header {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 17px;
+  border-bottom: 1px solid var(--admin-line);
+  background: rgba(var(--racing-accent-rgb), 0.045);
+}
+
+.admin-command-detail > header p,
+.admin-command-detail > header h2 {
+  margin: 0;
+}
+
+.admin-command-detail > header p {
+  margin-bottom: 5px;
+  color: var(--admin-accent);
+  font-size: 0.63rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.admin-command-detail > header h2 {
+  margin-bottom: 5px;
+  color: var(--admin-text);
+  font-family: "Sora", sans-serif;
+  font-size: 1.15rem;
+  letter-spacing: -0.035em;
+}
+
+.admin-command-detail > header > button {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 1px solid var(--admin-line);
+  border-radius: 4px;
+  color: var(--admin-muted);
+}
+
+.admin-command-detail > header > button:hover {
+  color: var(--admin-text);
+}
+
+.admin-command-detail__status {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 11px 17px;
+  border-bottom: 1px solid var(--admin-line);
+}
+
+.admin-command-detail__status > span {
+  color: var(--admin-muted);
+  font-size: 0.68rem;
+}
+
+.admin-command-detail__fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  border-bottom: 1px solid var(--admin-line);
+}
+
+.admin-command-detail__fields > div {
+  min-width: 0;
+  padding: 11px 13px;
+  display: grid;
+  gap: 4px;
+  border-right: 1px solid var(--admin-line);
+  border-bottom: 1px solid var(--admin-line);
+}
+
+.admin-command-detail__fields > div:nth-child(2n) {
+  border-right: 0;
+}
+
+.admin-command-detail__fields span,
+.admin-command-note > span {
+  color: var(--admin-muted);
+  font-size: 0.62rem;
+  font-weight: 750;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.admin-command-detail__fields strong {
+  overflow-wrap: anywhere;
+  color: var(--admin-copy);
+  font-size: 0.73rem;
+  font-weight: 650;
+}
+
+.admin-command-detail__section,
+.admin-command-detail__table {
+  padding: 15px;
+  display: grid;
+  gap: 10px;
+  border-bottom: 1px solid var(--admin-line);
+}
+
+.admin-command-detail__section h3,
+.admin-command-detail__table h3 {
+  margin: 0;
+  color: var(--admin-text);
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.admin-command-detail__section .admin-command-detail__fields {
+  border: 1px solid var(--admin-line);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.admin-command-detail__table .admin-data-table__wrap {
+  max-width: 100%;
+}
+
+.admin-command-detail__table .admin-data-table {
+  min-width: 620px;
+}
+
+.admin-command-detail__table p {
+  margin: 0;
+  color: var(--admin-muted);
+  font-size: 0.74rem;
+}
+
+.admin-command-role-editor {
+  padding: 15px;
+  display: grid;
+  gap: 11px;
+  border-bottom: 1px solid var(--admin-line);
+}
+
+.admin-command-role-editor > div:first-child {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.admin-command-role-editor p {
+  margin: 0;
+  color: var(--admin-text);
+  font-size: 0.78rem;
+  font-weight: 750;
+}
+
+.admin-command-role-editor > div:first-child > span {
+  color: var(--admin-muted);
+  font-size: 0.66rem;
+}
+
+.admin-command-role-editor__assign {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 7px;
+}
+
+.admin-command-role-editor select,
+.admin-command-note textarea {
+  width: 100%;
+  border: 1px solid var(--admin-line-strong);
+  border-radius: 4px;
+  background: rgba(8, 14, 10, 0.48);
+  color: var(--admin-copy);
+}
+
+.admin-command-role-editor select {
+  min-height: 38px;
+  padding: 0 9px;
+  text-transform: capitalize;
+}
+
+.admin-command-role-editor__assign button,
+.admin-command-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 38px;
+  padding: 0 11px;
+  border: 1px solid var(--admin-accent-strong);
+  border-radius: 4px;
+  background: var(--admin-accent-strong);
+  color: var(--admin-text);
+  font-size: 0.7rem;
+  font-weight: 750;
+}
+
+.admin-command-role-editor__assign button:disabled,
+.admin-command-action:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.admin-command-role-list {
+  display: grid;
+  gap: 5px;
+}
+
+.admin-command-role-list > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 34px;
+  padding: 5px 8px;
+  border: 1px solid var(--admin-line);
+  border-radius: 4px;
+  color: var(--admin-copy);
+  font-size: 0.7rem;
+  text-transform: capitalize;
+}
+
+.admin-command-role-list button {
+  color: var(--racing-danger);
+  font-size: 0.66rem;
+  font-weight: 750;
+}
+
+.admin-command-role-list button:disabled {
+  opacity: 0.4;
+}
+
+.admin-command-note {
+  padding: 15px;
+  display: grid;
+  gap: 7px;
+  border-bottom: 1px solid var(--admin-line);
+}
+
+.admin-command-note textarea {
+  min-height: 86px;
+  padding: 10px;
+  resize: vertical;
+  font: inherit;
+  font-size: 0.76rem;
+}
+
+.admin-command-detail > footer {
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
+  padding: 14px 15px;
+  display: flex;
+  gap: 7px;
+  flex-wrap: wrap;
+  border-top: 1px solid var(--admin-line);
+  background: rgba(16, 21, 15, 0.96);
+}
+
+.admin-command-action--danger {
+  border-color: rgba(218, 104, 94, 0.52);
+  background: rgba(166, 67, 60, 0.2);
+  color: var(--racing-danger-soft);
+}
+
+.admin-command-locked {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  color: var(--racing-success);
+}
+
+.admin-command-locked span {
+  display: grid;
+  gap: 2px;
+}
+
+.admin-command-locked strong {
+  color: var(--admin-copy);
+  font-size: 0.72rem;
+}
+
+.admin-command-locked small {
+  color: var(--admin-muted);
+  font-size: 0.65rem;
+}
+
+/* Race incident desk */
+.admin-incident-workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1.42fr) minmax(360px, 0.58fr);
+  gap: 12px;
+  align-items: start;
+}
+
+.admin-incident-ledger .admin-data-table {
+  min-width: 920px;
+}
+
+.admin-incident-ledger .admin-data-table td strong {
+  display: block;
+  max-width: 24ch;
+  overflow: hidden;
+  color: var(--admin-text);
+  font-size: 0.8rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin-incident-subline {
+  display: block;
+  max-width: 28ch;
+  margin-top: 4px;
+  overflow: hidden;
+  color: var(--admin-muted);
+  font-size: 0.68rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin-incident-detail {
+  position: sticky;
+  top: 18px;
+  gap: 16px;
+  min-width: 0;
+}
+
+.admin-incident-detail__status {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--admin-line);
+}
+
+.admin-incident-detail__status > span:last-child {
+  color: var(--admin-muted);
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.admin-incident-facts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  border: 1px solid var(--admin-line);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.admin-incident-facts > div {
+  min-width: 0;
+  padding: 11px;
+  display: grid;
+  gap: 4px;
+  border-right: 1px solid var(--admin-line);
+  border-bottom: 1px solid var(--admin-line);
+}
+
+.admin-incident-facts > div:nth-child(2n) {
+  border-right: 0;
+}
+
+.admin-incident-facts > div:nth-last-child(-n + 2) {
+  border-bottom: 0;
+}
+
+.admin-incident-facts span,
+.admin-incident-copy > span,
+.admin-incident-section-title span {
+  color: var(--admin-muted);
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.admin-incident-facts strong {
+  overflow-wrap: anywhere;
+  color: var(--admin-copy);
+  font-size: 0.75rem;
+  font-weight: 650;
+}
+
+.admin-incident-copy {
+  display: grid;
+  gap: 7px;
+}
+
+.admin-incident-copy p,
+.admin-incident-muted,
+.admin-incident-violation p {
+  margin: 0;
+  color: var(--admin-copy);
+  font-size: 0.78rem;
+  line-height: 1.55;
+}
+
+.admin-incident-actions,
+.admin-incident-violations {
+  display: grid;
+  gap: 11px;
+  padding-top: 14px;
+  border-top: 1px solid var(--admin-line);
+}
+
+.admin-incident-actions > div:first-child,
+.admin-incident-section-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--admin-accent);
+}
+
+.admin-incident-actions > div:last-child,
+.admin-incident-violation__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.admin-incident-actions .admin-header__button,
+.admin-incident-violation__actions .admin-header__button {
+  min-height: 36px;
+  padding: 0 11px;
+  font-size: 0.72rem;
+}
+
+.admin-incident-violation {
+  display: grid;
+  gap: 8px;
+  padding: 11px;
+  border: 1px solid var(--admin-line);
+  border-radius: 6px;
+  background: rgba(var(--racing-contrast-rgb), 0.035);
+}
+
+.admin-incident-violation > div:first-child {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.admin-incident-violation strong {
+  color: var(--admin-text);
+  font-size: 0.78rem;
+}
+
+.admin-incident-violation small {
+  color: var(--admin-muted);
+  font-size: 0.68rem;
+}
+
+.admin-module-row:last-child {
+  border-bottom: 0;
+}
+
+.admin-module-row:hover {
+  background: rgba(var(--racing-accent-rgb), 0.055);
+  color: var(--admin-text);
+}
+
+.admin-module-row__icon {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border: 1px solid var(--admin-line);
+  border-radius: 5px;
+  color: var(--admin-accent);
+}
+
+.admin-module-row__copy {
+  display: grid;
+  min-width: 0;
+  gap: 3px;
+}
+
+.admin-module-row__copy strong {
+  color: var(--admin-text);
+  font-size: 0.82rem;
+}
+
+.admin-module-row__copy small {
+  overflow: hidden;
+  color: var(--admin-muted);
+  font-size: 0.72rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin-module-row__state {
+  padding: 3px 7px;
+  border: 1px solid var(--admin-line);
+  border-radius: 3px;
+  color: var(--admin-muted);
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.admin-module-row__state--live {
+  border-color: rgba(102, 189, 124, 0.32);
+  color: var(--racing-success);
+}
+
+.admin-race-protocol {
+  padding: 19px;
+}
+
+.admin-race-protocol__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 30px;
+  color: var(--admin-muted);
+  font-size: 0.67rem;
+  font-weight: 750;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.admin-race-protocol__header span {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--admin-accent);
+}
+
+.admin-race-protocol > p {
+  margin: 12px 0 24px;
+  color: var(--admin-muted);
+  font-size: 0.77rem;
+  line-height: 1.6;
+}
+
+.admin-race-protocol ol {
+  margin: 0 0 24px;
+  padding: 0;
+  display: grid;
+  list-style: none;
+}
+
+.admin-race-protocol li {
+  position: relative;
+  display: grid;
+  grid-template-columns: 35px 1fr;
+  gap: 10px;
+  min-height: 62px;
+}
+
+.admin-race-protocol li::before {
+  position: absolute;
+  top: 25px;
+  bottom: 0;
+  left: 14px;
+  width: 1px;
+  background: var(--admin-line-strong);
+  content: "";
+}
+
+.admin-race-protocol li:last-child::before {
+  display: none;
+}
+
+.admin-race-protocol li > span {
+  display: grid;
+  width: 29px;
+  height: 29px;
+  place-items: center;
+  border: 1px solid var(--admin-line-strong);
+  border-radius: 50%;
+  background: var(--admin-surface);
+  color: var(--admin-accent);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.62rem;
+  z-index: 1;
+}
+
+.admin-race-protocol li div {
+  display: grid;
+  align-content: start;
+  gap: 3px;
+  padding-top: 3px;
+}
+
+.admin-race-protocol li strong {
+  color: var(--admin-copy);
+  font-size: 0.78rem;
+}
+
+.admin-race-protocol li small {
+  color: var(--admin-muted);
+  font-size: 0.68rem;
+}
+
+/* Competition planning */
+.admin-competition__row-actions--tournament {
+  flex-wrap: wrap;
+  min-width: 240px;
+}
+
+.admin-competition__row-actions--tournament > .admin-competition__row-actions {
+  display: contents;
+}
+
+.admin-competition__row-actions--tournament > button,
+.admin-competition__row-actions--tournament > .admin-competition__row-actions > button {
+  min-height: 32px;
+  padding: 6px 9px;
+  border: 1px solid var(--admin-line-strong);
+  border-radius: 4px;
+  background: rgba(var(--racing-contrast-rgb), 0.03);
+  color: var(--admin-copy);
+  font-size: 0.7rem;
+}
+
+.admin-competition__row-actions--tournament > button:hover,
+.admin-competition__row-actions--tournament > .admin-competition__row-actions > button:hover {
+  border-color: var(--admin-accent);
+  color: var(--admin-accent-soft);
+}
+
+.admin-tournament-detail {
+  scroll-margin-top: 24px;
+  padding: 0;
+  overflow: hidden;
+  outline: none;
+  border-color: rgba(var(--racing-accent-rgb), 0.42);
+  box-shadow: 0 0 0 1px rgba(var(--racing-accent-rgb), 0.08), 0 18px 36px rgba(0, 0, 0, 0.12);
+}
+
+.admin-tournament-detail__grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0;
+}
+
+.admin-tournament-detail__grid > div {
+  display: grid;
+  gap: 6px;
+  min-height: 84px;
+  padding: 16px;
+  border-right: 1px solid var(--admin-line);
+}
+
+.admin-tournament-detail__grid > div:last-child { border-right: 0; }
+.admin-tournament-detail__grid span { color: var(--admin-muted); font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.08em; }
+.admin-tournament-detail__grid strong { color: var(--admin-copy); font-size: 0.82rem; }
+
+.admin-race-toast {
+  position: fixed;
+  z-index: 30;
+  right: 24px;
+  bottom: 24px;
+  width: min(420px, calc(100vw - 32px));
+  padding: 16px;
+  border: 1px solid rgba(var(--racing-accent-rgb), 0.4);
+  border-radius: 8px;
+  background: #151c18;
+  color: var(--admin-copy);
+  box-shadow: 0 22px 60px rgba(0, 0, 0, 0.38);
+  animation: admin-race-toast-in 180ms ease-out;
+}
+
+.admin-race-toast__header { display: flex; justify-content: space-between; gap: 16px; align-items: start; padding-bottom: 12px; border-bottom: 1px solid var(--admin-line); }
+.admin-race-toast__header h2 { margin: 4px 0; font-size: 1rem; }
+.admin-race-toast__header span { color: var(--admin-muted); font-size: 0.72rem; }
+.admin-race-toast__header button { display: grid; place-items: center; padding: 5px; border: 0; background: transparent; color: var(--admin-muted); cursor: pointer; }
+.admin-race-toast__header button:hover { color: var(--admin-copy); }
+.admin-race-toast__list { display: grid; max-height: 260px; overflow: auto; }
+.admin-race-toast__item { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 11px 0; border-bottom: 1px solid var(--admin-line); }
+.admin-race-toast__item > div { display: grid; gap: 3px; min-width: 0; }
+.admin-race-toast__item strong { overflow: hidden; color: var(--admin-copy); font-size: 0.78rem; text-overflow: ellipsis; white-space: nowrap; }
+.admin-race-toast__item span { color: var(--admin-muted); font-size: 0.7rem; }
+.admin-race-toast__empty { display: grid; justify-items: center; gap: 8px; padding: 26px 12px; color: var(--admin-muted); font-size: 0.76rem; text-align: center; }
+.admin-race-toast__footer { width: 100%; justify-content: center; margin-top: 12px; }
+
+.admin-race-window { z-index: 40; }
+.admin-race-window__card { width: min(720px, calc(100vw - 32px)); max-height: min(720px, calc(100dvh - 48px)); padding: 0; overflow: auto; scroll-behavior: smooth; }
+.admin-race-window__card .admin-competition__section-header { min-height: 86px; }
+.admin-race-window__meta { display: flex; flex-wrap: wrap; gap: 8px; padding: 12px 16px; border-bottom: 1px solid var(--admin-line); background: rgba(var(--racing-contrast-rgb), 0.025); }
+.admin-race-window__meta span { padding: 5px 8px; border: 1px solid var(--admin-line); border-radius: 4px; color: var(--admin-muted); font-size: 0.7rem; }
+.admin-race-window__list { display: grid; max-height: 500px; overflow: auto; }
+.admin-race-window__item { display: grid; grid-template-columns: 42px minmax(0, 1fr) auto 16px; align-items: center; gap: 12px; padding: 14px 16px; border: 0; border-bottom: 1px solid var(--admin-line); background: transparent; color: inherit; text-align: left; cursor: pointer; }
+.admin-race-window__item:hover { background: rgba(var(--racing-accent-rgb), 0.08); }
+.admin-race-window__item:focus-visible { outline: 2px solid var(--admin-accent); outline-offset: -2px; }
+.admin-race-window__number { display: grid; width: 34px; height: 34px; place-items: center; border: 1px solid rgba(var(--racing-accent-rgb), 0.4); border-radius: 4px; color: var(--admin-accent-soft); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.72rem; }
+.admin-race-window__copy { display: grid; gap: 4px; min-width: 0; }
+.admin-race-window__copy strong { overflow: hidden; color: var(--admin-copy); font-size: 0.82rem; text-overflow: ellipsis; white-space: nowrap; }
+.admin-race-window__copy small { overflow: hidden; color: var(--admin-muted); font-size: 0.7rem; text-overflow: ellipsis; white-space: nowrap; }
+.admin-race-window__item > svg { color: var(--admin-accent-soft); }
+.admin-race-window__empty { display: grid; justify-items: center; gap: 7px; padding: 48px 20px; color: var(--admin-muted); text-align: center; }
+.admin-race-window__empty strong { color: var(--admin-copy); font-size: 0.85rem; }
+.admin-race-window__empty span { font-size: 0.72rem; }
+.admin-race-window__item.is-selected { background: rgba(var(--racing-accent-rgb), 0.1); }
+.admin-race-window__detail { scroll-margin-top: 12px; margin: 0 16px 16px; padding: 14px; border: 1px solid rgba(var(--racing-accent-rgb), 0.36); border-radius: 6px; background: rgba(var(--racing-accent-rgb), 0.035); outline: none; }
+.admin-race-window__detail-header { display: flex; align-items: start; justify-content: space-between; gap: 12px; padding-bottom: 12px; border-bottom: 1px solid var(--admin-line); }
+.admin-race-window__detail-header h3 { margin: 4px 0; color: var(--admin-copy); font-size: 0.92rem; }
+.admin-race-window__detail-header span { color: var(--admin-muted); font-size: 0.7rem; }
+.admin-race-window__detail-header button { display: inline-flex; align-items: center; gap: 5px; padding: 5px 8px; border: 1px solid var(--admin-line-strong); border-radius: 4px; background: transparent; color: var(--admin-muted); font-size: 0.7rem; cursor: pointer; }
+.admin-race-window__detail-header button:hover { border-color: var(--admin-accent); color: var(--admin-accent-soft); }
+.admin-race-window__detail-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1px; margin-top: 12px; background: var(--admin-line); }
+.admin-race-window__detail-grid > div { display: grid; gap: 5px; padding: 10px; background: #151c18; }
+.admin-race-window__detail-grid span { color: var(--admin-muted); font-size: 0.64rem; text-transform: uppercase; letter-spacing: 0.07em; }
+.admin-race-window__detail-grid strong { color: var(--admin-copy); font-size: 0.74rem; }
+
+.admin-race-detail { scroll-margin-top: 24px; padding: 0; overflow: hidden; outline: none; border-color: rgba(var(--racing-accent-rgb), 0.42); }
+.admin-race-detail__grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.admin-race-detail__grid > div { display: grid; gap: 6px; min-height: 80px; padding: 15px 16px; border-right: 1px solid var(--admin-line); border-bottom: 1px solid var(--admin-line); }
+.admin-race-detail__grid > div:nth-child(4n) { border-right: 0; }
+.admin-race-detail__grid span { color: var(--admin-muted); font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.08em; }
+.admin-race-detail__grid strong { color: var(--admin-copy); font-size: 0.8rem; }
+
+@media (max-width: 900px) {
+  .admin-race-detail__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .admin-race-detail__grid > div:nth-child(4n) { border-right: 1px solid var(--admin-line); }
+  .admin-race-detail__grid > div:nth-child(2n) { border-right: 0; }
+}
+
+@media (max-width: 620px) {
+  .admin-race-window__item { grid-template-columns: 36px minmax(0, 1fr) 16px; gap: 9px; }
+  .admin-race-window__item .admin-status-badge { display: none; }
+  .admin-race-window__detail-grid { grid-template-columns: 1fr; }
+  .admin-race-detail__grid { grid-template-columns: 1fr; }
+  .admin-race-detail__grid > div,
+  .admin-race-detail__grid > div:nth-child(2n),
+  .admin-race-detail__grid > div:nth-child(4n) { border-right: 0; }
+}
+
+@keyframes admin-race-toast-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+@media (max-width: 900px) {
+  .admin-tournament-detail__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .admin-tournament-detail__grid > div:nth-child(2) { border-right: 0; }
+}
+
+@media (max-width: 620px) {
+  .admin-tournament-detail__grid { grid-template-columns: 1fr; }
+  .admin-tournament-detail__grid > div { border-right: 0; border-bottom: 1px solid var(--admin-line); }
+  .admin-tournament-detail__grid > div:last-child { border-bottom: 0; }
+  .admin-race-toast { right: 16px; bottom: 16px; }
+}
+
+.admin-competition__flow {
+  display: grid;
+  grid-template-columns: 1fr 34px 1fr 34px 1fr;
+  align-items: center;
+  border: 1px solid var(--admin-line);
+  border-radius: 6px;
+  background: rgba(var(--racing-contrast-rgb), 0.025);
+}
+
+.admin-competition__flow > div {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 10px;
+  min-height: 58px;
+  padding: 10px 14px;
+}
+
+.admin-competition__flow > div > span {
+  color: var(--admin-accent);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.64rem;
+}
+
+.admin-competition__flow strong {
+  color: var(--admin-copy);
+  font-size: 0.77rem;
+}
+
+.admin-competition__flow small {
+  display: grid;
+  min-width: 28px;
+  height: 28px;
+  place-items: center;
+  border: 1px solid var(--admin-line);
+  border-radius: 4px;
+  color: var(--admin-text);
+  font-size: 0.7rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.admin-competition__flow i {
+  position: relative;
+  height: 1px;
+  background: var(--admin-line-strong);
+}
+
+.admin-competition__flow i::after {
+  position: absolute;
+  top: -3px;
+  right: 0;
+  width: 7px;
+  height: 7px;
+  border-top: 1px solid var(--admin-line-strong);
+  border-right: 1px solid var(--admin-line-strong);
+  content: "";
+  transform: rotate(45deg);
+}
+
+.admin-metrics.admin-metrics--module {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0;
+  border: 1px solid var(--admin-line);
+  border-radius: 6px;
+  background: rgba(var(--racing-contrast-rgb), 0.025);
+}
+
+.admin-metric-card__label {
+  margin: 0;
+  color: var(--admin-muted);
+  font-size: 0.72rem;
+}
+
+.admin-metric-card__value {
+  color: var(--admin-text);
+  font-family: "Sora", sans-serif;
+  font-variant-numeric: tabular-nums;
+}
+
+.admin-metrics--module .admin-metric-card {
+  min-height: 88px;
+  padding: 15px 17px;
+  border: 0;
+  border-right: 1px solid var(--admin-line);
+  border-radius: 0;
+  background: transparent;
+}
+
+.admin-metrics--module .admin-metric-card:last-child {
+  border-right: 0;
+}
+
+.admin-metrics--module .admin-metric-card__value {
+  margin-top: 7px;
+  font-size: 1.7rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.admin-actions-panel {
+  padding: 15px;
+}
+
+.admin-actions-panel .admin-panel__header {
+  grid-template-columns: auto 1fr;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.admin-actions-panel .admin-panel__header h2 {
+  font-size: 0.9rem;
+}
+
+.admin-actions-panel .admin-toolbar {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(170px, 0.5fr) auto;
+  align-items: end;
+  gap: 10px;
+}
+
+.admin-competition__stack {
+  display: grid;
+  gap: 14px;
+}
+
+/* Tournament setup keeps round data for race context, but does not render the round builder here. */
+.admin-competition__stack > .admin-panel:has(.admin-competition__round-controls) {
+  display: none;
+}
+
+.admin-competition__stack > .admin-panel,
+.admin-content > .admin-panel:has(.admin-competition__ledger-heading) {
+  padding: 0;
+  overflow: hidden;
+}
+
+.admin-competition__ledger-heading,
+.admin-competition__section-header {
+  min-height: 67px;
+  padding: 13px 16px;
+  align-items: center;
+  border-bottom: 1px solid var(--admin-line);
+}
+
+.admin-competition__section-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.admin-competition__ledger-heading {
+  display: flex;
+  justify-content: space-between;
+}
+
+.admin-competition__ledger-heading > div,
+.admin-competition__section-header > div:first-child {
+  display: grid;
+  gap: 4px;
+}
+
+.admin-competition__ledger-heading > span,
+.admin-competition__section-header > div:first-child > span {
+  color: var(--admin-muted);
+  font-size: 0.68rem;
+}
+
+.admin-competition__ledger-heading h2,
+.admin-competition__section-header h2 {
+  font-size: 1rem;
+}
+
+.admin-competition__stack .admin-data-table__wrap,
+.admin-content > .admin-panel:has(.admin-competition__ledger-heading) .admin-data-table__wrap {
+  border: 0;
+  border-radius: 0;
+}
+
+.admin-competition__round-controls {
+  display: flex;
+  align-items: end;
+  gap: 8px;
+}
+
+.admin-competition__round-controls .admin-field {
+  min-width: 190px;
+}
+
+.admin-competition__round-controls .admin-field span {
+  font-size: 0.68rem;
+}
+
+.admin-competition__round-controls select {
+  min-height: 38px;
+}
+
+.admin-competition__betting-panel {
+  padding: 0;
+  overflow: hidden;
+}
+
+.admin-competition__betting-status {
+  display: grid;
+  justify-items: end;
+  gap: 5px;
+  min-width: 180px;
+  text-align: right;
+}
+
+.admin-competition__betting-status small,
+.admin-competition__muted {
+  color: var(--admin-muted);
+  font-size: 0.7rem;
+}
+
+.admin-competition__betting-controls {
+  display: grid;
+  grid-template-columns: minmax(280px, 0.95fr) minmax(0, 1.35fr) minmax(240px, 0.72fr);
+  align-items: stretch;
+  gap: 14px;
+  padding: 16px;
+}
+
+.admin-competition__race-picker,
+.admin-competition__control-block {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--admin-line);
+  border-radius: 6px;
+  background: rgba(var(--racing-contrast-rgb), 0.04);
+}
+
+.admin-competition__race-picker {
+  display: grid;
+  align-content: start;
+  gap: 12px;
+  padding: 14px;
+}
+
+.admin-competition__race-picker select,
+.admin-competition__betting-settings input,
+.admin-competition__betting-settings select {
+  min-height: 44px;
+}
+
+.admin-competition__race-context {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.admin-competition__race-context > div {
+  min-width: 0;
+  display: grid;
+  gap: 4px;
+  padding: 10px;
+  border: 1px solid rgba(var(--racing-contrast-rgb), 0.08);
+  border-radius: 5px;
+  background: rgba(9, 15, 11, 0.3);
+}
+
+.admin-competition__race-context span,
+.admin-competition__control-block-header span {
+  color: var(--admin-muted);
+  font-size: 0.66rem;
+  font-weight: 700;
+}
+
+.admin-competition__race-context strong {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--admin-copy);
+  font-size: 0.76rem;
+  font-variant-numeric: tabular-nums;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin-competition__control-block {
+  display: grid;
+  gap: 12px;
+  padding: 14px;
+}
+
+.admin-competition__control-block-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  min-width: 0;
+}
+
+.admin-competition__control-block-header strong {
+  color: var(--admin-text);
+  font-family: "Sora", sans-serif;
+  font-size: 0.83rem;
+}
+
+.admin-competition__control-block-header span {
+  text-align: right;
+}
+
+.admin-competition__betting-settings {
+  display: grid;
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 0.8fr) minmax(0, 1fr);
+  gap: 10px;
+}
+
+.admin-competition__betting-settings .admin-field {
+  min-width: 0;
+}
+
+.admin-competition__betting-settings .admin-field > span {
+  font-size: 0.68rem;
+}
+
+.admin-competition__betting-settings .admin-field:last-child {
+  grid-column: 1 / -1;
+}
+
+.admin-competition__betting-settings input,
+.admin-competition__betting-settings select {
+  min-width: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.admin-competition__betting-actions {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+}
+
+.admin-competition__betting-actions button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  width: 100%;
+  min-height: 40px;
+  padding: 0 12px;
+  border-radius: 5px;
+  font-size: 0.73rem;
+  font-weight: 760;
+  text-align: left;
+}
+
+.admin-competition__betting-actions button:not(:disabled):first-child {
+  border-color: rgba(var(--racing-accent-rgb), 0.46);
+  background: rgba(var(--racing-accent-rgb), 0.12);
+}
+
+.admin-competition__odds-snapshot,
+.admin-competition__odds-empty {
+  margin: 0 16px 16px;
+  border: 1px solid var(--admin-line);
+  border-radius: 6px;
+  background: rgba(var(--racing-contrast-rgb), 0.035);
+}
+
+.admin-competition__odds-empty {
+  min-height: 58px;
+  display: grid;
+  align-items: center;
+  padding: 14px;
+  color: var(--admin-muted);
+  font-size: 0.78rem;
+}
+
+.admin-competition__odds-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  padding: 12px 12px 0;
+  margin-bottom: 10px;
+}
+
+.admin-competition__odds-meta span {
+  border: 1px solid var(--admin-line);
+  border-radius: 999px;
+  padding: 4px 8px;
+  color: var(--admin-muted);
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+
+.admin-competition__odds-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 0 12px;
+}
+
+.admin-competition__odds-toolbar .admin-competition__odds-meta {
+  padding-left: 0;
+}
+
+.admin-competition__odds-toolbar > button,
+.admin-competition__odds-edit-actions button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 34px;
+  padding: 0 10px;
+  border-radius: 5px;
+  font-size: 0.7rem;
+  font-weight: 750;
+}
+
+.admin-competition__odds-edit-actions {
+  display: flex;
+  gap: 7px;
+}
+
+.admin-competition__odds-note {
+  display: grid;
+  grid-template-columns: auto minmax(180px, 1fr);
+  align-items: center;
+  gap: 10px;
+  padding: 0 12px 12px;
+  color: var(--admin-muted);
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.admin-competition__odds-note input,
+.admin-competition__odds-table input {
+  min-width: 0;
+  border: 1px solid var(--admin-line);
+  border-radius: 4px;
+  background: var(--admin-surface);
+  color: var(--admin-text);
+}
+
+.admin-competition__odds-note input {
+  min-height: 36px;
+  padding: 0 9px;
+}
+
+.admin-competition__odds-error {
+  margin: 0 12px 10px;
+  color: var(--racing-danger);
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.admin-competition__odds-table-wrap {
+  overflow-x: auto;
+}
+
+.admin-competition__odds-table {
+  width: 100%;
+  min-width: 740px;
+  border-collapse: collapse;
+  font-size: 0.75rem;
+}
+
+.admin-competition__odds-table th,
+.admin-competition__odds-table td {
+  border-top: 1px solid var(--admin-line);
+  padding: 9px 8px;
+  text-align: left;
+}
+
+.admin-competition__odds-table th {
+  color: var(--admin-muted);
+  font-size: 0.65rem;
+  text-transform: uppercase;
+}
+
+.admin-competition__odds-table td:not(:nth-child(2)),
+.admin-competition__odds-table th:not(:nth-child(2)) {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.admin-competition__odds-table small {
+  display: block;
+  margin-top: 3px;
+  color: var(--admin-muted);
+  font-size: 0.66rem;
+}
+
+.admin-competition__odds-table input {
+  width: 88px;
+  min-height: 34px;
+  padding: 0 7px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 720px) {
+  .admin-competition__odds-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .admin-competition__odds-edit-actions,
+  .admin-competition__odds-edit-actions button,
+  .admin-competition__odds-toolbar > button {
+    width: 100%;
+  }
+
+  .admin-competition__odds-note {
+    grid-template-columns: 1fr;
+  }
+}
+
+.admin-competition__row-actions {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+}
+
+.admin-competition__id,
+.admin-competition__subline {
+  display: block;
+  margin-top: 4px;
+  color: var(--admin-muted);
+  font-size: 0.66rem;
+  font-weight: 500;
+}
+
+.admin-competition__id {
+  max-width: 150px;
+  overflow: hidden;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin-competition__row-actions button {
+  min-height: 32px;
+  padding: 0 8px;
+  border-radius: 4px;
+  font-size: 0.68rem;
+}
+
+.admin-competition__order {
+  display: grid;
+  width: 32px;
+  height: 32px;
+  place-items: center;
+  border: 1px solid rgba(var(--racing-accent-rgb), 0.28);
+  border-radius: 4px;
+  background: rgba(var(--racing-accent-rgb), 0.08);
+  color: var(--admin-accent);
+  font-weight: 800;
+}
+
+.admin-competition__empty {
+  margin: 16px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 120px;
+  border: 1px dashed var(--admin-line-strong);
+  border-radius: 5px;
+  color: var(--admin-muted);
+}
+
+.admin-competition__empty h3,
+.admin-competition__empty p {
+  margin: 0;
+}
+
+.admin-competition__empty h3 {
+  color: var(--admin-text);
+  font-family: "Sora", sans-serif;
+  font-size: 0.95rem;
+}
+
+.admin-competition__empty p {
+  margin-top: 4px;
+  font-size: 0.76rem;
+}
+
+.admin-competition__success {
+  border-color: rgba(102, 189, 124, 0.34);
+  background: rgba(102, 189, 124, 0.1);
+}
+
+.admin-competition__modal {
+  width: min(820px, 100%);
+  border: 1px solid color-mix(in srgb, var(--admin-line-strong) 82%, var(--admin-accent));
+  border-radius: 8px;
+  background:
+    linear-gradient(150deg, rgba(var(--racing-accent-rgb), 0.08), transparent 32%),
+    var(--racing-surface);
+  box-shadow: 0 28px 72px rgba(3, 8, 5, 0.62), inset 0 1px 0 rgba(255, 255, 255, 0.035);
+}
+
+.admin-competition__modal-header {
+  align-items: start;
+}
+
+.admin-competition__modal-close {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  flex: 0 0 auto;
+  place-items: center;
+  padding: 0;
+  border: 1px solid var(--admin-line);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--admin-muted);
+  cursor: pointer;
+  transition: border-color 160ms ease, color 160ms ease, background 160ms ease;
+}
+
+.admin-competition__modal-close:hover:not(:disabled) {
+  border-color: var(--admin-accent);
+  background: rgba(var(--racing-accent-rgb), 0.07);
+  color: var(--admin-accent-soft);
+}
+
+.admin-competition__modal-close:focus-visible {
+  outline: 2px solid var(--admin-accent);
+  outline-offset: 2px;
+}
+
+.admin-competition__entry-modal {
+  max-height: calc(100vh - 32px);
+  overflow: auto;
+  width: min(1180px, 100%);
+}
+
+.admin-competition__entry-header,
+.admin-competition__entry-header-actions,
+.admin-competition__entry-toolbar {
+  align-items: center;
+  display: flex;
+  gap: 10px;
+  justify-content: space-between;
+}
+
+.admin-competition__entry-summary {
+  display: grid;
+  gap: 1px;
+  grid-template-columns: 140px 140px minmax(220px, 1fr);
+  margin: 14px 0;
+  overflow: hidden;
+  border: 1px solid var(--admin-border);
+  border-radius: 6px;
+  background: var(--admin-border);
+}
+
+.admin-competition__entry-summary > div {
+  background: var(--admin-surface);
+  display: grid;
+  gap: 4px;
+  min-height: 66px;
+  padding: 12px;
+}
+
+.admin-competition__entry-summary span,
+.admin-competition__entry-toolbar span {
+  color: var(--admin-muted);
+  font-size: 0.7rem;
+}
+
+.admin-competition__entry-toolbar {
+  border-bottom: 1px solid var(--admin-border);
+  padding: 0 0 14px;
+}
+
+.admin-competition__entry-table-wrap {
+  margin-top: 14px;
+}
+
+.admin-competition__entry-table {
+  min-width: 1030px;
+}
+
+.admin-competition__entry-table td > input {
+  background: var(--admin-surface);
+  border: 1px solid var(--admin-border);
+  border-radius: 4px;
+  color: var(--admin-text);
+  min-height: 34px;
+  padding: 5px 7px;
+  width: 70px;
+}
+
+.admin-competition__entry-table td > input:disabled {
+  background: transparent;
+  border-color: transparent;
+  opacity: 1;
+}
+
+.admin-competition__rating-edit {
+  display: grid;
+  gap: 5px;
+  width: 112px;
+}
+
+.admin-competition__rating-edit input {
+  background: var(--admin-surface);
+  border: 1px solid var(--admin-border);
+  border-radius: 4px;
+  color: var(--admin-text);
+  min-height: 32px;
+  min-width: 0;
+  padding: 5px 7px;
+  width: 100%;
+}
+
+.admin-competition__entry-table td > small,
+.admin-competition__entry-table td > strong + small {
+  color: var(--admin-muted);
+  display: block;
+  font-size: 0.66rem;
+  line-height: 1.35;
+  margin-top: 4px;
+  max-width: 170px;
+}
+
+.admin-competition__entry-ready {
+  align-items: center;
+  color: #307947;
+  display: inline-flex;
+  font-size: 0.7rem;
+  font-weight: 750;
+  gap: 4px;
+}
+
+.admin-competition__entry-save {
+  align-items: center;
+  display: inline-flex;
+  height: 34px;
+  justify-content: center;
+  padding: 0;
+  width: 34px;
+}
+
+.admin-competition__form {
+  gap: 16px;
+  margin-top: 18px;
+}
+
+.admin-competition__form-columns {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 11px;
+}
+
+.admin-competition__form-intro {
+  display: grid;
+  gap: 3px;
+  padding: 0 1px;
+}
+
+.admin-competition__form-intro strong,
+.admin-competition__form-section-heading h3 {
+  margin: 0;
+  color: var(--admin-text);
+  font-family: "Sora", sans-serif;
+  font-size: 0.9rem;
+  letter-spacing: -0.02em;
+}
+
+.admin-competition__form-intro span,
+.admin-competition__form-section-heading p,
+.admin-competition__form-section-heading > span,
+.admin-competition__field-note,
+.admin-field small {
+  color: var(--admin-muted);
+  font-size: 0.72rem;
+  line-height: 1.45;
+}
+
+.admin-competition__form-section {
+  display: grid;
+  gap: 14px;
+  padding: 15px;
+  border: 1px solid var(--admin-line);
+  border-radius: 8px;
+  background: rgba(var(--racing-contrast-rgb), 0.025);
+}
+
+.admin-competition__form-section--primary {
+  border-color: color-mix(in srgb, var(--admin-accent) 38%, var(--admin-line));
+  background: linear-gradient(135deg, rgba(var(--racing-accent-rgb), 0.07), rgba(var(--racing-contrast-rgb), 0.02));
+}
+
+.admin-competition__form-section-heading {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.admin-competition__form-section-heading > div {
+  display: grid;
+  gap: 4px;
+}
+
+.admin-competition__form-section-heading p {
+  margin: 0;
+}
+
+.admin-competition__form-section-heading > span {
+  padding-top: 2px;
+  text-align: right;
+}
+
+.admin-competition__field--full,
+.admin-competition__form-section .admin-competition__image-field {
+  grid-column: 1 / -1;
+}
+
+.admin-competition__field-note {
+  display: grid;
+  align-content: end;
+  min-height: 44px;
+  padding: 0 2px 2px;
+}
+
+.admin-competition__form-disclosure {
+  overflow: hidden;
+  border: 1px solid var(--admin-line);
+  border-radius: 8px;
+  background: rgba(8, 14, 10, 0.3);
+}
+
+.admin-competition__form-disclosure summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 58px;
+  padding: 11px 15px;
+  color: var(--admin-text);
+  cursor: pointer;
+  list-style: none;
+  transition: background 160ms ease;
+}
+
+.admin-competition__form-disclosure summary::-webkit-details-marker {
+  display: none;
+}
+
+.admin-competition__form-disclosure summary::after {
+  width: 7px;
+  height: 7px;
+  margin-left: 14px;
+  border-right: 1px solid var(--admin-muted);
+  border-bottom: 1px solid var(--admin-muted);
+  content: "";
+  transform: rotate(45deg) translateY(-2px);
+  transition: transform 160ms ease;
+}
+
+.admin-competition__form-disclosure[open] summary::after {
+  transform: rotate(225deg) translate(-2px, -2px);
+}
+
+.admin-competition__form-disclosure summary:hover {
+  background: rgba(var(--racing-accent-rgb), 0.06);
+}
+
+.admin-competition__form-disclosure summary:focus-visible {
+  outline: 2px solid var(--admin-accent);
+  outline-offset: -2px;
+}
+
+.admin-competition__form-disclosure summary span {
+  display: grid;
+  gap: 3px;
+}
+
+.admin-competition__form-disclosure summary strong {
+  font-size: 0.8rem;
+}
+
+.admin-competition__form-disclosure summary small {
+  color: var(--admin-muted);
+  font-size: 0.7rem;
+}
+
+.admin-competition__form-disclosure-body {
+  padding: 0 15px 15px;
+  border-top: 1px solid var(--admin-line);
+}
+
+.admin-competition__form-disclosure-body .admin-competition__form-columns {
+  padding-top: 15px;
+}
+
+.admin-competition__form-actions {
+  align-items: center;
+  justify-content: flex-end;
+  margin-top: 2px;
+  padding-top: 4px;
+}
+
+.admin-competition__form-actions .admin-header__button {
+  min-width: 132px;
+}
+
+.admin-competition__form-actions .admin-header__button:active,
+.admin-competition__upload-button:active {
+  transform: translateY(1px);
+}
+
+.admin-competition__image-preview {
+  position: relative;
+  overflow: hidden;
+  min-height: 150px;
+  border: 1px solid var(--admin-border);
+  border-radius: 7px;
+  background: var(--racing-ink);
+}
+
+.admin-competition__image-preview img {
+  display: block;
+  width: 100%;
+  height: 190px;
+  object-fit: cover;
+}
+
+.admin-competition__image-preview span {
+  position: absolute;
+  left: 12px;
+  bottom: 12px;
+  padding: 5px 9px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 6px;
+  background: rgba(10, 15, 22, 0.74);
+  color: var(--racing-text);
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.admin-competition__spin {
+  animation: admin-competition-spin 800ms linear infinite;
+}
+
+@keyframes admin-competition-spin {
+  to { transform: rotate(360deg); }
+}
+
+.admin-competition__delete-dialog {
+  width: min(430px, 100%);
+  display: grid;
+  gap: 15px;
+}
+
+.admin-competition__delete-dialog > svg {
+  color: var(--racing-danger);
+}
+
+.admin-competition__delete-dialog h2,
+.admin-competition__delete-dialog p {
+  margin: 0;
+}
+
+.admin-competition__delete-dialog h2 {
+  margin-top: 5px;
+  color: var(--admin-text);
+  font-family: "Sora", sans-serif;
+  font-size: 1.25rem;
+}
+
+.admin-competition__delete-dialog > div > p:last-child {
+  margin-top: 8px;
+  color: var(--admin-muted);
+  font-size: 0.78rem;
+}
+
+/* Jockey and referee directories */
+.admin-registry-summary {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1fr;
+  border: 1px solid var(--admin-line);
+  border-radius: 6px;
+  background: rgba(var(--racing-contrast-rgb), 0.025);
+}
+
+.admin-registry-summary > div {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 78px;
+  padding: 13px 16px;
+  border-right: 1px solid var(--admin-line);
+}
+
+.admin-registry-summary > div:last-child {
+  border-right: 0;
+}
+
+.admin-registry-summary svg {
+  color: var(--admin-accent);
+}
+
+.admin-registry-summary span {
+  display: grid;
+  gap: 4px;
+}
+
+.admin-registry-summary strong {
+  color: var(--admin-text);
+  font-family: "Sora", sans-serif;
+  font-size: 1.4rem;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.admin-registry-summary small {
+  color: var(--admin-muted);
+  font-size: 0.69rem;
+}
+
+.admin-registry-workspace--detail {
+  display: grid;
+  grid-template-columns: minmax(0, 1.45fr) minmax(320px, 0.55fr);
+  gap: 12px;
+  align-items: start;
+}
+
+.admin-registry-ledger,
+.admin-registry-detail {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--admin-line);
+  border-radius: 6px;
+  background: rgba(var(--racing-contrast-rgb), 0.025);
+}
+
+.admin-registry-ledger > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  min-height: 62px;
+  padding: 11px 15px;
+  border-bottom: 1px solid var(--admin-line);
+}
+
+.admin-registry-ledger > header > div {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.admin-registry-ledger > header svg {
+  color: var(--admin-accent);
+}
+
+.admin-registry-ledger > header span {
+  display: grid;
+  gap: 3px;
+}
+
+.admin-registry-ledger > header strong {
+  color: var(--admin-text);
+  font-size: 0.82rem;
+}
+
+.admin-registry-ledger > header small,
+.admin-registry-ledger > header > span {
+  color: var(--admin-muted);
+  font-size: 0.68rem;
+}
+
+.admin-registry-ledger .admin-data-table__wrap {
+  border: 0;
+  border-radius: 0;
+}
+
+.admin-registry-ledger .admin-data-table th,
+.admin-registry-ledger .admin-data-table td {
+  padding: 12px 13px;
+  font-size: 0.78rem;
+}
+
+.admin-registry-detail {
+  position: sticky;
+  top: 20px;
+}
+
+.admin-registry-detail > header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 17px;
+  border-bottom: 1px solid var(--admin-line);
+  background: rgba(var(--racing-accent-rgb), 0.045);
+}
+
+.admin-registry-detail > header p,
+.admin-registry-detail > header h2,
+.admin-registry-detail > header span {
+  margin: 0;
+}
+
+.admin-registry-detail > header p {
+  margin-bottom: 5px;
+  color: var(--admin-accent);
+  font-size: 0.63rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.admin-registry-detail > header h2 {
+  margin-bottom: 5px;
+  color: var(--admin-text);
+  font-family: "Sora", sans-serif;
+  font-size: 1.1rem;
+  letter-spacing: -0.035em;
+}
+
+.admin-registry-detail > header span {
+  color: var(--admin-muted);
+  font-size: 0.7rem;
+}
+
+.admin-registry-detail > header button {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 1px solid var(--admin-line);
+  border-radius: 4px;
+  color: var(--admin-muted);
+}
+
+.admin-registry-detail > footer {
+  padding: 14px;
+}
+
+.admin-not-found {
+  min-height: 320px;
+  padding: clamp(24px, 5vw, 54px);
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 20px;
+  border: 1px solid var(--admin-line);
+  border-left: 3px solid var(--admin-accent-strong);
+  border-radius: 6px;
+  background: rgba(var(--racing-contrast-rgb), 0.025);
+}
+
+.admin-not-found > span {
+  display: grid;
+  width: 54px;
+  height: 54px;
+  place-items: center;
+  border: 1px solid var(--admin-line-strong);
+  border-radius: 6px;
+  color: var(--admin-accent);
+}
+
+.admin-not-found h2,
+.admin-not-found p {
+  margin: 0;
+}
+
+.admin-not-found h2 {
+  color: var(--admin-text);
+  font-family: "Sora", sans-serif;
+  font-size: 1.35rem;
+  letter-spacing: -0.04em;
+}
+
+.admin-not-found p {
+  margin-top: 6px;
+  color: var(--admin-muted);
+  font-size: 0.8rem;
+}
+
+@media (max-width: 1180px) {
+  .admin-incident-workspace {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-incident-detail {
+    position: static;
+  }
+
+  .admin-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-sidebar {
+    position: relative;
+    height: auto;
+    padding: 14px 20px;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    border-right: 0;
+    border-bottom: 1px solid var(--admin-line);
+    overflow: visible;
+  }
+
+  .admin-brand {
+    min-width: 196px;
+  }
+
+  .admin-system-state,
+  .admin-nav__label,
+  .admin-user-info {
+    display: none;
+  }
+
+  .admin-nav__group,
+  .admin-nav__links {
+    display: contents;
+  }
+
+  .admin-nav {
+    display: flex;
+    gap: 4px;
+    overflow-x: auto;
+  }
+
+  .admin-nav a {
+    flex: 0 0 auto;
+    min-height: 38px;
+  }
+
+  .admin-nav a.active::before {
+    top: auto;
+    right: 9px;
+    bottom: -14px;
+    left: 9px;
+    width: auto;
+    height: 2px;
+  }
+
+  .admin-user-row {
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+
+  .admin-user-avatar {
+    display: none;
+  }
+
+  .admin-dashboard-grid {
+    grid-template-columns: minmax(0, 1.35fr) minmax(280px, 0.65fr);
+  }
+
+  .admin-command-workspace--detail {
+    grid-template-columns: minmax(0, 1.2fr) minmax(310px, 0.8fr);
+  }
+}
+
+@media (max-width: 900px) {
+  .admin-sidebar {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+  }
+
+  .admin-brand__copy {
+    display: none;
+  }
+
+  .admin-brand {
+    min-width: auto;
+  }
+
+  .admin-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .admin-header__actions {
+    justify-content: flex-start;
+  }
+
+  .admin-command-strip {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .admin-command-strip > div:nth-child(2) {
+    border-right: 0;
+  }
+
+  .admin-command-strip > div:last-child {
+    grid-column: 1 / -1;
+    border-top: 1px solid var(--admin-line);
+  }
+
+  .admin-control-grid,
+  .admin-dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-dashboard-queue-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-dashboard-queue,
+  .admin-dashboard-queue:nth-child(2n),
+  .admin-dashboard-queue:nth-last-child(-n + 2) {
+    border-right: 0;
+    border-bottom: 1px solid var(--admin-line);
+  }
+
+  .admin-dashboard-queue:last-child {
+    border-bottom: 0;
+  }
+
+  .admin-command-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .admin-dashboard-domain-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .admin-dashboard-domain-grid article,
+  .admin-dashboard-domain-grid article:nth-child(4n),
+  .admin-dashboard-domain-grid article:nth-last-child(-n + 4) {
+    border-right: 1px solid var(--admin-line);
+    border-bottom: 1px solid var(--admin-line);
+  }
+
+  .admin-dashboard-domain-grid article:nth-child(2n) {
+    border-right: 0;
+  }
+
+  .admin-dashboard-domain-grid article:nth-last-child(-n + 2) {
+    border-bottom: 0;
+  }
+
+  .admin-command-metrics article:nth-child(2) {
+    border-right: 0;
+  }
+
+  .admin-command-metrics article:nth-child(-n + 2) {
+    border-bottom: 1px solid var(--admin-line);
+  }
+
+  .admin-command-toolbar {
+    align-items: stretch;
+    flex-wrap: wrap;
+  }
+
+  .admin-command-toolbar > label {
+    flex-basis: 100%;
+  }
+
+  .admin-command-filters {
+    flex: 1 1 auto;
+  }
+
+  .admin-command-workspace--detail {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-command-detail {
+    position: static;
+    grid-row: 1;
+  }
+
+  .admin-command-modal .admin-command-detail {
+    position: relative;
+    grid-row: auto;
+  }
+
+  .admin-actions-panel .admin-toolbar {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-competition__section-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .admin-competition__round-controls {
+    width: 100%;
+  }
+
+  .admin-competition__round-controls .admin-field {
+    flex: 1;
+  }
+
+  .admin-competition__betting-panel .admin-competition__section-header,
+  .admin-competition__betting-controls {
+    align-items: stretch;
+    grid-template-columns: 1fr;
+  }
+
+  .admin-competition__betting-status {
+    justify-items: start;
+    min-width: 0;
+    text-align: left;
+  }
+
+  .admin-competition__betting-settings {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .admin-competition__race-context {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .admin-competition__betting-actions {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .admin-competition__betting-actions button {
+    justify-content: center;
+  }
+
+  .admin-registry-workspace--detail {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-rewards-workspace,
+  .admin-deposit-workspace {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-rewards-editor,
+  .admin-deposit-editor {
+    position: static;
+  }
+
+  .admin-rewards-toolbar {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .admin-registry-detail {
+    position: static;
+    grid-row: 1;
+  }
+
+  .admin-control-card {
+    min-height: 250px;
+  }
+}
+
+@media (max-width: 680px) {
+  .admin-sidebar {
+    padding: 12px 16px;
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .admin-nav {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    margin: 1px -16px -12px;
+    padding: 0 16px 11px;
+    display: flex;
+    gap: 4px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .admin-nav::-webkit-scrollbar {
+    display: none;
+  }
+
+  .admin-nav__group {
+    display: contents;
+  }
+
+  .admin-nav__links {
+    display: contents;
+  }
+
+  .admin-nav a.active::before {
+    bottom: -11px;
+  }
+
+  .admin-nav a span {
+    white-space: nowrap;
+  }
+
+  .admin-user-row {
+    justify-self: end;
+  }
+
+  .admin-content {
+    padding: 22px 16px 46px;
+    gap: 18px;
+  }
+
+  .admin-header {
+    padding-bottom: 16px;
+  }
+
+  .admin-header h1 {
+    font-size: clamp(1.7rem, 10vw, 2.55rem);
+  }
+
+  .admin-header__actions,
+  .admin-header__actions > * {
+    width: 100%;
+  }
+
+  .admin-command-strip {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-command-strip > div,
+  .admin-command-strip > div:nth-child(2) {
+    border-right: 0;
+    border-bottom: 1px solid var(--admin-line);
+  }
+
+  .admin-command-strip > div:last-child {
+    grid-column: auto;
+    border-top: 0;
+    border-bottom: 0;
+  }
+
+  .admin-section-heading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 7px;
+  }
+
+  .admin-section-heading > span {
+    text-align: left;
+  }
+
+  .admin-control-card {
+    min-height: 268px;
+  }
+
+  .admin-module-row {
+    grid-template-columns: 36px minmax(0, 1fr) auto;
+    padding-inline: 12px;
+  }
+
+  .admin-module-row__state {
+    display: none;
+  }
+
+  .admin-command-metrics {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-dashboard-domain-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-dashboard-domain-grid article,
+  .admin-dashboard-domain-grid article:nth-child(2n),
+  .admin-dashboard-domain-grid article:nth-child(4n),
+  .admin-dashboard-domain-grid article:nth-last-child(-n + 4),
+  .admin-dashboard-domain-grid article:nth-last-child(-n + 2) {
+    border-right: 0;
+    border-bottom: 1px solid var(--admin-line);
+  }
+
+  .admin-dashboard-domain-grid article:last-child {
+    border-bottom: 0;
+  }
+
+  .admin-command-metrics article,
+  .admin-command-metrics article:nth-child(2) {
+    min-height: 68px;
+    border-right: 0;
+    border-bottom: 1px solid var(--admin-line);
+  }
+
+  .admin-command-metrics article:last-child {
+    border-bottom: 0;
+  }
+
+  .admin-command-ledger > header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .admin-command-pagination {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .admin-command-pagination > div {
+    max-width: 100%;
+    overflow-x: auto;
+  }
+
+  .admin-command-modal {
+    padding: 12px;
+    align-items: stretch;
+  }
+
+  .admin-command-modal .admin-command-detail {
+    width: 100%;
+    max-height: calc(100vh - 24px);
+  }
+
+  .admin-command-detail__fields {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-command-detail__fields > div,
+  .admin-command-detail__fields > div:nth-child(2n) {
+    border-right: 0;
+  }
+
+  .admin-incident-facts {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-incident-facts > div,
+  .admin-incident-facts > div:nth-child(2n),
+  .admin-incident-facts > div:nth-last-child(-n + 2) {
+    border-right: 0;
+    border-bottom: 1px solid var(--admin-line);
+  }
+
+  .admin-incident-facts > div:last-child {
+    border-bottom: 0;
+  }
+
+  .admin-metrics.admin-metrics--module {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-metrics--module .admin-metric-card,
+  .admin-metrics--module .admin-metric-card:last-child {
+    min-height: 70px;
+    border-right: 0;
+    border-bottom: 1px solid var(--admin-line);
+  }
+
+  .admin-metrics--module .admin-metric-card:last-child {
+    border-bottom: 0;
+  }
+
+  .admin-competition__flow {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-competition__flow i {
+    width: 1px;
+    height: 18px;
+    margin-left: 27px;
+  }
+
+  .admin-competition__flow i::after {
+    top: auto;
+    right: -3px;
+    bottom: 0;
+    transform: rotate(135deg);
+  }
+
+  .admin-competition__ledger-heading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 7px;
+  }
+
+  .admin-competition__round-controls {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .admin-competition__round-controls .admin-field {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .admin-competition__round-controls .admin-header__button {
+    width: 100%;
+  }
+
+  .admin-competition__betting-panel .admin-competition__section-header,
+  .admin-competition__betting-controls {
+    align-items: stretch;
+    grid-template-columns: 1fr;
+  }
+
+  .admin-competition__betting-status {
+    justify-items: start;
+    min-width: 0;
+    text-align: left;
+  }
+
+  .admin-competition__betting-settings {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .admin-competition__race-context {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-competition__betting-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-competition__betting-actions button {
+    justify-content: center;
+  }
+
+  .admin-competition__betting-settings {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-competition__form-columns {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-competition__entry-header,
+  .admin-competition__entry-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .admin-competition__entry-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-competition__row-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .admin-registry-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-rewards-toolbar,
+  .admin-rewards-toolbar--compact,
+  .admin-rewards-editor__split {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-rewards-toolbar .admin-header__button {
+    width: 100%;
+  }
+
+  .admin-registry-summary > div,
+  .admin-registry-summary > div:last-child {
+    min-height: 66px;
+    border-right: 0;
+    border-bottom: 1px solid var(--admin-line);
+  }
+
+  .admin-registry-summary > div:last-child {
+    border-bottom: 0;
+  }
+
+  .admin-registry-ledger > header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .admin-not-found {
+    grid-template-columns: 1fr;
+    align-items: start;
+    min-height: 280px;
+  }
+
+  .admin-not-found .admin-header__button {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .admin-page *,
+  .admin-page *::before,
+  .admin-page *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+.admin-competition__image-field {
+  min-width: 0;
+}
+
+.admin-competition__image-picker {
+  display: grid;
+  grid-template-columns: 78px minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+  min-height: 96px;
+  padding: 9px;
+  border: 1px dashed color-mix(in srgb, var(--admin-line-strong) 78%, var(--admin-accent));
+  border-radius: 8px;
+  background: rgba(8, 14, 10, 0.52);
+}
+
+.admin-competition__image-thumb {
+  display: grid;
+  aspect-ratio: 1 / 1;
+  place-items: center;
+  overflow: hidden;
+  border: 1px solid rgba(var(--racing-accent-rgb), 0.24);
+  border-radius: 6px;
+  background: rgba(4, 9, 6, 0.74);
+  color: var(--admin-accent);
+}
+
+.admin-competition__image-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.admin-competition__image-picker > div:last-child {
+  display: grid;
+  min-width: 0;
+  gap: 6px;
+  justify-items: start;
+}
+
+.admin-competition__upload-button {
+  position: relative;
+  min-height: 32px;
+  cursor: pointer;
+  transition: border-color 160ms ease, color 160ms ease, transform 160ms ease;
+}
+
+.admin-competition__upload-button:hover,
+.admin-competition__upload-button:focus-within {
+  border-color: var(--admin-accent);
+  color: var(--admin-accent-soft);
+}
+
+.admin-competition__upload-button input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.admin-competition__image-picker small {
+  max-width: 100%;
+  overflow: hidden;
+  color: var(--admin-muted);
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin-competition__image-reset {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--admin-accent-soft);
+  font: inherit;
+  font-size: 0.68rem;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.admin-competition__image-error {
+  color: #ffaaa0 !important;
+}
+
+@media (max-width: 620px) {
+  .admin-competition__modal {
+    width: 100%;
+    max-height: calc(100dvh - 24px);
+    padding: 16px;
+  }
+
+  .admin-competition__form-section,
+  .admin-competition__form-disclosure-body {
+    padding-inline: 12px;
+  }
+
+  .admin-competition__form-section-heading {
+    display: grid;
+    gap: 5px;
+  }
+
+  .admin-competition__form-section-heading > span {
+    text-align: left;
+  }
+
+  .admin-competition__field-note {
+    min-height: 0;
+    padding: 0;
+  }
+
+  .admin-competition__form-actions .admin-header__button {
+    flex: 1;
+    min-width: 0;
+  }
+}
+
+/* Live admin business intelligence dashboard */
+.admin-analytics-range { position: relative; display: inline-flex; align-items: center; gap: 10px; color: var(--admin-muted); font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: .1em; }
+.admin-analytics-range__label { padding-top: 1px; }
+.admin-analytics-picker { position: relative; min-width: 188px; }
+.admin-analytics-picker__trigger { width: 100%; min-height: 48px; display: flex; align-items: center; gap: 9px; padding: 7px 11px; border: 1px solid var(--admin-line); border-radius: 9px; background: linear-gradient(135deg, color-mix(in srgb, var(--admin-surface-raised) 92%, var(--admin-accent)), var(--admin-surface)); color: var(--admin-text); text-align: left; cursor: pointer; transition: border-color .18s ease, background .18s ease, box-shadow .18s ease, transform .18s ease; }
+.admin-analytics-picker__trigger:hover, .admin-analytics-range.is-open .admin-analytics-picker__trigger { border-color: var(--admin-accent); background: var(--admin-surface-raised); box-shadow: 0 0 0 3px color-mix(in srgb, var(--admin-accent) 13%, transparent); }
+.admin-analytics-picker__trigger:active { transform: translateY(1px); }
+.admin-analytics-picker__trigger > svg { margin-left: auto; color: var(--admin-muted); transition: transform .18s ease; }
+.admin-analytics-range.is-open .admin-analytics-picker__trigger > svg { transform: rotate(180deg); color: var(--admin-accent); }
+.admin-analytics-picker__indicator { width: 28px; height: 28px; display: grid; place-items: center; flex: 0 0 auto; border: 1px solid color-mix(in srgb, var(--admin-accent) 55%, var(--admin-line)); border-radius: 7px; color: var(--admin-accent); background: color-mix(in srgb, var(--admin-accent) 10%, transparent); }
+.admin-analytics-picker__value, .admin-analytics-picker__option span { display: grid; gap: 2px; min-width: 0; }
+.admin-analytics-picker__value strong, .admin-analytics-picker__option strong { color: var(--admin-text); font-size: 12px; line-height: 1.15; letter-spacing: -.01em; text-transform: none; }
+.admin-analytics-picker__value small, .admin-analytics-picker__option small { color: var(--admin-muted); font-size: 10px; font-weight: 600; line-height: 1.15; letter-spacing: 0; text-transform: none; }
+.admin-analytics-picker__menu { position: absolute; z-index: 20; top: calc(100% + 8px); right: 0; width: 232px; padding: 7px; border: 1px solid color-mix(in srgb, var(--admin-accent) 42%, var(--admin-line)); border-radius: 11px; background: var(--admin-surface-raised); box-shadow: 0 16px 35px rgb(0 0 0 / 30%), 0 0 0 1px rgb(255 255 255 / 3%); animation: admin-period-menu-in .16s ease-out both; }
+.admin-analytics-picker__menu-heading { padding: 5px 9px 7px; color: var(--admin-muted); font-size: 9px; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; }
+.admin-analytics-picker__option { width: 100%; display: flex; align-items: center; gap: 10px; padding: 10px 9px; border: 0; border-radius: 7px; background: transparent; color: var(--admin-text); text-align: left; cursor: pointer; }
+.admin-analytics-picker__option:hover, .admin-analytics-picker__option:focus-visible { outline: 0; background: color-mix(in srgb, var(--admin-accent) 12%, var(--admin-surface-raised)); }
+.admin-analytics-picker__option.is-selected { background: color-mix(in srgb, var(--admin-accent) 10%, var(--admin-surface-raised)); }
+.admin-analytics-picker__option > svg { margin-left: auto; color: var(--admin-accent); }
+@keyframes admin-period-menu-in { from { opacity: 0; transform: translateY(-5px) scale(.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+.admin-analytics-metrics { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); border: 1px solid var(--admin-line); background: var(--admin-panel); }
+.admin-analytics-metric { min-height: 153px; padding: 20px; position: relative; border-right: 1px solid var(--admin-line); display: grid; align-content: start; gap: 6px; }
+.admin-analytics-metric:last-child { border-right: 0; }
+.admin-analytics-metric__icon { color: var(--admin-accent); display: inline-flex; margin-bottom: 6px; }
+.admin-analytics-metric--money .admin-analytics-metric__icon { color: #67d49f; }
+.admin-analytics-metric__label, .admin-analytics-metric small { color: var(--admin-muted); font-size: 12px; }
+.admin-analytics-metric strong { font-size: clamp(24px, 2.25vw, 34px); letter-spacing: -.06em; line-height: 1.05; }
+.admin-analytics-metric small { display: inline-flex; align-items: center; gap: 4px; color: #67d49f; font-weight: 700; }
+.admin-analytics-metric small.is-down { color: #ed7770; }
+.admin-analytics-layout { display: grid; grid-template-columns: minmax(0, 1.8fr) minmax(280px, .85fr); gap: 12px; margin-top: 12px; }
+.admin-analytics-charts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.admin-analytics-chart, .admin-analytics-alerts, .admin-analytics-table, .admin-analytics-status { border: 1px solid var(--admin-line); background: var(--admin-panel); }
+.admin-analytics-chart header, .admin-analytics-alerts header, .admin-analytics-table header, .admin-analytics-status header { display: flex; justify-content: space-between; gap: 12px; align-items: start; padding: 18px 18px 0; }
+.admin-analytics-chart p, .admin-analytics-alerts p, .admin-analytics-table p, .admin-analytics-status p { margin: 0 0 4px; color: var(--admin-accent); font-size: 11px; font-weight: 900; letter-spacing: .1em; text-transform: uppercase; }
+.admin-analytics-chart h2, .admin-analytics-alerts h2, .admin-analytics-table h2, .admin-analytics-status h2 { margin: 0; font-size: 19px; letter-spacing: -.035em; }
+.admin-analytics-chart header > strong { color: var(--admin-text); font-size: 13px; }
+.admin-analytics-chart__plot { position: relative; height: 258px; margin: 14px 8px 0; border-radius: 7px; cursor: crosshair; outline: none; }
+.admin-analytics-chart__plot:focus-visible { box-shadow: 0 0 0 2px color-mix(in srgb, var(--admin-accent) 68%, transparent); }
+.admin-analytics-chart svg { width: 100%; height: 100%; overflow: visible; }
+.admin-analytics-chart__grid line { stroke: color-mix(in srgb, var(--admin-line) 88%, transparent); stroke-width: 1; vector-effect: non-scaling-stroke; }
+.admin-analytics-chart__grid-line--vertical { stroke-dasharray: 2 4; opacity: .7; }
+.admin-analytics-chart__grid text { fill: var(--admin-muted); font-size: 10px; font-weight: 700; }
+.admin-analytics-chart__axis { stroke: color-mix(in srgb, var(--admin-muted) 58%, var(--admin-line)); stroke-width: 1; vector-effect: non-scaling-stroke; }
+.admin-analytics-chart__axis-title { fill: color-mix(in srgb, var(--admin-muted) 90%, var(--admin-text)); font-size: 10px; font-weight: 900; letter-spacing: .06em; text-transform: uppercase; }
+.admin-analytics-chart__area { fill: color-mix(in srgb, var(--chart-color) 14%, transparent); stroke: none; }
+.admin-analytics-chart__line { fill: none; stroke: var(--chart-color); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; filter: drop-shadow(0 2px 3px color-mix(in srgb, var(--chart-color) 24%, transparent)); }
+.admin-analytics-chart__point { fill: var(--admin-panel); stroke: var(--chart-color); stroke-width: 2; vector-effect: non-scaling-stroke; transition: r .16s ease, fill .16s ease; }
+.admin-analytics-chart__point.is-active { fill: var(--chart-color); stroke: var(--admin-panel); stroke-width: 2.5; }
+.admin-analytics-chart__cursor { stroke: color-mix(in srgb, var(--chart-color) 70%, white); stroke-width: 1; stroke-dasharray: 4 4; vector-effect: non-scaling-stroke; }
+.admin-analytics-chart__tooltip { position: absolute; z-index: 2; top: 8px; min-width: 116px; padding: 8px 10px; border: 1px solid color-mix(in srgb, var(--admin-line) 35%, var(--admin-text)); border-radius: 7px; background: color-mix(in srgb, var(--admin-surface-raised) 94%, black); box-shadow: 0 10px 22px rgb(0 0 0 / 26%); pointer-events: none; transform: translateX(-50%); }
+.admin-analytics-chart__tooltip.is-left { transform: translateX(0); }
+.admin-analytics-chart__tooltip.is-right { transform: translateX(-100%); }
+.admin-analytics-chart__tooltip span, .admin-analytics-chart__tooltip strong, .admin-analytics-chart__tooltip small { display: block; }
+.admin-analytics-chart__tooltip span { color: var(--admin-muted); font-size: 10px; font-weight: 700; }
+.admin-analytics-chart__tooltip strong { margin-top: 2px; color: var(--admin-text); font-size: 13px; letter-spacing: -.02em; }
+.admin-analytics-chart__tooltip small { margin-top: 1px; color: var(--admin-accent); font-size: 10px; font-weight: 800; }
+.admin-analytics-chart__legend { display: flex; justify-content: space-between; gap: 10px; padding: 0 18px 16px; color: var(--admin-muted); font-size: 10px; font-weight: 700; }
+.admin-analytics-chart__legend span { display: inline-flex; align-items: center; gap: 6px; }
+.admin-analytics-chart__legend i { width: 16px; height: 3px; border-radius: 999px; background: var(--chart-color); box-shadow: 0 0 7px color-mix(in srgb, var(--chart-color) 50%, transparent); }
+.admin-analytics-alerts { display: flex; flex-direction: column; }
+.admin-analytics-alerts > a { min-height: 69px; padding: 13px 16px; border-top: 1px solid var(--admin-line); display: grid; grid-template-columns: 38px minmax(0, 1fr) auto; align-items: center; gap: 10px; color: inherit; text-decoration: none; }
+.admin-analytics-alerts > a:first-of-type { margin-top: 16px; }
+.admin-analytics-alerts > a:hover { background: var(--admin-panel-strong); }
+.admin-analytics-alerts > a > span { width: 32px; height: 32px; display: grid; place-items: center; border-radius: 50%; border: 1px solid #376048; color: #67d49f; font-size: 12px; font-weight: 900; }
+.admin-analytics-alerts > a > span.is-alert { border-color: color-mix(in srgb, var(--admin-accent) 60%, var(--admin-line)); color: var(--admin-accent); }
+.admin-analytics-alerts strong, .admin-analytics-alerts small { display: block; }
+.admin-analytics-alerts small { margin-top: 3px; color: var(--admin-muted); font-size: 11px; }
+.admin-analytics-bottom { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(280px, .8fr); gap: 12px; margin-top: 12px; }
+.admin-analytics-table header a { display: inline-flex; align-items: center; gap: 5px; color: var(--admin-accent); font-size: 12px; font-weight: 800; text-decoration: none; }
+.admin-analytics-table__row { display: grid; grid-template-columns: minmax(0, 1fr) 120px 110px; align-items: center; gap: 12px; min-height: 62px; padding: 10px 18px; border-top: 1px solid var(--admin-line); }
+.admin-analytics-table__row:first-of-type { margin-top: 16px; }
+.admin-analytics-table__row strong, .admin-analytics-table__row small { display: block; }
+.admin-analytics-table__row small { color: var(--admin-muted); font-size: 11px; margin-top: 4px; text-transform: capitalize; }
+.admin-analytics-table__row > span { color: var(--admin-text); font-size: 12px; font-weight: 800; text-align: right; }
+.admin-analytics-table__row > em { color: #67d49f; font-size: 12px; font-style: normal; font-weight: 800; text-align: right; }
+.admin-analytics-status > div { padding: 13px 18px; border-top: 1px solid var(--admin-line); }
+.admin-analytics-status > div:first-of-type { margin-top: 16px; }
+.admin-analytics-status span { display: flex; justify-content: space-between; gap: 10px; text-transform: capitalize; }
+.admin-analytics-status small { color: var(--admin-muted); font-size: 11px; }
+.admin-analytics-status i { display: block; height: 4px; margin-top: 9px; background: var(--admin-line); overflow: hidden; }
+.admin-analytics-status b { display: block; height: 100%; background: var(--admin-accent); }
+@media (max-width: 1180px) { .admin-analytics-metrics { grid-template-columns: repeat(3, 1fr); } .admin-analytics-metric:nth-child(3) { border-right: 0; } .admin-analytics-metric:nth-child(-n + 3) { border-bottom: 1px solid var(--admin-line); } .admin-analytics-layout, .admin-analytics-bottom { grid-template-columns: 1fr; } }
+@media (max-width: 760px) { .admin-analytics-metrics, .admin-analytics-charts { grid-template-columns: 1fr; } .admin-analytics-metric, .admin-analytics-metric:nth-child(3) { min-height: 118px; border-right: 0; border-bottom: 1px solid var(--admin-line); } .admin-analytics-metric:last-child { border-bottom: 0; } .admin-analytics-chart__plot { height: 246px; margin-inline: 4px; } .admin-analytics-chart__legend { padding-inline: 15px; } .admin-analytics-chart__legend span:last-child { display: none; } .admin-analytics-table__row { grid-template-columns: minmax(0, 1fr) auto; } .admin-analytics-table__row > em { display: none; } .admin-analytics-range { width: 100%; justify-content: space-between; } .admin-analytics-picker { flex: 1; min-width: 0; } .admin-analytics-picker__menu { width: 100%; } }
+.admin-incident-penalty-review {
+  display: grid;
+  gap: 14px;
+  margin-top: 12px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+/* Registration cancellation review */
+.admin-cancellation-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border: 1px solid var(--admin-line);
+  border-radius: 5px;
+  background: var(--admin-surface-soft);
+}
+
+.admin-cancellation-metrics article {
+  min-width: 0;
+  min-height: 88px;
+  padding: 17px 18px;
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  border-right: 1px solid var(--admin-line);
+}
+
+.admin-cancellation-metrics article:last-child {
+  border-right: 0;
+}
+
+.admin-cancellation-metrics__icon {
+  width: 38px;
+  height: 38px;
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 1px solid color-mix(in srgb, var(--admin-accent) 48%, var(--admin-line));
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--admin-accent) 8%, transparent);
+  color: var(--admin-accent);
+}
+
+.admin-cancellation-metrics article > div {
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+
+.admin-cancellation-metrics small {
+  color: var(--admin-muted);
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.admin-cancellation-metrics strong {
+  color: var(--admin-text);
+  font-family: "Sora", sans-serif;
+  font-size: 1.45rem;
+  line-height: 1;
+}
+
+.admin-cancellation-workspace {
+  min-height: 650px;
+  display: grid;
+  grid-template-columns: minmax(320px, 0.72fr) minmax(0, 1fr);
+  overflow: hidden;
+  border: 1px solid var(--admin-line);
+  border-radius: 6px;
+  background: rgba(8, 14, 10, 0.34);
+}
+
+.admin-cancellation-queue {
+  min-width: 0;
+  display: grid;
+  grid-template-rows: auto auto auto minmax(0, 1fr);
+  align-content: start;
+  border-right: 1px solid var(--admin-line);
+  background: rgba(var(--racing-contrast-rgb), 0.018);
+}
+
+.admin-cancellation-queue > header {
+  padding: 18px;
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.admin-cancellation-queue h2,
+.admin-cancellation-detail h2,
+.admin-cancellation-progress h3,
+.admin-cancellation-record h3 {
+  margin: 3px 0 0;
+  color: var(--admin-text);
+  font-family: "Sora", sans-serif;
+  letter-spacing: 0;
+}
+
+.admin-cancellation-queue h2 {
+  font-size: 1.08rem;
+}
+
+.admin-cancellation-queue > header > span {
+  color: var(--admin-muted);
+  font-size: 0.7rem;
+  font-weight: 750;
+  white-space: nowrap;
+}
+
+.admin-cancellation-tabs {
+  padding: 0 18px 14px;
+  display: flex;
+  gap: 2px;
+  overflow-x: auto;
+  border-bottom: 1px solid var(--admin-line);
+}
+
+.admin-cancellation-tabs button {
+  min-height: 32px;
+  padding: 0 9px;
+  flex: 0 0 auto;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: var(--admin-muted);
+  font-size: 0.69rem;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.admin-cancellation-tabs button:hover,
+.admin-cancellation-tabs button.is-active {
+  color: var(--admin-text);
+}
+
+.admin-cancellation-tabs button.is-active {
+  border-bottom-color: var(--admin-accent);
+}
+
+.admin-cancellation-search {
+  min-height: 44px;
+  margin: 12px 14px;
+  padding: 0 11px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--admin-line);
+  border-radius: 4px;
+  background: rgba(7, 12, 9, 0.45);
+  color: var(--admin-muted);
+}
+
+.admin-cancellation-search:focus-within {
+  border-color: var(--admin-accent);
+  color: var(--admin-accent);
+}
+
+.admin-cancellation-search input {
+  width: 100%;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--admin-text);
+  font: inherit;
+  font-size: 0.78rem;
+}
+
+.admin-cancellation-search input::placeholder {
+  color: var(--admin-muted);
+}
+
+.admin-cancellation-list {
+  min-height: 0;
+  max-height: 650px;
+  overflow-y: auto;
+  border-top: 1px solid var(--admin-line);
+}
+
+.admin-cancellation-row {
+  width: 100%;
+  min-height: 128px;
+  padding: 14px 16px 13px 18px;
+  display: grid;
+  align-content: center;
+  gap: 6px;
+  border: 0;
+  border-bottom: 1px solid var(--admin-line);
+  border-left: 3px solid transparent;
+  background: transparent;
+  color: var(--admin-copy);
+  text-align: left;
+  cursor: pointer;
+  transition: background 160ms ease, border-color 160ms ease;
+}
+
+.admin-cancellation-row:hover {
+  background: rgba(var(--racing-contrast-rgb), 0.035);
+}
+
+.admin-cancellation-row.is-selected {
+  border-left-color: var(--admin-accent);
+  background: color-mix(in srgb, var(--admin-accent) 8%, transparent);
+}
+
+.admin-cancellation-row__top,
+.admin-cancellation-row__bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.admin-cancellation-row__top strong {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--admin-text);
+  font-size: 0.86rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin-cancellation-row__owner {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--admin-copy);
+  font-size: 0.74rem;
+}
+
+.admin-cancellation-row__race {
+  overflow: hidden;
+  color: var(--admin-muted);
+  font-size: 0.72rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin-cancellation-row__bottom {
+  margin-top: 3px;
+  color: var(--admin-muted);
+}
+
+.admin-cancellation-row__bottom small {
+  font-size: 0.67rem;
+}
+
+.admin-cancellation-status {
+  min-height: 23px;
+  padding: 3px 7px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  border: 1px solid var(--admin-line);
+  border-radius: 3px;
+  color: var(--admin-muted);
+  font-size: 0.63rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.admin-cancellation-status.is-green {
+  border-color: rgba(102, 189, 124, 0.36);
+  background: rgba(102, 189, 124, 0.09);
+  color: var(--racing-success-soft);
+}
+
+.admin-cancellation-status.is-amber {
+  border-color: rgba(224, 165, 94, 0.4);
+  background: rgba(224, 165, 94, 0.09);
+  color: var(--racing-accent-soft);
+}
+
+.admin-cancellation-status.is-red {
+  border-color: rgba(218, 104, 94, 0.4);
+  background: rgba(218, 104, 94, 0.09);
+  color: var(--racing-danger-soft);
+}
+
+.admin-cancellation-detail {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  background: rgba(var(--racing-contrast-rgb), 0.012);
+}
+
+.admin-cancellation-detail__header {
+  min-height: 98px;
+  padding: 19px 22px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  border-bottom: 1px solid var(--admin-line);
+}
+
+.admin-cancellation-detail__header h2 {
+  font-size: 1.38rem;
+}
+
+.admin-cancellation-detail__header div > span {
+  display: block;
+  margin-top: 5px;
+  color: var(--admin-muted);
+  font-size: 0.76rem;
+}
+
+.admin-cancellation-detail__body {
+  padding: 22px;
+  display: grid;
+  gap: 22px;
+}
+
+.admin-cancellation-reason {
+  padding: 15px 16px;
+  border-left: 3px solid var(--admin-accent);
+  background: color-mix(in srgb, var(--admin-accent) 7%, transparent);
+}
+
+.admin-cancellation-reason span,
+.admin-cancellation-record p span {
+  display: block;
+  margin-bottom: 5px;
+  color: var(--admin-accent);
+  font-size: 0.66rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.admin-cancellation-reason p {
+  margin: 0;
+  color: var(--admin-text);
+  font-size: 0.84rem;
+  line-height: 1.55;
+}
+
+.admin-cancellation-facts {
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  border: 1px solid var(--admin-line);
+}
+
+.admin-cancellation-facts > div {
+  min-width: 0;
+  min-height: 94px;
+  padding: 14px 15px;
+  border-right: 1px solid var(--admin-line);
+  border-bottom: 1px solid var(--admin-line);
+}
+
+.admin-cancellation-facts > div:nth-child(2n) {
+  border-right: 0;
+}
+
+.admin-cancellation-facts > div:nth-last-child(-n + 2) {
+  border-bottom: 0;
+}
+
+.admin-cancellation-facts dt {
+  color: var(--admin-muted);
+  font-size: 0.66rem;
+  font-weight: 750;
+  text-transform: uppercase;
+}
+
+.admin-cancellation-facts dd {
+  margin: 7px 0 3px;
+  overflow-wrap: anywhere;
+  color: var(--admin-text);
+  font-size: 0.84rem;
+  font-weight: 750;
+}
+
+.admin-cancellation-facts small {
+  color: var(--admin-muted);
+  font-size: 0.68rem;
+}
+
+.admin-cancellation-progress,
+.admin-cancellation-record {
+  display: grid;
+  gap: 0;
+}
+
+.admin-cancellation-progress h3,
+.admin-cancellation-record h3 {
+  margin-bottom: 12px;
+  font-size: 0.86rem;
+}
+
+.admin-cancellation-progress__item {
+  position: relative;
+  min-height: 54px;
+  padding: 0 0 11px 38px;
+  display: flex;
+  align-items: flex-start;
+}
+
+.admin-cancellation-progress__item:not(:last-child)::before {
+  position: absolute;
+  top: 27px;
+  bottom: -1px;
+  left: 13px;
+  width: 1px;
+  background: var(--admin-line);
+  content: "";
+}
+
+.admin-cancellation-progress__item > span {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 27px;
+  height: 27px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--admin-line);
+  border-radius: 50%;
+  background: var(--admin-surface);
+  color: var(--admin-muted);
+  font-size: 0.68rem;
+  font-weight: 800;
+}
+
+.admin-cancellation-progress__item.is-current > span {
+  border-color: var(--admin-accent);
+  color: var(--admin-accent);
+}
+
+.admin-cancellation-progress__item.is-complete > span {
+  border-color: rgba(102, 189, 124, 0.5);
+  background: rgba(102, 189, 124, 0.12);
+  color: var(--racing-success-soft);
+}
+
+.admin-cancellation-progress__item strong,
+.admin-cancellation-progress__item small {
+  display: block;
+}
+
+.admin-cancellation-progress__item strong {
+  color: var(--admin-text);
+  font-size: 0.76rem;
+}
+
+.admin-cancellation-progress__item small {
+  margin-top: 4px;
+  color: var(--admin-muted);
+  font-size: 0.68rem;
+}
+
+.admin-cancellation-record {
+  padding-top: 2px;
+  border-top: 1px solid var(--admin-line);
+}
+
+.admin-cancellation-record h3 {
+  margin-top: 15px;
+}
+
+.admin-cancellation-record p {
+  margin: 0;
+  padding: 10px 0;
+  border-top: 1px solid var(--admin-line);
+  color: var(--admin-copy);
+  font-size: 0.76rem;
+  line-height: 1.45;
+}
+
+.admin-cancellation-record p span {
+  margin-bottom: 3px;
+  color: var(--admin-muted);
+}
+
+.admin-cancellation-actions {
+  margin-top: auto;
+  padding: 18px 22px;
+  display: grid;
+  gap: 12px;
+  border-top: 1px solid var(--admin-line);
+  background: rgba(6, 11, 8, 0.48);
+}
+
+.admin-cancellation-actions .admin-field textarea {
+  min-height: 72px;
+}
+
+.admin-cancellation-actions > div:last-child {
+  display: flex;
+  justify-content: flex-end;
+  gap: 9px;
+}
+
+.admin-cancellation-actions--refund .admin-header__button {
+  justify-self: end;
+}
+
+.admin-cancellation-refund-heading,
+.admin-cancellation-actions--waiting,
+.admin-cancellation-actions--complete,
+.admin-cancellation-actions--closed {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+
+.admin-cancellation-refund-heading > svg,
+.admin-cancellation-actions--waiting > svg,
+.admin-cancellation-actions--complete > svg,
+.admin-cancellation-actions--closed > svg {
+  flex: 0 0 auto;
+  color: var(--admin-accent);
+}
+
+.admin-cancellation-actions--complete > svg {
+  color: var(--racing-success-soft);
+}
+
+.admin-cancellation-refund-heading strong,
+.admin-cancellation-refund-heading span,
+.admin-cancellation-actions--waiting strong,
+.admin-cancellation-actions--waiting span,
+.admin-cancellation-actions--complete strong,
+.admin-cancellation-actions--complete span,
+.admin-cancellation-actions--closed strong,
+.admin-cancellation-actions--closed span {
+  display: block;
+}
+
+.admin-cancellation-refund-heading strong,
+.admin-cancellation-actions--waiting strong,
+.admin-cancellation-actions--complete strong,
+.admin-cancellation-actions--closed strong {
+  color: var(--admin-text);
+  font-size: 0.8rem;
+}
+
+.admin-cancellation-refund-heading span,
+.admin-cancellation-actions--waiting span,
+.admin-cancellation-actions--complete span,
+.admin-cancellation-actions--closed span {
+  margin-top: 3px;
+  color: var(--admin-muted);
+  font-size: 0.7rem;
+}
+
+.admin-cancellation-empty {
+  min-height: 150px;
+  padding: 24px;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 7px;
+  color: var(--admin-muted);
+  font-size: 0.76rem;
+  text-align: center;
+}
+
+.admin-cancellation-empty--detail {
+  min-height: 520px;
+}
+
+.admin-cancellation-empty strong {
+  color: var(--admin-text);
+  font-size: 0.84rem;
+}
+
+@media (max-width: 1080px) {
+  .admin-cancellation-workspace {
+    grid-template-columns: minmax(280px, 0.82fr) minmax(0, 1fr);
+  }
+
+  .admin-cancellation-facts {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-cancellation-facts > div,
+  .admin-cancellation-facts > div:nth-child(2n),
+  .admin-cancellation-facts > div:nth-last-child(-n + 2) {
+    border-right: 0;
+    border-bottom: 1px solid var(--admin-line);
+  }
+
+  .admin-cancellation-facts > div:last-child {
+    border-bottom: 0;
+  }
+}
+
+@media (max-width: 780px) {
+  .admin-cancellation-metrics {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-cancellation-metrics article,
+  .admin-cancellation-metrics article:last-child {
+    min-height: 72px;
+    border-right: 0;
+    border-bottom: 1px solid var(--admin-line);
+  }
+
+  .admin-cancellation-metrics article:last-child {
+    border-bottom: 0;
+  }
+
+  .admin-cancellation-workspace {
+    display: block;
+  }
+
+  .admin-cancellation-queue {
+    border-right: 0;
+    border-bottom: 1px solid var(--admin-line);
+  }
+
+  .admin-cancellation-list {
+    max-height: 390px;
+  }
+
+  .admin-cancellation-detail__header,
+  .admin-cancellation-detail__body,
+  .admin-cancellation-actions {
+    padding-right: 16px;
+    padding-left: 16px;
+  }
+
+  .admin-cancellation-actions > div:last-child {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .admin-cancellation-actions .admin-header__button,
+  .admin-cancellation-actions--refund .admin-header__button {
+    width: 100%;
+    justify-self: stretch;
+  }
+}
+
+/* Role application review */
+.admin-role-application-filter-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 142px;
+  gap: 8px;
+  padding: 0 14px 12px;
+  border-bottom: 1px solid var(--admin-line);
+}
+
+.admin-role-application-filter-row .admin-cancellation-search {
+  margin: 0;
+}
+
+.admin-role-application-role-filter select {
+  width: 100%;
+  min-height: 44px;
+  padding: 0 9px;
+  border: 1px solid var(--admin-line);
+  border-radius: 4px;
+  background: rgba(7, 12, 9, 0.45);
+  color: var(--admin-text);
+  font: inherit;
+  font-size: 0.75rem;
+}
+
+.admin-role-application-role-filter select:focus,
+.admin-role-application-link:focus-visible {
+  outline: 2px solid var(--admin-accent);
+  outline-offset: 2px;
+}
+
+.admin-role-application-row {
+  min-height: 142px;
+}
+
+.admin-role-application-row__open {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--admin-accent);
+  font-size: 0.66rem;
+  font-weight: 750;
+}
+
+.admin-role-application-section {
+  display: grid;
+  gap: 11px;
+}
+
+.admin-role-application-section__heading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--admin-accent);
+}
+
+.admin-role-application-section__heading h3 {
+  margin: 0;
+  color: var(--admin-text);
+  font-size: 0.86rem;
+}
+
+.admin-role-application-section__heading span {
+  margin-left: auto;
+  color: var(--admin-muted);
+  font-size: 0.7rem;
+}
+
+.admin-role-application-data {
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  border: 1px solid var(--admin-line);
+}
+
+.admin-role-application-data > div {
+  min-width: 0;
+  padding: 11px 13px;
+  border-right: 1px solid var(--admin-line);
+  border-bottom: 1px solid var(--admin-line);
+}
+
+.admin-role-application-data > div:nth-child(2n) {
+  border-right: 0;
+}
+
+.admin-role-application-data > div:nth-last-child(-n + 2) {
+  border-bottom: 0;
+}
+
+.admin-role-application-data dt {
+  color: var(--admin-muted);
+  font-size: 0.65rem;
+  font-weight: 750;
+  text-transform: uppercase;
+}
+
+.admin-role-application-data dd {
+  margin: 6px 0 0;
+  overflow-wrap: anywhere;
+  color: var(--admin-copy);
+  font-size: 0.77rem;
+  line-height: 1.45;
+}
+
+.admin-role-application-documents {
+  display: grid;
+  gap: 7px;
+}
+
+.admin-role-application-documents article {
+  min-width: 0;
+  padding: 11px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border: 1px solid var(--admin-line);
+  border-radius: 4px;
+  background: rgba(var(--racing-contrast-rgb), 0.025);
+}
+
+.admin-role-application-documents article > div {
+  min-width: 0;
+  display: grid;
+  gap: 4px;
+}
+
+.admin-role-application-documents strong {
+  overflow-wrap: anywhere;
+  color: var(--admin-text);
+  font-size: 0.76rem;
+}
+
+.admin-role-application-documents small,
+.admin-role-application-muted {
+  color: var(--admin-muted);
+  font-size: 0.7rem;
+  line-height: 1.5;
+}
+
+.admin-role-application-muted {
+  margin: 0;
+}
+
+.admin-role-application-link {
+  display: inline-flex;
+  align-items: center;
+  flex: 0 0 auto;
+  gap: 5px;
+  color: var(--admin-accent);
+  font-size: 0.7rem;
+  font-weight: 750;
+}
+
+.admin-role-application-link:hover {
+  color: var(--admin-text);
+}
+
+.admin-role-application-record {
+  padding-top: 2px;
+}
+
+.admin-role-application-record p {
+  margin: 0;
+  color: var(--admin-copy);
+  font-size: 0.76rem;
+  line-height: 1.5;
+}
+
+.admin-role-application-actions--closed {
+  margin-top: auto;
+}
+
+@media (max-width: 780px) {
+  .admin-role-application-filter-row {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-role-application-data {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-role-application-data > div,
+  .admin-role-application-data > div:nth-child(2n),
+  .admin-role-application-data > div:nth-last-child(-n + 2) {
+    border-right: 0;
+    border-bottom: 1px solid var(--admin-line);
+  }
+
+  .admin-role-application-data > div:last-child {
+    border-bottom: 0;
+  }
+
+  .admin-role-application-documents article {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

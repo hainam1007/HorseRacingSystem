@@ -1,0 +1,380 @@
+.penalty-editor {
+  display: grid;
+  gap: 16px;
+}
+
+.penalty-editor__comparison {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 28px minmax(0, 1fr);
+  gap: 12px;
+  align-items: center;
+  padding: 14px;
+  border: 1px solid rgba(var(--racing-contrast-rgb), 0.18);
+  border-radius: 4px;
+  background: rgba(var(--racing-contrast-rgb), 0.045);
+}
+
+.penalty-editor__comparison > div {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.penalty-editor__comparison > svg {
+  color: var(--racing-accent);
+}
+
+.penalty-editor__comparison strong,
+.penalty-choice strong {
+  color: var(--racing-text-strong);
+}
+
+.penalty-editor__comparison small,
+.penalty-choice small {
+  color: var(--racing-text-muted);
+  line-height: 1.35;
+}
+
+.penalty-editor__eyebrow {
+  color: var(--racing-accent-soft);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.penalty-editor fieldset {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.penalty-editor legend {
+  margin-bottom: 9px;
+  color: var(--racing-text-soft);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.penalty-editor__choices {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.penalty-editor__choices legend {
+  grid-column: 1 / -1;
+}
+
+.penalty-choice {
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr);
+  gap: 9px;
+  align-items: start;
+  padding: 10px;
+  border: 1px solid rgba(var(--racing-contrast-rgb), 0.18);
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.penalty-choice:has(input:checked) {
+  border-color: var(--racing-accent);
+  background: rgba(var(--racing-accent-rgb), 0.1);
+}
+
+.penalty-choice--disabled {
+  cursor: not-allowed;
+  opacity: 0.48;
+}
+
+.penalty-choice--disabled:has(input:checked) {
+  opacity: 0.72;
+}
+
+.penalty-choice input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.penalty-choice__mark {
+  display: grid;
+  width: 18px;
+  height: 18px;
+  place-items: center;
+  border: 1px solid var(--racing-muted-warm);
+  border-radius: 50%;
+  color: transparent;
+}
+
+.penalty-choice input:checked + .penalty-choice__mark {
+  border-color: var(--racing-accent-strong);
+  background: var(--racing-accent-strong);
+  color: var(--racing-green);
+}
+
+.penalty-choice > span:last-child {
+  display: grid;
+  gap: 3px;
+}
+
+.penalty-editor__supplemental {
+  display: grid;
+  gap: 10px;
+}
+
+.penalty-editor__supplemental > label {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  min-height: 2.3rem;
+  padding: 0.45rem 0.6rem;
+  border: 1px solid rgba(var(--racing-contrast-rgb), 0.12);
+  border-radius: 0.65rem;
+  background: rgba(var(--racing-contrast-rgb), 0.025);
+  color: var(--racing-text);
+  cursor: pointer;
+  transition: border-color 180ms ease, background 180ms ease, transform 180ms ease;
+}
+
+.referee-page .penalty-editor__supplemental {
+  gap: 0.65rem;
+  padding: 0.85rem;
+  border: 1px solid rgba(var(--racing-contrast-rgb), 0.12);
+  border-radius: 0.85rem;
+  background: rgba(4, 13, 8, 0.28);
+}
+
+.referee-page .penalty-editor__supplemental legend {
+  margin-bottom: 0.15rem;
+  color: var(--referee-ink);
+  font-size: 0.72rem;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.referee-page .penalty-editor__supplemental > label {
+  min-height: 2.65rem;
+  padding: 0.58rem 0.7rem;
+  border-color: rgba(var(--racing-contrast-rgb), 0.16);
+  background: rgba(var(--racing-contrast-rgb), 0.035);
+}
+
+.penalty-editor__supplemental > label:hover {
+  transform: translateY(-1px);
+  border-color: rgba(var(--racing-accent-rgb), 0.35);
+  background: rgba(var(--racing-accent-rgb), 0.07);
+}
+
+.penalty-editor__supplemental > label:has(input:checked) {
+  border-color: rgba(var(--racing-accent-rgb), 0.48);
+  background: rgba(var(--racing-accent-rgb), 0.1);
+}
+
+.penalty-editor__supplemental > label:has(input:disabled) {
+  cursor: not-allowed;
+  opacity: 0.62;
+}
+
+.penalty-editor__supplemental > label:has(input:disabled):hover {
+  transform: none;
+}
+
+.penalty-editor__supplemental input[type="checkbox"] {
+  appearance: none;
+  display: grid;
+  flex: 0 0 1.05rem;
+  width: 1.05rem;
+  height: 1.05rem;
+  margin: 0;
+  place-items: center;
+  border: 1px solid rgba(var(--racing-contrast-rgb), 0.34);
+  border-radius: 0.32rem;
+  background: rgba(4, 13, 8, 0.72);
+  cursor: pointer;
+  transition: border-color 180ms ease, background 180ms ease, box-shadow 180ms ease;
+}
+
+.penalty-editor__supplemental input[type="checkbox"]::after {
+  width: 0.3rem;
+  height: 0.58rem;
+  border: solid var(--racing-green);
+  border-width: 0 2px 2px 0;
+  content: "";
+  opacity: 0;
+  transform: rotate(45deg) translate(-1px, -1px);
+}
+
+.penalty-editor__supplemental input[type="checkbox"]:checked {
+  border-color: var(--racing-accent-strong);
+  background: var(--racing-accent-strong);
+  box-shadow: 0 0 0 0.2rem rgba(var(--racing-accent-rgb), 0.1);
+}
+
+.penalty-editor__supplemental input[type="checkbox"]:checked::after {
+  opacity: 1;
+}
+
+.penalty-editor__supplemental input[type="checkbox"]:focus-visible {
+  outline: 2px solid var(--racing-accent);
+  outline-offset: 2px;
+}
+
+.penalty-stepper {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  padding: 8px 0;
+  color: var(--racing-text-soft);
+}
+
+.penalty-stepper__control {
+  display: grid;
+  grid-template-columns: 34px 82px 34px;
+  height: 34px;
+}
+
+.penalty-stepper button,
+.penalty-stepper input {
+  min-width: 0;
+  border: 1px solid rgba(var(--racing-contrast-rgb), 0.24);
+  background: var(--racing-green);
+  color: var(--racing-text-strong);
+}
+
+.penalty-stepper button {
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+
+.penalty-stepper button:first-child {
+  border-radius: 4px 0 0 4px;
+}
+
+.penalty-stepper button:last-child {
+  border-radius: 0 4px 4px 0;
+}
+
+.penalty-stepper input {
+  width: 82px;
+  border-right: 0;
+  border-left: 0;
+  text-align: center;
+}
+
+.penalty-editor__reason {
+  display: grid;
+  gap: 0.65rem;
+  padding: 1rem;
+  border: 1px solid rgba(var(--racing-danger-rgb, 239, 128, 96), 0.38);
+  border-left: 3px solid var(--racing-danger);
+  border-radius: 0.85rem;
+  background: linear-gradient(135deg, rgba(var(--racing-danger-rgb, 239, 128, 96), 0.075), rgba(4, 13, 8, 0.45));
+}
+
+.penalty-editor__reason-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.penalty-editor__reason-label {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.28rem;
+  color: var(--racing-text-strong);
+  font-size: 0.86rem;
+  font-weight: 750;
+  line-height: 1.3;
+}
+
+.penalty-editor__reason-label b {
+  color: var(--racing-danger);
+  font-size: 1.05em;
+  line-height: 1;
+}
+
+.penalty-editor__reason-status {
+  flex: 0 0 auto;
+  color: var(--racing-danger);
+  font-size: 0.61rem;
+  font-weight: 800;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.penalty-editor__reason textarea {
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 7.5rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid rgba(var(--racing-accent-rgb), 0.32);
+  border-radius: 0.7rem;
+  outline: none;
+  background: rgba(3, 11, 7, 0.72);
+  color: var(--racing-text-strong);
+  font: inherit;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  resize: vertical;
+  transition: border-color 180ms ease, box-shadow 180ms ease, background 180ms ease, transform 180ms ease;
+}
+
+.penalty-editor__reason textarea::placeholder {
+  color: rgba(238, 231, 212, 0.46);
+}
+
+.penalty-editor__reason textarea:hover {
+  border-color: rgba(var(--racing-accent-rgb), 0.48);
+  background: rgba(3, 11, 7, 0.9);
+}
+
+.penalty-editor__reason textarea:focus {
+  border-color: var(--racing-accent);
+  box-shadow: 0 0 0 0.22rem rgba(var(--racing-accent-rgb), 0.12);
+}
+
+.penalty-editor__reason textarea:disabled {
+  cursor: not-allowed;
+  opacity: 0.68;
+}
+
+.penalty-editor__reason-helper {
+  margin: -0.05rem 0 0;
+  color: var(--racing-text-muted);
+  font-size: 0.68rem;
+  line-height: 1.45;
+}
+
+.penalty-editor__review {
+  display: flex;
+  gap: 9px;
+  align-items: flex-start;
+  padding: 11px;
+  border-left: 3px solid var(--racing-accent);
+  background: rgba(var(--racing-accent-rgb), 0.1);
+  color: var(--racing-accent-soft);
+}
+
+@media (max-width: 720px) {
+  .penalty-editor__comparison {
+    grid-template-columns: 1fr;
+  }
+
+  .penalty-editor__comparison > svg {
+    transform: rotate(90deg);
+  }
+
+  .penalty-editor__choices {
+    grid-template-columns: 1fr;
+  }
+
+  .penalty-editor__reason-heading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+}

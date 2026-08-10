@@ -1,0 +1,10 @@
+
+> horse-ridingt-app@0.0.0 dev
+> vite --host 127.0.0.1
+
+
+  [32m[1mVITE[22m v5.4.21[39m  [2mready in [0m[1m274[22m[2m[0m ms[22m
+
+  [32m➜[39m  [1mLocal[22m:   [36mhttp://127.0.0.1:[1m5173[22m/[39m
+[2m8:37:46 AM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/Referee/RaceClosure.jsx, /src/Referee/HorseInspection.jsx, /src/Referee/JockeyInspection.jsx, /src/Referee/RaceMonitor.jsx, /src/Referee/ViolationManagement.jsx, /src/Referee/RefereeRaceDetail.jsx, /src/Referee/RefereeRaces.jsx, /src/Referee/RefereeDashboard.jsx[22m
+[2m8:37:46 AM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/Referee/RaceClosure.jsx[22m

@@ -1,0 +1,46 @@
+{
+  "passed": true,
+  "assertions": [
+    "Predictions navigation renders race rows instead of tournament cards",
+    "Open market is sorted before other upcoming races",
+    "Open market CTA uses raceId and keeps Race info as a separate action",
+    "Live race routes to the viewer and never exposes a betting CTA",
+    "Mobile market board has no page overflow or clipped rows"
+  ],
+  "screenshots": [
+    "race-market-board-desktop-1440x1000.png",
+    "race-market-board-mobile-390x844.png"
+  ],
+  "audits": {
+    "upcoming": {
+      "rows": 2,
+      "firstRace": "Opening Sprint",
+      "firstMarket": "Betting open",
+      "filters": 4,
+      "tournamentCards": 0,
+      "overflow": 0
+    },
+    "mobile": {
+      "overflow": 0,
+      "clippedRows": 0,
+      "filterWidth": 300,
+      "widest": [
+        {
+          "className": "is-active",
+          "right": 439.28125,
+          "width": 103.671875
+        },
+        {
+          "className": "",
+          "right": 428.28125,
+          "width": 18
+        },
+        {
+          "className": "",
+          "right": 403.28125,
+          "width": 56.671875
+        }
+      ]
+    }
+  }
+}

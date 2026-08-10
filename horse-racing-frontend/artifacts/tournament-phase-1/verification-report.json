@@ -1,0 +1,35 @@
+{
+  "passed": true,
+  "assertions": [
+    "Rendered all four races with one explicit open-market Bet now CTA",
+    "Rendered canonical race filters and live state without desktop overflow",
+    "Completed filter reduced the list to the completed race",
+    "View Race opened a nonblank track preview with no betting controls",
+    "Mobile race hub has no horizontal overflow or wrapped CTA labels"
+  ],
+  "screenshots": [
+    "tournament-detail-desktop-1440x1000.png",
+    "race-detail-desktop-1440x1000.png",
+    "tournament-detail-mobile-390x844.png"
+  ],
+  "audits": {
+    "desktop": {
+      "rows": 4,
+      "betButtons": 1,
+      "liveRows": 1,
+      "overflow": 0,
+      "filters": 4
+    },
+    "raceDetail": {
+      "trackWidth": 1119.6572265625,
+      "bettingInputs": 0,
+      "overflow": 0
+    },
+    "mobile": {
+      "overflow": 0,
+      "rowWidth": 295.99853515625,
+      "viewportWidth": 390,
+      "wrappedButtons": 0
+    }
+  }
+}

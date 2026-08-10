@@ -1,0 +1,119 @@
+#!/usr/bin/env node
+
+// BẮT BUỘC ĐẶT LÊN DÒNG 1 ĐỂ ÉP NODE.JS OVERRIDE CACHE BIẾN MÔI TRƯỜNG
+const dotenv = require("dotenv");
+const result = dotenv.config({ override: true });
+
+if (process.env.NODE_ENV !== "production") {
+  console.log("================= BOOTSTRAP ENV CHECK =================");
+
+  if (result.error) {
+    console.error("⚠️ Không tìm thấy file .env", result.error.message);
+  } else {
+    console.log("✅ Đã load file .env thành công!");
+    console.log(
+      "➜ MOMO_SECRET_KEY:",
+      process.env.MOMO_SECRET_KEY ? "Đã nạp" : "Bị thiếu"
+    );
+    console.log(
+      "➜ VNPAY_TMN_CODE:",
+      process.env.VNPAY_TMN_CODE ? "Đã nạp" : "Bị thiếu"
+    );
+  }
+
+  console.log("=======================================================");
+}
+
+/**
+ * Module dependencies.
+ */
+
+require("dotenv").config({ quiet: true });
+
+var app = require("../app");
+var connectDatabase = require("../config/database").connectDatabase;
+var debug = require("debug")("horse-racing:server");
+var http = require("http");
+
+/**
+ * Get port from environment and store in Express.
+ */
+
+var port = normalizePort(process.env.PORT || "3000");
+app.set("port", port);
+
+/**
+ * Create HTTP server.
+ */
+
+var server = http.createServer(app);
+
+startServer();
+
+async function startServer() {
+  try {
+    await connectDatabase();
+    server.listen(port);
+    server.on("error", onError);
+    server.on("listening", onListening);
+  } catch (error) {
+    console.error("Failed to start server:", error.message);
+    process.exit(1);
+  }
+}
+
+/**
+ * Normalize a port into a number, string, or false.
+ */
+
+function normalizePort(val) {
+  var port = parseInt(val, 10);
+
+  if (isNaN(port)) {
+    // named pipe
+    return val;
+  }
+
+  if (port >= 0) {
+    // port number
+    return port;
+  }
+
+  return false;
+}
+
+/**
+ * Event listener for HTTP server "error" event.
+ */
+
+function onError(error) {
+  if (error.syscall !== "listen") {
+    throw error;
+  }
+
+  var bind = typeof port === "string" ? "Pipe " + port : "Port " + port;
+
+  // handle specific listen errors with friendly messages
+  switch (error.code) {
+    case "EACCES":
+      console.error(bind + " requires elevated privileges");
+      process.exit(1);
+      break;
+    case "EADDRINUSE":
+      console.error(bind + " is already in use");
+      process.exit(1);
+      break;
+    default:
+      throw error;
+  }
+}
+
+/**
+ * Event listener for HTTP server "listening" event.
+ */
+
+function onListening() {
+  var addr = server.address();
+  var bind = typeof addr === "string" ? "pipe " + addr : "port " + addr.port;
+  debug("Listening on " + bind);
+}

@@ -1,0 +1,49 @@
+
+> horse-ridingt-app@0.0.0 dev
+> vite --host 127.0.0.1 --port 5173
+
+
+  [32m[1mVITE[22m v5.4.21[39m  [2mready in [0m[1m380[22m[2m[0m ms[22m
+
+  [32m➜[39m  [1mLocal[22m:   [36mhttp://127.0.0.1:[1m5173[22m/[39m
+[2m[32m  ➜[39m[22m[2m  press [22m[1mh + enter[22m[2m to show help[22m
+[2m11:34:02 PM[22m [36m[1m[vite][22m[39m [32m.env changed, restarting server...[39m
+[2m11:34:02 PM[22m [36m[1m[vite][22m[39m server restarted.
+[2m11:35:20 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/spectator/PredictionDetail.jsx[22m
+[2m11:35:57 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/spectator/spectator.css[22m
+[2m11:37:49 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/spectator/PredictionDetail.jsx[22m
+[2m11:37:49 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/spectator/PredictionDetail.jsx[22m
+[2m11:37:49 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/spectator/PredictionDetail.jsx[22m
+[2m11:38:55 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/spectator/PredictionDetail.jsx[22m
+[2m11:38:55 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/spectator/PredictionDetail.jsx[22m
+[2m11:39:20 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/spectator/PredictionDetail.jsx[22m
+[2m11:39:20 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/spectator/PredictionDetail.jsx[22m
+[2m11:39:20 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/spectator/spectator.css[22m
+[2m11:39:44 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/spectator/PredictionDetail.jsx[22m
+[2m11:43:01 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/spectator/PredictionDetail.jsx[22m
+[2m11:43:47 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/spectator/PredictionDetail.jsx[22m
+[2m11:43:47 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/spectator/PredictionDetail.jsx[22m
+[2m11:43:47 PM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/spectator/spectator.css[22m
+node:internal/fs/watchers:321
+    const error = new UVException({
+                  ^
+
+Error: EBUSY: resource busy or locked, watch 'D:\WDP\horse-racing-frontend\src\assets\pixel-horses\pixel-horses-source.png'
+    at FSWatcher.<computed> (node:internal/fs/watchers:321:19)
+    at Object.watch (node:fs:2548:36)
+    at createFsWatchInstance (file:///D:/WDP/horse-racing-frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:42780:17)
+    at setFsWatchListener (file:///D:/WDP/horse-racing-frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:42827:15)
+    at NodeFsHandler._watchWithNodeFs (file:///D:/WDP/horse-racing-frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:42982:14)
+    at NodeFsHandler._handleFile (file:///D:/WDP/horse-racing-frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:43046:23)
+    at NodeFsHandler._addToNodeFs (file:///D:/WDP/horse-racing-frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:43288:21)
+Emitted 'error' event on FSWatcher instance at:
+    at FSWatcher._handleError (file:///D:/WDP/horse-racing-frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:44481:10)
+    at NodeFsHandler._addToNodeFs (file:///D:/WDP/horse-racing-frontend/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:43296:18) {
+  errno: -4082,
+  syscall: 'watch',
+  code: 'EBUSY',
+  path: 'D:\\WDP\\horse-racing-frontend\\src\\assets\\pixel-horses\\pixel-horses-source.png',
+  filename: 'D:\\WDP\\horse-racing-frontend\\src\\assets\\pixel-horses\\pixel-horses-source.png'
+}
+
+Node.js v24.16.0

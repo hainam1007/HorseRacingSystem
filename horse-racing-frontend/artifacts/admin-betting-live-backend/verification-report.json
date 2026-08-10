@@ -1,0 +1,11 @@
+{
+  "passed": true,
+  "skipped": true,
+  "apiBaseUrl": "http://127.0.0.1:3000/api",
+  "targetRaceId": null,
+  "mutationMode": false,
+  "assertions": [],
+  "screenshots": [],
+  "audits": {},
+  "skipReason": "Set BETTING_VERIFY_ADMIN_TOKEN or ADMIN_TOKEN to run live backend admin betting verification."
+}

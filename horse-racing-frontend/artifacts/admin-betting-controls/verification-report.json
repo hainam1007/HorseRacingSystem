@@ -1,0 +1,127 @@
+{
+  "passed": true,
+  "assertions": [
+    "Admin betting panel hydrates selected race status, stake limits, odds snapshot, and action gates",
+    "Open betting sends configured min/max stake, currency, and ISO close time",
+    "Completed or closed races disable generation and allow retry settlement",
+    "Invalid stake limits are blocked before calling the backend",
+    "Schedule filters retarget betting controls to the visible race list",
+    "Mobile admin betting panel has no horizontal overflow or clipped action buttons"
+  ],
+  "screenshots": [
+    "admin-betting-controls-mobile-390x844.png",
+    "admin-betting-controls-desktop-1440x1000.png"
+  ],
+  "audits": {
+    "initial": {
+      "title": "Win market lifecycle",
+      "selectedRace": "race-generated",
+      "badge": "Generated",
+      "fieldValues": [
+        "2",
+        "200",
+        "TOKEN",
+        "2026-07-03T17:00"
+      ],
+      "oddsRows": [
+        [
+          "1",
+          "Red CometMai Tran",
+          "42.0%",
+          "2.38",
+          "2.02"
+        ],
+        [
+          "2",
+          "Blue HarborAn Le",
+          "31.0%",
+          "3.23",
+          "2.75"
+        ],
+        [
+          "3",
+          "Gold SignalBao Pham",
+          "27.0%",
+          "3.70",
+          "3.15"
+        ]
+      ],
+      "oddsMeta": "probability_engine_history_v1history_v1.0.003 Jul 2026, 16:05",
+      "actions": [
+        {
+          "text": "Generate odds",
+          "disabled": false
+        },
+        {
+          "text": "Open betting",
+          "disabled": false
+        },
+        {
+          "text": "Close betting",
+          "disabled": false
+        },
+        {
+          "text": "Retry settle",
+          "disabled": true
+        }
+      ],
+      "overflow": 0
+    },
+    "openCall": {
+      "method": "POST",
+      "path": "/api/races/race-generated/betting/open",
+      "body": {
+        "min_stake": 7,
+        "max_stake": 700,
+        "currency": "PTS",
+        "closes_at": "2026-07-03T11:30:00.000Z"
+      }
+    },
+    "completedActions": [
+      {
+        "text": "Generate odds",
+        "disabled": true
+      },
+      {
+        "text": "Open betting",
+        "disabled": true
+      },
+      {
+        "text": "Close betting",
+        "disabled": true
+      },
+      {
+        "text": "Retry settle",
+        "disabled": false
+      }
+    ],
+    "filtered": {
+      "selectedRace": "race-running",
+      "optionCount": 1,
+      "badge": "Open",
+      "actions": [
+        {
+          "text": "Generate odds",
+          "disabled": true
+        },
+        {
+          "text": "Open betting",
+          "disabled": true
+        },
+        {
+          "text": "Close betting",
+          "disabled": false
+        },
+        {
+          "text": "Retry settle",
+          "disabled": true
+        }
+      ]
+    },
+    "mobile": {
+      "overflow": 0,
+      "panelWidth": 358,
+      "clippedActions": 0
+    }
+  }
+}

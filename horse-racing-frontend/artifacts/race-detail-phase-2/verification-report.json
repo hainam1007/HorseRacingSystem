@@ -1,0 +1,103 @@
+{
+  "passed": true,
+  "assertions": [
+    "Scheduled race renders five approved runners, one navigation CTA, and no betting controls",
+    "Running race animates runner coordinates and updates a five-row live ranking",
+    "Completed race renders official Top 3 and all five final positions",
+    "Mobile race detail has no horizontal overflow or clipped participant rows"
+  ],
+  "screenshots": [
+    "race-detail-running-desktop-1440x1100.png",
+    "race-detail-completed-desktop-1440x1100.png",
+    "race-detail-scheduled-mobile-390x844.png"
+  ],
+  "audits": {
+    "scheduled": {
+      "runners": 5,
+      "participants": 5,
+      "betCta": 1,
+      "bettingControls": 0,
+      "status": "Starting field confirmed",
+      "overflow": 0
+    },
+    "running": {
+      "after": "matrix(0.0620944, -0.99807, 0.99807, 0.0620944, 13.0073, 278.334)",
+      "status": "Race in progress",
+      "rows": 5,
+      "broadcast": "Liveopening pace 1% complete",
+      "leader": "#3 Golden Gallop",
+      "gapLabels": [
+        "Leader",
+        "+1m",
+        "+1m",
+        "+3m",
+        "+4m"
+      ],
+      "viewerToTablesGap": 22,
+      "tableGap": 20,
+      "betCta": 0,
+      "overflow": 0,
+      "before": "matrix(0, -1, 1, 0, 12, 296)",
+      "startingGate": {
+        "status": "Runners at the gate",
+        "label": "Start",
+        "progress": [
+          "0",
+          "0",
+          "0",
+          "0",
+          "0"
+        ]
+      }
+    },
+    "completed": {
+      "podium": 3,
+      "rows": 5,
+      "firstPlace": "Golden Gallop",
+      "runnerTransforms": [
+        "matrix(0.344643, -0.938734, 0.938734, 0.344643, 43.9809, 197.949)",
+        "matrix(0.19971, -0.979855, 0.979855, 0.19971, 35.2538, 241.18)",
+        "matrix(0.60793, -0.79399, 0.79399, 0.60793, 140.181, 135.202)",
+        "matrix(0.04568, -0.998956, 0.998956, 0.04568, 51.5042, 284.374)",
+        "matrix(0.481754, -0.876307, 0.876307, 0.481754, 122.136, 178.211)"
+      ],
+      "runnerCoordinates": [
+        {
+          "x": 230.32528686523438,
+          "y": 707.852783203125
+        },
+        {
+          "x": 221.6042709350586,
+          "y": 751.0529479980469
+        },
+        {
+          "x": 326.45750427246094,
+          "y": 645.1502685546875
+        },
+        {
+          "x": 237.84326171875,
+          "y": 794.2174377441406
+        },
+        {
+          "x": 308.42529296875,
+          "y": 688.1288146972656
+        }
+      ],
+      "status": "Official finish",
+      "official": "Official",
+      "bettingControls": 0,
+      "finishSeparations": [
+        44,
+        149,
+        173,
+        127
+      ]
+    },
+    "mobile": {
+      "overflow": 0,
+      "trackWidth": 299.9846496582031,
+      "viewportWidth": 390,
+      "clippedRows": 0
+    }
+  }
+}

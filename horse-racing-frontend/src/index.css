@@ -1,0 +1,93 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Sora:wght@400;500;600;700;800&display=swap');
+
+:root {
+  color-scheme: dark;
+  font-family: 'Inter', system-ui, sans-serif;
+  --racing-ink: hsl(138 18% 8%);
+  --racing-green: hsl(145 25% 15%);
+  --racing-green-2: hsl(145 24% 19%);
+  --racing-green-3: hsl(145 22% 22%);
+  --racing-green-muted: hsl(145 20% 24%);
+  --racing-surface: hsl(145 23% 12%);
+  --racing-surface-raised: hsl(145 21% 15%);
+  --racing-contrast: hsl(45 38% 88%);
+  --racing-text-strong: hsl(39 100% 96%);
+  --racing-text: hsl(43 42% 94%);
+  --racing-text-soft: hsl(42 33% 84%);
+  --racing-text-muted: hsl(39 25% 77%);
+  --racing-muted-warm: hsl(36 18% 65%);
+  --racing-accent: hsl(29 82% 65%);
+  --racing-accent-soft: hsl(36 100% 77%);
+  --racing-accent-strong: hsl(25 67% 53%);
+  --racing-accent-hover: hsl(27 100% 63%);
+  --racing-success: hsl(148 69% 67%);
+  --racing-success-soft: hsl(132 75% 77%);
+  --racing-danger: hsl(5 68% 72%);
+  --racing-danger-soft: hsl(8 100% 89%);
+  --racing-green-rgb: 29, 48, 36;
+  --racing-green-muted-rgb: 62, 91, 73;
+  --racing-contrast-rgb: 238, 231, 212;
+  --racing-accent-rgb: 240, 161, 92;
+  --racing-success-rgb: 110, 231, 168;
+  --racing-danger-rgb: 239, 168, 162;
+  --bg: var(--racing-ink);
+  --panel: rgba(238, 231, 212, 0.08);
+  --panel-strong: rgba(238, 231, 212, 0.16);
+  --text: var(--racing-text);
+  --muted: rgba(247, 243, 232, 0.72);
+  --accent: var(--racing-accent-strong);
+  --accent-soft: var(--racing-accent);
+  --green: var(--racing-green-2);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  color: var(--text);
+  background:
+    radial-gradient(circle at 15% 10%, rgba(238, 231, 212, 0.08), transparent 24%),
+    radial-gradient(circle at 85% 22%, rgba(240, 161, 92, 0.12), transparent 28%),
+    linear-gradient(180deg, var(--racing-ink) 0%, var(--racing-green) 48%, var(--racing-green-2) 100%);
+  overflow-x: hidden;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image: linear-gradient(rgba(255, 255, 255, 0.022) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.022) 1px, transparent 1px);
+  background-size: 64px 64px;
+  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.5), transparent 85%);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+#root {
+  min-height: 100vh;
+}

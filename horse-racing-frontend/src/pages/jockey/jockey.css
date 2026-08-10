@@ -1,0 +1,4122 @@
+.jockey-page {
+  --jockey-text-strong: var(--racing-text-strong);
+  --jockey-text: var(--racing-text);
+  --jockey-text-soft: var(--racing-text-soft);
+  --jockey-text-muted: var(--racing-text-muted);
+  --jockey-surface: rgba(var(--racing-contrast-rgb), 0.1);
+  --jockey-surface-soft: rgba(255, 255, 255, 0.065);
+  --jockey-border: rgba(var(--racing-contrast-rgb), 0.2);
+  --jockey-accent-border: rgba(var(--racing-accent-rgb), 0.34);
+  --jockey-accent-surface: rgba(var(--racing-accent-rgb), 0.1);
+  --jockey-moss-panel: rgba(42, 64, 49, 0.72);
+  --jockey-moss-panel-soft: rgba(45, 70, 53, 0.52);
+  --jockey-moss-panel-strong: rgba(18, 35, 25, 0.88);
+  --jockey-moss-border: rgba(214, 226, 202, 0.18);
+  min-height: 100dvh;
+  padding: 28px clamp(16px, 4vw, 48px) 48px;
+  color: var(--jockey-text);
+  background:
+    radial-gradient(circle at 12% 8%, rgba(var(--racing-accent-rgb), 0.10), transparent 30%),
+    radial-gradient(circle at 86% 10%, rgba(var(--racing-contrast-rgb), 0.08), transparent 28%),
+    linear-gradient(180deg, var(--racing-green-2) 0%, var(--racing-green) 52%, var(--racing-ink) 100%);
+}
+
+.jockey-sync-note {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: min(100%, 1120px);
+  margin: 0 auto 18px;
+  padding: 12px 14px;
+  border: 1px solid rgba(103, 211, 141, 0.34);
+  border-radius: 8px;
+  background: rgba(103, 211, 141, 0.12);
+  color: #DDF8E5;
+  font-size: 0.9rem;
+  font-weight: 750;
+  line-height: 1.45;
+}
+
+.jockey-sync-note--warning {
+  border-color: rgba(var(--racing-accent-rgb), 0.38);
+  background: rgba(var(--racing-accent-rgb), 0.13);
+  color: #FFE0B8;
+}
+
+.jockey-page * {
+  box-sizing: border-box;
+  text-wrap: pretty;
+}
+
+.jockey-page :focus-visible {
+  outline: 3px solid rgba(var(--racing-accent-rgb), 0.72);
+  outline-offset: 3px;
+}
+
+.jockey-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  max-width: 1240px;
+  margin: 0 auto 30px;
+}
+
+.jockey-brand {
+  text-decoration: none;
+}
+
+.jockey-nav {
+  display: inline-flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px;
+  border: 1px solid rgba(var(--racing-contrast-rgb), 0.28);
+  border-radius: 999px;
+  background: rgba(var(--racing-contrast-rgb), 0.1);
+  backdrop-filter: blur(12px);
+}
+
+.jockey-nav__link,
+.jockey-button,
+.jockey-icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 160ms ease, background 160ms ease, border-color 160ms ease, box-shadow 160ms ease, color 160ms ease;
+}
+
+.jockey-nav__link {
+  min-height: 38px;
+  padding: 0 16px;
+  border-radius: 999px;
+  color: var(--jockey-text-soft);
+  font-size: 0.88rem;
+  font-weight: 800;
+}
+
+.jockey-nav__link:hover {
+  color: var(--jockey-text-strong);
+  background: rgba(var(--racing-contrast-rgb), 0.28);
+  transform: translateY(-1px);
+}
+
+.jockey-nav__link--active {
+  color: var(--racing-green-2);
+  background: var(--jockey-text-strong);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.2);
+}
+
+.jockey-topbar__actions {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.jockey-icon-button {
+  width: 42px;
+  height: 42px;
+  border: 1px solid rgba(var(--racing-contrast-rgb), 0.28);
+  border-radius: 999px;
+  color: var(--jockey-text-strong);
+  background: rgba(var(--racing-contrast-rgb), 0.11);
+}
+
+.jockey-icon-button:hover {
+  border-color: rgba(var(--racing-contrast-rgb), 0.42);
+  background: rgba(var(--racing-contrast-rgb), 0.22);
+  transform: translateY(-1px);
+}
+
+.jockey-button {
+  min-height: 42px;
+  padding: 0 18px;
+  border: 1px solid rgba(var(--racing-contrast-rgb), 0.26);
+  border-radius: 4px;
+  color: var(--jockey-text-strong);
+  background: rgba(var(--racing-contrast-rgb), 0.12);
+  font-weight: 800;
+}
+
+.jockey-button:hover {
+  border-color: rgba(var(--racing-contrast-rgb), 0.46);
+  background: rgba(var(--racing-contrast-rgb), 0.22);
+  transform: translateY(-2px);
+  box-shadow: 0 14px 30px rgba(21, 35, 26, 0.22);
+}
+
+.jockey-button:active,
+.jockey-icon-button:active,
+.jockey-nav__link:active {
+  transform: translateY(1px);
+}
+
+.jockey-button--primary {
+  border-color: transparent;
+  color: var(--jockey-text-strong);
+  background: linear-gradient(180deg, var(--racing-accent-strong), var(--racing-accent-strong));
+  box-shadow: 0 16px 28px rgba(var(--racing-accent-rgb), 0.28);
+}
+
+.jockey-button--primary:hover {
+  background: linear-gradient(180deg, var(--racing-accent-hover), var(--racing-accent-strong));
+  box-shadow: 0 20px 34px rgba(var(--racing-accent-rgb), 0.36);
+}
+
+.jockey-button--danger {
+  border-color: rgba(239, 128, 116, 0.5);
+  color: var(--racing-danger-soft);
+  background: rgba(177, 65, 53, 0.14);
+}
+
+.jockey-button--danger:hover {
+  border-color: rgba(239, 128, 116, 0.72);
+  background: rgba(177, 65, 53, 0.24);
+}
+
+.jockey-button--ghost {
+  border-radius: 999px;
+}
+
+.jockey-content {
+  animation: jockeyFadeIn 300ms ease-out;
+}
+
+@keyframes jockeyFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.jockey-notification-menu {
+  position: relative;
+}
+
+.jockey-notification-trigger {
+  position: relative;
+  padding: 0;
+}
+
+.jockey-notification-trigger span {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  min-width: 18px;
+  height: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 5px;
+  border: 2px solid var(--racing-green-2);
+  border-radius: 999px;
+  color: var(--racing-green-2);
+  background: var(--racing-accent-soft);
+  font-size: 0.68rem;
+  font-weight: 1000;
+  line-height: 1;
+}
+
+.jockey-notification-popover {
+  position: absolute;
+  top: calc(100% + 12px);
+  right: 0;
+  z-index: 40;
+  width: min(380px, calc(100vw - 28px));
+  display: grid;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid rgba(var(--racing-contrast-rgb), 0.28);
+  border-radius: 8px;
+  background: rgba(26, 45, 35, 0.96);
+  box-shadow: 0 26px 60px rgba(12, 24, 17, 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(18px);
+  opacity: 0;
+  transform: translateY(-8px) scale(0.98);
+  transform-origin: top right;
+  pointer-events: none;
+  transition: opacity 180ms ease, transform 220ms ease;
+}
+
+.jockey-notification-popover.is-open {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+
+.jockey-notification-popover::before {
+  content: "";
+  position: absolute;
+  top: -7px;
+  right: 18px;
+  width: 14px;
+  height: 14px;
+  border-top: 1px solid rgba(var(--racing-contrast-rgb), 0.28);
+  border-left: 1px solid rgba(var(--racing-contrast-rgb), 0.28);
+  background: rgba(26, 45, 35, 0.96);
+  transform: rotate(45deg);
+}
+
+.jockey-notification-popover__header {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.jockey-notification-popover__header h2 {
+  margin: 0;
+  color: var(--jockey-text-strong);
+  font-family: "Sora", sans-serif;
+  font-size: 1.35rem;
+  line-height: 1;
+}
+
+.jockey-notification-popover__list {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 8px;
+  max-height: 290px;
+  overflow-y: auto;
+  padding-right: 2px;
+}
+
+.jockey-notification-item {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 10px;
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid rgba(var(--racing-contrast-rgb), 0.16);
+  border-radius: 8px;
+  color: inherit;
+  background: rgba(255, 255, 255, 0.075);
+  text-decoration: none;
+  transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
+}
+
+.jockey-notification-item:hover {
+  transform: translateY(-2px);
+  border-color: rgba(var(--racing-accent-rgb), 0.32);
+  background: rgba(var(--racing-contrast-rgb), 0.13);
+}
+
+.jockey-notification-item__icon {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  color: var(--racing-accent-soft);
+  background: rgba(var(--racing-accent-rgb), 0.16);
+}
+
+.jockey-notification-item strong {
+  display: block;
+  min-width: 0;
+  color: var(--jockey-text-strong);
+  font-size: 0.9rem;
+  line-height: 1.3;
+}
+
+.jockey-notification-item small {
+  display: block;
+  margin-top: 5px;
+  color: var(--jockey-text-muted);
+  font-size: 0.76rem;
+  font-weight: 900;
+}
+
+.jockey-notification-empty {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 46px;
+  padding: 12px;
+  border: 1px dashed var(--jockey-border);
+  border-radius: 8px;
+  color: var(--jockey-text-muted);
+  background: rgba(255, 255, 255, 0.045);
+  font-weight: 850;
+}
+
+.jockey-notification-popover__footer {
+  position: relative;
+  z-index: 1;
+  min-height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(var(--racing-contrast-rgb), 0.2);
+  border-radius: 8px;
+  color: var(--jockey-text-strong);
+  background: rgba(var(--racing-contrast-rgb), 0.1);
+  font-weight: 900;
+  text-decoration: none;
+  transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
+}
+
+.jockey-notification-popover__footer:hover {
+  transform: translateY(-1px);
+  border-color: rgba(var(--racing-accent-rgb), 0.38);
+  background: rgba(var(--racing-contrast-rgb), 0.16);
+}
+
+.jockey-dashboard {
+  display: grid;
+  gap: 16px;
+  max-width: 1240px;
+  margin-inline: auto;
+}
+
+.jockey-hero {
+  position: relative;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(320px, 0.72fr);
+  gap: 22px;
+  align-items: end;
+  min-height: 480px;
+  padding: clamp(22px, 4vw, 44px);
+  border: 1px solid rgba(var(--racing-contrast-rgb), 0.24);
+  border-radius: 8px;
+  background: rgba(var(--racing-contrast-rgb), 0.1);
+  box-shadow: 0 24px 70px rgba(10, 22, 15, 0.24);
+}
+
+.jockey-hero > img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 42%;
+  filter: saturate(0.92) contrast(1.08);
+  transform: scale(1.01);
+}
+
+.jockey-hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, rgba(17, 31, 23, 0.98) 0%, rgba(17, 31, 23, 0.82) 43%, rgba(17, 31, 23, 0.34) 100%),
+    radial-gradient(circle at 72% 18%, rgba(var(--racing-accent-rgb), 0.18), transparent 34%),
+    linear-gradient(180deg, rgba(9, 18, 12, 0.05), rgba(9, 18, 12, 0.56));
+}
+
+.jockey-hero__copy,
+.jockey-hero__panel {
+  position: relative;
+  z-index: 1;
+}
+
+.jockey-kicker {
+  display: block;
+  margin-bottom: 7px;
+  color: var(--racing-accent);
+  font-size: 0.74rem;
+  font-weight: 900;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+.jockey-hero__copy {
+  display: grid;
+  justify-items: start;
+  gap: 12px;
+}
+
+.jockey-hero__copy h1 {
+  max-width: 13ch;
+  margin: 0;
+  color: var(--jockey-text-strong);
+  font-family: "Sora", sans-serif;
+  font-size: clamp(2.8rem, 6.4vw, 5.7rem);
+  line-height: 0.9;
+  text-wrap: balance;
+}
+
+.jockey-hero__copy p:not(.jockey-kicker) {
+  max-width: 58ch;
+  margin: 0;
+  color: var(--jockey-text-soft);
+  line-height: 1.62;
+}
+
+.jockey-hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.jockey-hero__panel {
+  display: grid;
+  gap: 14px;
+  padding: 18px;
+  border: 1px solid rgba(var(--racing-contrast-rgb), 0.28);
+  border-radius: 8px;
+  background: rgba(18, 34, 25, 0.78);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(14px);
+}
+
+.jockey-hero__panel strong {
+  color: var(--jockey-text-strong);
+  font-family: "Sora", sans-serif;
+  line-height: 1.05;
+}
+
+.jockey-hero__panel p {
+  margin: 0;
+  color: var(--jockey-text-soft);
+  line-height: 1.55;
+}
+
+.jockey-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: fit-content;
+  min-height: 30px;
+  padding: 0 10px;
+  border: 1px solid rgba(var(--racing-contrast-rgb), 0.2);
+  border-radius: 999px;
+  color: var(--jockey-text-strong);
+  background: rgba(var(--racing-contrast-rgb), 0.13);
+  font-size: 0.78rem;
+  font-weight: 900;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.jockey-badge--green {
+  border-color: rgba(114, 223, 138, 0.46);
+  color: var(--racing-success-soft);
+  background: rgba(78, 207, 107, 0.18);
+}
+
+.jockey-badge--amber {
+  border-color: rgba(var(--racing-accent-rgb), 0.48);
+  color: var(--racing-accent-soft);
+  background: rgba(var(--racing-accent-rgb), 0.18);
+}
+
+.jockey-badge--muted {
+  border-color: rgba(212, 200, 179, 0.32);
+  color: var(--jockey-text-muted);
+  background: rgba(var(--racing-contrast-rgb), 0.08);
+}
+
+.jockey-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.jockey-stat-card,
+.jockey-card,
+.jockey-visual-card,
+.jockey-race-strip__item {
+  border: 1px solid rgba(var(--racing-contrast-rgb), 0.2);
+  border-radius: 8px;
+  background: rgba(var(--racing-contrast-rgb), 0.09);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.jockey-stat-card {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 7px 11px;
+  min-width: 0;
+  padding: 15px;
+  transition: transform 220ms ease, border-color 220ms ease, background 220ms ease, box-shadow 220ms ease;
+}
+
+.jockey-stat-card:hover,
+.jockey-card:hover,
+.jockey-visual-card:hover,
+.jockey-race-strip__item:hover {
+  transform: translateY(-2px);
+  border-color: rgba(var(--racing-accent-rgb), 0.34);
+  background: rgba(var(--racing-contrast-rgb), 0.14);
+  box-shadow: 0 18px 38px rgba(16, 29, 21, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.jockey-stat-card svg {
+  color: var(--racing-accent);
+}
+
+.jockey-stat-card span,
+.jockey-stat-card small {
+  color: var(--jockey-text-muted);
+  line-height: 1.35;
+}
+
+.jockey-stat-card strong {
+  grid-column: 1 / -1;
+  min-width: 0;
+  color: var(--jockey-text-strong);
+  font-family: "Sora", sans-serif;
+  font-size: clamp(1.7rem, 3vw, 2.45rem);
+  line-height: 1;
+  overflow-wrap: anywhere;
+}
+
+.jockey-cockpit-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.86fr) minmax(260px, 0.58fr) minmax(300px, 0.64fr);
+  gap: 16px;
+  align-items: stretch;
+}
+
+.jockey-card {
+  min-width: 0;
+  display: grid;
+  gap: 16px;
+  padding: clamp(18px, 2.2vw, 24px);
+  transition: transform 220ms ease, border-color 220ms ease, background 220ms ease, box-shadow 220ms ease;
+}
+
+.jockey-card__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.jockey-card__header h2,
+.jockey-visual-card h2,
+.jockey-race-strip__item strong,
+.jockey-next-race__body strong,
+.jockey-invite-item strong,
+.jockey-assignment-item strong,
+.jockey-empty-panel strong,
+.jockey-command-panel__meta strong {
+  margin: 0;
+  color: var(--jockey-text-strong);
+  font-family: "Sora", sans-serif;
+  line-height: 1.08;
+}
+
+.jockey-command-panel__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.jockey-command-panel__meta {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.jockey-command-panel__meta div {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+  padding: 11px;
+  border: 1px solid rgba(var(--racing-contrast-rgb), 0.16);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.jockey-command-panel__meta span,
+.jockey-empty-panel span {
+  color: var(--jockey-text-muted);
+  font-size: 0.76rem;
+  font-weight: 900;
+  line-height: 1.35;
+}
+
+.jockey-command-panel__meta strong {
+  min-width: 0;
+  font-size: 0.92rem;
+  overflow-wrap: anywhere;
+}
+
+.jockey-next-race__body {
+  display: grid;
+  grid-template-columns: 118px minmax(0, 1fr);
+  gap: 14px;
+  align-items: center;
+}
+
+.jockey-date-block {
+  display: grid;
+  gap: 6px;
+  justify-items: start;
+  padding: 12px;
+  border: 1px solid rgba(var(--racing-accent-rgb), 0.28);
+  border-radius: 8px;
+  background: rgba(var(--racing-accent-rgb), 0.1);
+}
+
+.jockey-date-block span {
+  color: var(--racing-accent-soft);
+  font-size: 0.82rem;
+  font-weight: 900;
+}
+
+.jockey-date-block strong {
+  color: var(--jockey-text-strong);
+  font-size: 1.2rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.jockey-next-race__body > div:last-child {
+  display: grid;
+  gap: 7px;
+}
+
+.jockey-next-race__body span,
+.jockey-next-race__body small,
+.jockey-invite-item small,
+.jockey-assignment-item small,
+.jockey-race-strip__item small {
+  color: var(--jockey-text-muted);
+  line-height: 1.35;
+}
+
+.jockey-next-race__body small,
+.jockey-race-strip__item small {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.jockey-invite-list,
+.jockey-assignment-list {
+  display: grid;
+  gap: 10px;
+}
+
+.jockey-invite-item,
+.jockey-assignment-item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  padding: 14px;
+  border: 1px solid rgba(var(--racing-contrast-rgb), 0.16);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.075);
+}
+
+.jockey-invite-item > div,
+.jockey-assignment-item > div {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+}
+
+.jockey-invite-item span:not(.jockey-badge) {
+  color: var(--racing-accent);
+  font-size: 0.78rem;
+  font-weight: 900;
+}
+
+.jockey-inline-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  width: fit-content;
+  min-height: 34px;
+  color: var(--racing-accent-soft);
+  font-size: 0.82rem;
+  font-weight: 900;
+  text-decoration: none;
+  transition: color 160ms ease, transform 160ms ease;
+}
+
+.jockey-inline-link:hover {
+  color: var(--jockey-text-strong);
+  transform: translateX(3px);
+}
+
+.jockey-empty-panel {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+  padding: 15px;
+  border: 1px dashed rgba(var(--racing-contrast-rgb), 0.25);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.045);
+}
+
+.jockey-dashboard-lower {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 0.72fr);
+  gap: 16px;
+}
+
+.jockey-visual-card {
+  position: relative;
+  overflow: hidden;
+  min-height: 100%;
+  display: grid;
+  align-content: end;
+  padding: 18px;
+  transition: transform 220ms ease, border-color 220ms ease, background 220ms ease, box-shadow 220ms ease;
+}
+
+.jockey-visual-card img,
+.jockey-result-card > img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.jockey-visual-card img {
+  position: absolute;
+  inset: 0;
+  transition: transform 620ms ease, filter 620ms ease;
+}
+
+.jockey-visual-card:hover img {
+  transform: scale(1.06);
+  filter: saturate(1.06) contrast(1.04);
+}
+
+.jockey-visual-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(29, 48, 36, 0.02), rgba(15, 28, 20, 0.7));
+}
+
+.jockey-visual-card > div {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 9px;
+  padding: 16px;
+  border: 1px solid rgba(var(--racing-contrast-rgb), 0.26);
+  border-radius: 8px;
+  background: rgba(22, 38, 30, 0.72);
+  backdrop-filter: blur(12px);
+}
+
+.jockey-visual-card p {
+  margin: 0;
+  color: var(--jockey-text-soft);
+  line-height: 1.5;
+}
+
+.jockey-pairing-spotlight {
+  min-height: 360px;
+}
+
+.jockey-assignment-item {
+  grid-template-columns: auto minmax(0, 1fr);
+}
+
+.jockey-result-card > img {
+  height: 170px;
+  border: 1px solid rgba(var(--racing-contrast-rgb), 0.18);
+  border-radius: 8px;
+}
+
+.jockey-result-card__stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.jockey-result-card__stats div {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid rgba(var(--racing-contrast-rgb), 0.16);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.065);
+}
+
+.jockey-result-card__stats span {
+  color: var(--jockey-text-muted);
+  font-size: 0.78rem;
+  font-weight: 900;
+}
+
+.jockey-result-card__stats strong {
+  color: var(--jockey-text-strong);
+  font-family: "Sora", sans-serif;
+  line-height: 1.12;
+}
+
+.jockey-readiness-card {
+  align-content: start;
+}
+
+.jockey-race-strip {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.jockey-race-strip__item {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+  padding: 16px;
+  transition: transform 220ms ease, border-color 220ms ease, background 220ms ease, box-shadow 220ms ease;
+}
+
+.jockey-race-strip__item div {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--racing-accent-soft);
+  font-size: 0.84rem;
+  font-weight: 900;
+}
+
+.jockey-invitations-page {
+  display: grid;
+  gap: 18px;
+  max-width: 1180px;
+  margin-inline: auto;
+}
+
+.jockey-invitations-hero {
+  position: relative;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 380px);
+  gap: 24px;
+  align-items: end;
+  min-height: 430px;
+  padding: clamp(24px, 4vw, 46px);
+  border: 1px solid rgba(var(--racing-contrast-rgb), 0.24);
+  border-radius: 8px;
+  background: rgba(var(--racing-contrast-rgb), 0.1);
+}
+
+.jockey-invitations-hero > img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: saturate(0.95) contrast(1.05);
+}
+
+.jockey-invitations-hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, rgba(22, 38, 30, 0.96) 0%, rgba(22, 38, 30, 0.7) 48%, rgba(22, 38, 30, 0.24) 100%),
+    radial-gradient(circle at 80% 18%, rgba(var(--racing-accent-rgb), 0.22), transparent 34%);
+}
+
+.jockey-invitations-hero__copy,
+.jockey-invitations-hero__panel {
+  position: relative;
+  z-index: 1;
+}
+
+.jockey-invitations-hero__copy h1 {
+  max-width: 12ch;
+  margin: 0;
+  color: var(--jockey-text-strong);
+  font-family: "Sora", sans-serif;
+  font-size: clamp(2.65rem, 5.8vw, 5.2rem);
+  line-height: 0.92;
+}
+
+.jockey-invitations-hero__copy p:not(.jockey-kicker) {
+  max-width: 58ch;
+  margin: 18px 0 0;
+  color: var(--jockey-text-soft);
+  line-height: 1.65;
+}
+
+.jockey-invitations-hero__panel {
+  display: grid;
+  gap: 12px;
+  padding: 20px;
+  border: 1px solid rgba(var(--racing-contrast-rgb), 0.28);
+  border-radius: 8px;
+  background: rgba(22, 38, 30, 0.74);
+  backdrop-filter: blur(14px);
+}
+
+.jockey-invitations-hero__panel strong {
+  color: var(--jockey-text-strong);
+  font-family: "Sora", sans-serif;
+  font-size: clamp(1.8rem, 4vw, 3rem);
+  line-height: 1;
+}
+
+.jockey-invitations-hero__panel p {
+  margin: 0;
+  color: var(--jockey-text-soft);
+  line-height: 1.55;
+}
+
+.jockey-invitation-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.jockey-invitation-stat {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid rgba(var(--racing-contrast-rgb), 0.2);
+  border-radius: 8px;
+  background: rgba(var(--racing-contrast-rgb), 0.09);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  transition: transform 220ms ease, border-color 220ms ease, background 220ms ease, box-shadow 220ms ease;
+}
+
+.jockey-invitation-stat:hover {
+  transform: translateY(-2px);
+  border-color: rgba(var(--racing-accent-rgb), 0.34);
+  background: rgba(var(--racing-contrast-rgb), 0.14);
+  box-shadow: 0 18px 38px rgba(16, 29, 21, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.jockey-invitation-stat svg {
+  color: var(--racing-accent);
+}
+
+.jockey-invitation-stat span,
+.jockey-invitation-stat small {
+  color: var(--jockey-text-muted);
+  line-height: 1.35;
+}
+
+.jockey-invitation-stat strong {
+  min-width: 0;
+  color: var(--jockey-text-strong);
+  font-family: "Sora", sans-serif;
+  font-size: clamp(1.7rem, 3vw, 2.45rem);
+  line-height: 1;
+}
+
+.jockey-invitation-board {
+  display: grid;
+  gap: 16px;
+  padding: clamp(18px, 2.2vw, 24px);
+  border: 1px solid rgba(var(--racing-contrast-rgb), 0.24);
+  border-radius: 8px;
+  background: rgba(var(--racing-contrast-rgb), 0.1);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.jockey-invitation-board__header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.jockey-invitation-board__header h2 {
+  margin: 0;
+  color: var(--jockey-text-strong);
+  font-family: "Sora", sans-serif;
+  font-size: clamp(1.6rem, 3vw, 2.35rem);
+  line-height: 1;
+}
+
+.jockey-segmented {
+  display: inline-flex;
+  gap: 6px;
+  padding: 6px;
+  border: 1px solid rgba(var(--racing-contrast-rgb), 0.22);
+  border-radius: 999px;
+  background: rgba(var(--racing-contrast-rgb), 0.1);
+}
+
+.jockey-segmented button {
+  min-height: 36px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 999px;
+  color: var(--jockey-text-soft);
+  background: transparent;
+  font-weight: 900;
+  cursor: pointer;
+  transition: transform 160ms ease, background 160ms ease, color 160ms ease;
+}
+
+.jockey-segmented button:hover,
+.jockey-segmented__active {
+  color: var(--racing-green-2) !important;
+  background: var(--jockey-text-strong) !important;
+}
+
+.jockey-invitation-list {
+  display: grid;
+  gap: 14px;
+}
+
+.jockey-invitation-card {
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: minmax(260px, 0.42fr) minmax(0, 1fr);
+  min-width: 0;
+  border: 1px solid rgba(var(--racing-contrast-rgb), 0.2);
+  border-radius: 8px;
+  background: rgba(var(--racing-contrast-rgb), 0.09);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  transition: transform 220ms ease, border-color 220ms ease, background 220ms ease, box-shadow 220ms ease;
+}
+
+.jockey-invitation-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(var(--racing-accent-rgb), 0.36);
+  background: rgba(var(--racing-contrast-rgb), 0.12);
+  box-shadow: 0 22px 48px rgba(19, 31, 24, 0.28);
+}
+
+.jockey-invitation-card__media {
+  position: relative;
+  overflow: hidden;
+  min-height: 330px;
+}
+
+.jockey-invitation-card__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 620ms ease, filter 620ms ease;
+}
+
+.jockey-invitation-card:hover .jockey-invitation-card__media img {
+  transform: scale(1.06);
+  filter: saturate(1.06) contrast(1.04);
+}
+
+.jockey-invitation-card__media::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(29, 48, 36, 0.02), rgba(15, 28, 20, 0.56));
+}
+
+.jockey-invitation-card__media .jockey-badge {
+  position: absolute;
+  z-index: 1;
+  top: 14px;
+  left: 14px;
+  backdrop-filter: blur(10px);
+}
+
+.jockey-invitation-card__body {
+  display: grid;
+  gap: 16px;
+  padding: 20px;
+}
+
+.jockey-invitation-card__title {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.jockey-invitation-card__title h3 {
+  margin: 0;
+  color: var(--jockey-text-strong);
+  font-family: "Sora", sans-serif;
+  font-size: clamp(1.7rem, 3vw, 2.45rem);
+  line-height: 0.98;
+}
+
+.jockey-invitation-card__title > strong {
+  max-width: 16ch;
+  color: var(--racing-accent-soft);
+  font-size: 0.86rem;
+  line-height: 1.25;
+  text-align: right;
+}
+
+.jockey-invitation-card__body p {
+  margin: 0;
+  color: var(--jockey-text-soft);
+  line-height: 1.55;
+}
+
+.jockey-invitation-meta {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.jockey-invitation-meta div {
+  display: grid;
+  gap: 7px;
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid rgba(var(--racing-contrast-rgb), 0.16);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.065);
+}
+
+.jockey-invitation-meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--jockey-text-muted);
+  font-size: 0.78rem;
+  font-weight: 900;
+}
+
+.jockey-invitation-meta strong {
+  min-width: 0;
+  color: var(--jockey-text-strong);
+  font-family: "Sora", sans-serif;
+  line-height: 1.12;
+  overflow-wrap: anywhere;
+}
+
+.jockey-invitation-review {
+  display: grid;
+  gap: 10px;
+}
+
+.jockey-invitation-review div {
+  display: grid;
+  gap: 7px;
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid rgba(var(--racing-accent-rgb), 0.24);
+  border-radius: 8px;
+  background: rgba(var(--racing-accent-rgb), 0.08);
+}
+
+.jockey-invitation-review span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--racing-accent-soft);
+  font-size: 0.78rem;
+  font-weight: 900;
+}
+
+.jockey-invitation-review a,
+.jockey-invitation-review strong {
+  min-width: 0;
+  color: var(--jockey-text-strong);
+  font-size: 0.88rem;
+  font-weight: 800;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.jockey-invitation-review a:hover {
+  color: var(--racing-accent-soft);
+}
+
+.jockey-invitation-stage {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  padding: 12px;
+  border-left: 3px solid var(--racing-accent);
+  color: var(--jockey-text-soft);
+  background: rgba(var(--racing-accent-rgb), 0.08);
+  line-height: 1.5;
+}
+
+.jockey-invitation-stage svg {
+  flex: 0 0 auto;
+  margin-top: 2px;
+  color: var(--racing-accent-soft);
+}
+
+.jockey-invitation-terms {
+  display: grid;
+  gap: 8px;
+  padding: 14px;
+  border: 1px solid rgba(118, 207, 143, 0.28);
+  border-radius: 8px;
+  background: rgba(76, 154, 98, 0.08);
+}
+
+.jockey-invitation-terms > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--racing-success-soft);
+  font-size: 0.8rem;
+  font-weight: 900;
+}
+
+.jockey-invitation-terms p,
+.jockey-invitation-terms small {
+  margin: 0;
+  color: var(--jockey-text-soft);
+  line-height: 1.55;
+  white-space: pre-wrap;
+}
+
+.jockey-invitation-terms small {
+  color: var(--jockey-text-muted);
+}
+
+.jockey-cancellation-panel {
+  display: grid;
+  gap: 10px;
+  padding: 14px;
+  border: 1px solid rgba(239, 128, 116, 0.3);
+  border-radius: 8px;
+  background: rgba(177, 65, 53, 0.08);
+}
+
+.jockey-cancellation-panel > strong,
+.jockey-cancellation-panel label > span {
+  color: var(--racing-danger-soft);
+  font-size: 0.82rem;
+  font-weight: 900;
+}
+
+.jockey-cancellation-panel p,
+.jockey-cancellation-panel small {
+  margin: 0;
+  color: var(--jockey-text-soft);
+  line-height: 1.55;
+  white-space: pre-wrap;
+}
+
+.jockey-cancellation-panel label {
+  display: grid;
+  gap: 7px;
+}
+
+.jockey-cancellation-panel textarea {
+  width: 100%;
+  min-height: 92px;
+  padding: 12px;
+  border: 1px solid rgba(var(--racing-contrast-rgb), 0.24);
+  border-radius: 6px;
+  outline: 0;
+  color: var(--jockey-text-strong);
+  background: rgba(11, 25, 16, 0.28);
+  font: inherit;
+  resize: vertical;
+}
+
+.jockey-cancellation-panel textarea:focus-visible {
+  border-color: rgba(239, 128, 116, 0.7);
+  box-shadow: 0 0 0 4px rgba(177, 65, 53, 0.12);
+}
+
+.jockey-invitation-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: auto;
+}
+
+.jockey-invitation-card__actions .jockey-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+  transform: none;
+  box-shadow: none;
+}
+
+.jockey-empty {
+  padding: 28px;
+  border: 1px solid rgba(var(--racing-contrast-rgb), 0.22);
+  border-radius: 8px;
+  color: var(--jockey-text-soft);
+  text-align: center;
+  background: rgba(var(--racing-contrast-rgb), 0.1);
+}
+
+.jockey-schedule-page {
+  display: grid;
+  gap: 18px;
+  max-width: 1180px;
+  margin-inline: auto;
+}
+
+.jockey-schedule-hero {
+  position: relative;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 380px);
+  gap: 24px;
+  align-items: end;
+  min-height: 430px;
+  padding: clamp(24px, 4vw, 46px);
+  border: 1px solid rgba(var(--racing-contrast-rgb), 0.24);
+  border-radius: 8px;
+  background: rgba(var(--racing-contrast-rgb), 0.1);
+}
+
+.jockey-schedule-hero > img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: saturate(0.95) contrast(1.05);
+}
+
+.jockey-schedule-hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, rgba(22, 38, 30, 0.96) 0%, rgba(22, 38, 30, 0.7) 48%, rgba(22, 38, 30, 0.24) 100%),
+    radial-gradient(circle at 80% 18%, rgba(var(--racing-accent-rgb), 0.22), transparent 34%);
+}
+
+.jockey-schedule-hero__copy,
+.jockey-schedule-hero__panel {
+  position: relative;
+  z-index: 1;
+}
+
+.jockey-schedule-hero__copy h1 {
+  max-width: 12ch;
+  margin: 0;
+  color: var(--jockey-text-strong);
+  font-family: "Sora", sans-serif;
+  font-size: clamp(2.65rem, 5.8vw, 5.2rem);
+  line-height: 0.92;
+}
+
+.jockey-schedule-hero__copy p:not(.jockey-kicker) {
+  max-width: 58ch;
+  margin: 18px 0 0;
+  color: var(--jockey-text-soft);
+  line-height: 1.65;
+}
+
+.jockey-schedule-hero__panel {
+  display: grid;
+  gap: 12px;
+  padding: 20px;
+  border: 1px solid rgba(var(--racing-contrast-rgb), 0.28);
+  border-radius: 8px;
+  background: rgba(22, 38, 30, 0.74);
+  backdrop-filter: blur(14px);
+}
+
+.jockey-schedule-hero__panel strong {
+  color: var(--jockey-text-strong);
+  font-family: "Sora", sans-serif;
+  font-size: clamp(1.8rem, 4vw, 3rem);
+  line-height: 1;
+}
+
+.jockey-schedule-hero__panel p {
+  margin: 0;
+  color: var(--jockey-text-soft);
+  line-height: 1.55;
+}
+
+.jockey-schedule-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.jockey-schedule-stat {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid rgba(var(--racing-contrast-rgb), 0.2);
+  border-radius: 8px;
+  background: rgba(var(--racing-contrast-rgb), 0.09);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  transition: transform 220ms ease, border-color 220ms ease, background 220ms ease, box-shadow 220ms ease;
+}
+
+.jockey-schedule-stat:hover {
+  transform: translateY(-2px);
+  border-color: rgba(var(--racing-accent-rgb), 0.34);
+  background: rgba(var(--racing-contrast-rgb), 0.14);
+  box-shadow: 0 18px 38px rgba(16, 29, 21, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.jockey-schedule-stat svg {
+  color: var(--racing-accent);
+}
+
+.jockey-schedule-stat span,
+.jockey-schedule-stat small {
+  color: var(--jockey-text-muted);
+  line-height: 1.35;
+}
+
+.jockey-schedule-stat strong {
+  min-width: 0;
+  color: var(--jockey-text-strong);
+  font-family: "Sora", sans-serif;
+  font-size: clamp(1.7rem, 3vw, 2.45rem);
+  line-height: 1;
+}
+
+.jockey-schedule-board {
+  display: grid;
+  gap: 16px;
+  padding: clamp(18px, 2.2vw, 24px);
+  border: 1px solid rgba(var(--racing-contrast-rgb), 0.24);
+  border-radius: 8px;
+  background: rgba(var(--racing-contrast-rgb), 0.1);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.jockey-schedule-board__header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.jockey-schedule-board__header h2 {
+  margin: 0;
+  color: var(--jockey-text-strong);
+  font-family: "Sora", sans-serif;
+  font-size: clamp(1.6rem, 3vw, 2.35rem);
+  line-height: 1;
+}
+
+.jockey-schedule-list {
+  display: grid;
+  gap: 14px;
+}
+
+.jockey-schedule-slot {
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: minmax(240px, 0.38fr) minmax(0, 1fr);
+  min-width: 0;
+  border: 1px solid rgba(var(--racing-contrast-rgb), 0.2);
+  border-radius: 8px;
+  background: rgba(var(--racing-contrast-rgb), 0.09);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  transition: transform 220ms ease, border-color 220ms ease, background 220ms ease, box-shadow 220ms ease;
+}
+
+.jockey-schedule-slot:hover {
+  transform: translateY(-3px);
+  border-color: rgba(var(--racing-accent-rgb), 0.36);
+  background: rgba(var(--racing-contrast-rgb), 0.12);
+  box-shadow: 0 22px 48px rgba(19, 31, 24, 0.28);
+}
+
+.jockey-schedule-slot__media {
+  position: relative;
+  overflow: hidden;
+  min-height: 300px;
+}
+
+.jockey-schedule-slot__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 620ms ease, filter 620ms ease;
+}
+
+.jockey-schedule-slot:hover .jockey-schedule-slot__media img {
+  transform: scale(1.06);
+  filter: saturate(1.06) contrast(1.04);
+}
+
+.jockey-schedule-slot__media::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(29, 48, 36, 0.02), rgba(15, 28, 20, 0.56));
+}
+
+.jockey-schedule-slot__media .jockey-badge {
+  position: absolute;
+  z-index: 1;
+  top: 14px;
+  left: 14px;
+  backdrop-filter: blur(10px);
+}
+
+.jockey-schedule-slot__body {
+  display: grid;
+  grid-template-columns: 122px minmax(0, 1fr);
+  gap: 16px;
+  align-content: start;
+  padding: 20px;
+}
+
+.jockey-schedule-slot__time {
+  display: grid;
+  gap: 6px;
+  align-self: start;
+  padding: 12px;
+  border: 1px solid rgba(var(--racing-accent-rgb), 0.28);
+  border-radius: 8px;
+  background: rgba(var(--racing-accent-rgb), 0.1);
+}
+
+.jockey-schedule-slot__time span {
+  color: var(--racing-accent-soft);
+  font-size: 0.82rem;
+  font-weight: 900;
+}
+
+.jockey-schedule-slot__time strong {
+  color: var(--jockey-text-strong);
+  font-family: "Sora", sans-serif;
+  font-size: 1.2rem;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.jockey-schedule-slot__race {
+  display: grid;
+  gap: 7px;
+  min-width: 0;
+}
+
+.jockey-schedule-slot__race h3 {
+  margin: 0;
+  color: var(--jockey-text-strong);
+  font-family: "Sora", sans-serif;
+  font-size: clamp(1.45rem, 3vw, 2.2rem);
+  line-height: 1;
+}
+
+.jockey-schedule-slot__race small,
+.jockey-schedule-slot__footer small {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--jockey-text-muted);
+  line-height: 1.35;
+}
+
+.jockey-schedule-slot__meta,
+.jockey-schedule-slot__footer {
+  grid-column: 1 / -1;
+}
+
+.jockey-schedule-slot__meta {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.jockey-schedule-slot__meta div {
+  display: grid;
+  gap: 7px;
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid rgba(var(--racing-contrast-rgb), 0.16);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.065);
+}
+
+.jockey-schedule-slot__meta span {
+  color: var(--jockey-text-muted);
+  font-size: 0.78rem;
+  font-weight: 900;
+}
+
+.jockey-schedule-slot__meta strong {
+  min-width: 0;
+  color: var(--jockey-text-strong);
+  font-family: "Sora", sans-serif;
+  line-height: 1.12;
+  overflow-wrap: anywhere;
+}
+
+.jockey-schedule-slot__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 2px;
+}
+
+.jockey-schedule-slot__footer svg {
+  color: var(--racing-accent);
+}
+
+.jockey-assignments-page {
+  display: grid;
+  gap: 18px;
+  max-width: 1180px;
+  margin-inline: auto;
+}
+
+.jockey-assignments-hero {
+  position: relative;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 380px);
+  gap: 24px;
+  align-items: end;
+  min-height: 430px;
+  padding: clamp(24px, 4vw, 46px);
+  border: 1px solid rgba(var(--racing-contrast-rgb), 0.24);
+  border-radius: 8px;
+  background: rgba(var(--racing-contrast-rgb), 0.1);
+}
+
+.jockey-assignments-hero > img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: saturate(0.95) contrast(1.05);
+}
+
+.jockey-assignments-hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, rgba(22, 38, 30, 0.96) 0%, rgba(22, 38, 30, 0.7) 48%, rgba(22, 38, 30, 0.24) 100%),
+    radial-gradient(circle at 80% 18%, rgba(var(--racing-accent-rgb), 0.22), transparent 34%);
+}
+
+.jockey-assignments-hero__copy,
+.jockey-assignments-hero__panel {
+  position: relative;
+  z-index: 1;
+}
+
+.jockey-assignments-hero__copy h1 {
+  max-width: 12ch;
+  margin: 0;
+  color: var(--jockey-text-strong);
+  font-family: "Sora", sans-serif;
+  font-size: clamp(2.65rem, 5.8vw, 5.2rem);
+  line-height: 0.92;
+}
+
+.jockey-assignments-hero__copy p:not(.jockey-kicker) {
+  max-width: 58ch;
+  margin: 18px 0 0;
+  color: var(--jockey-text-soft);
+  line-height: 1.65;
+}
+
+.jockey-assignments-hero__panel {
+  display: grid;
+  gap: 12px;
+  padding: 20px;
+  border: 1px solid rgba(var(--racing-contrast-rgb), 0.28);
+  border-radius: 8px;
+  background: rgba(22, 38, 30, 0.74);
+  backdrop-filter: blur(14px);
+}
+
+.jockey-assignments-hero__panel strong {
+  color: var(--jockey-text-strong);
+  font-family: "Sora", sans-serif;
+  font-size: clamp(1.8rem, 4vw, 3rem);
+  line-height: 1;
+}
+
+.jockey-assignments-hero__panel p {
+  margin: 0;
+  color: var(--jockey-text-soft);
+  line-height: 1.55;
+}
+
+.jockey-assignment-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.jockey-assignment-stat {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid rgba(var(--racing-contrast-rgb), 0.2);
+  border-radius: 8px;
+  background: rgba(var(--racing-contrast-rgb), 0.09);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  transition: transform 220ms ease, border-color 220ms ease, background 220ms ease, box-shadow 220ms ease;
+}
+
+.jockey-assignment-stat:hover {
+  transform: translateY(-2px);
+  border-color: rgba(var(--racing-accent-rgb), 0.34);
+  background: rgba(var(--racing-contrast-rgb), 0.14);
+  box-shadow: 0 18px 38px rgba(16, 29, 21, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.jockey-assignment-stat svg {
+  color: var(--racing-accent);
+}
+
+.jockey-assignment-stat span,
+.jockey-assignment-stat small {
+  color: var(--jockey-text-muted);
+  line-height: 1.35;
+}
+
+.jockey-assignment-stat strong {
+  min-width: 0;
+  color: var(--jockey-text-strong);
+  font-family: "Sora", sans-serif;
+  font-size: clamp(1.7rem, 3vw, 2.45rem);
+  line-height: 1;
+}
+
+.jockey-assignment-layout {
+  display: grid;
+  grid-template-columns: minmax(260px, 0.36fr) minmax(0, 1fr);
+  gap: 18px;
+  align-items: start;
+}
+
+.jockey-assignment-profile {
+  position: sticky;
+  top: 22px;
+  overflow: hidden;
+  display: grid;
+  border: 1px solid rgba(var(--racing-contrast-rgb), 0.2);
+  border-radius: 8px;
+  background: rgba(var(--racing-contrast-rgb), 0.09);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.jockey-assignment-profile > img {
+  width: 100%;
+  height: 260px;
+  object-fit: cover;
+}
+
+.jockey-assignment-profile > div {
+  display: grid;
+  gap: 10px;
+  padding: 18px;
+}
+
+.jockey-assignment-profile strong {
+  color: var(--jockey-text-strong);
+  font-family: "Sora", sans-serif;
+  font-size: clamp(1.55rem, 3vw, 2.35rem);
+  line-height: 1;
+}
+
+.jockey-assignment-profile p {
+  margin: 0;
+  color: var(--jockey-text-soft);
+  line-height: 1.45;
+}
+
+.jockey-assignment-board {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+  padding: clamp(18px, 2.2vw, 24px);
+  border: 1px solid rgba(var(--racing-contrast-rgb), 0.24);
+  border-radius: 8px;
+  background: rgba(var(--racing-contrast-rgb), 0.1);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.jockey-assignment-board__header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.jockey-assignment-board__header h2 {
+  margin: 0;
+  color: var(--jockey-text-strong);
+  font-family: "Sora", sans-serif;
+  font-size: clamp(1.6rem, 3vw, 2.35rem);
+  line-height: 1;
+}
+
+.jockey-assignment-card-list {
+  display: grid;
+  gap: 14px;
+}
+
+.jockey-assignment-card {
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: minmax(220px, 0.34fr) minmax(0, 1fr);
+  min-width: 0;
+  border: 1px solid rgba(var(--racing-contrast-rgb), 0.2);
+  border-radius: 8px;
+  background: rgba(var(--racing-contrast-rgb), 0.09);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  transition: transform 220ms ease, border-color 220ms ease, background 220ms ease, box-shadow 220ms ease;
+}
+
+.jockey-assignment-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(var(--racing-accent-rgb), 0.36);
+  background: rgba(var(--racing-contrast-rgb), 0.12);
+  box-shadow: 0 22px 48px rgba(19, 31, 24, 0.28);
+}
+
+.jockey-assignment-card__media {
+  position: relative;
+  overflow: hidden;
+  min-height: 300px;
+}
+
+.jockey-assignment-card__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 620ms ease, filter 620ms ease;
+}
+
+.jockey-assignment-card:hover .jockey-assignment-card__media img {
+  transform: scale(1.06);
+  filter: saturate(1.06) contrast(1.04);
+}
+
+.jockey-assignment-card__media::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(29, 48, 36, 0.02), rgba(15, 28, 20, 0.56));
+}
+
+.jockey-assignment-card__media .jockey-badge {
+  position: absolute;
+  z-index: 1;
+  top: 14px;
+  left: 14px;
+  backdrop-filter: blur(10px);
+}
+
+.jockey-assignment-card__body {
+  display: grid;
+  gap: 16px;
+  padding: 20px;
+}
+
+.jockey-assignment-card__title {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.jockey-assignment-card__title h3 {
+  margin: 0;
+  color: var(--jockey-text-strong);
+  font-family: "Sora", sans-serif;
+  font-size: clamp(1.7rem, 3vw, 2.45rem);
+  line-height: 0.98;
+}
+
+.jockey-assignment-card__title > strong {
+  max-width: 16ch;
+  color: var(--racing-accent-soft);
+  font-size: 0.86rem;
+  line-height: 1.25;
+  text-align: right;
+}
+
+.jockey-assignment-card__body p {
+  margin: 0;
+  color: var(--jockey-text-soft);
+  line-height: 1.55;
+}
+
+.jockey-assignment-meta {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.jockey-assignment-meta div {
+  display: grid;
+  gap: 7px;
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid rgba(var(--racing-contrast-rgb), 0.16);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.065);
+}
+
+.jockey-assignment-meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--jockey-text-muted);
+  font-size: 0.78rem;
+  font-weight: 900;
+}
+
+.jockey-assignment-meta strong {
+  min-width: 0;
+  color: var(--jockey-text-strong);
+  font-family: "Sora", sans-serif;
+  line-height: 1.12;
+  overflow-wrap: anywhere;
+}
+
+.jockey-results-page {
+  display: grid;
+  gap: 22px;
+  max-width: 1240px;
+  margin: 0 auto;
+}
+
+.jockey-results-hero {
+  position: relative;
+  isolation: isolate;
+  min-height: 430px;
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(260px, 0.4fr);
+  align-items: end;
+  gap: 22px;
+  overflow: hidden;
+  padding: clamp(22px, 4vw, 44px);
+  border: 1px solid rgba(var(--racing-contrast-rgb), 0.24);
+  border-radius: 8px;
+  background: rgba(var(--racing-contrast-rgb), 0.08);
+  box-shadow: 0 26px 70px rgba(19, 34, 25, 0.26);
+}
+
+.jockey-results-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(90deg, rgba(27, 45, 34, 0.9), rgba(27, 45, 34, 0.46) 52%, rgba(27, 45, 34, 0.18)),
+    radial-gradient(circle at 18% 18%, rgba(var(--racing-accent-rgb), 0.28), transparent 28%);
+}
+
+.jockey-results-hero > img {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 36%;
+  filter: saturate(0.9) contrast(1.02);
+}
+
+.jockey-results-hero__copy {
+  max-width: 760px;
+}
+
+.jockey-results-hero__copy h1 {
+  max-width: 13ch;
+  margin: 8px 0 14px;
+  color: var(--jockey-text-strong);
+  font-family: "Sora", sans-serif;
+  font-size: clamp(3.3rem, 8vw, 6.8rem);
+  line-height: 0.86;
+  letter-spacing: -0.06em;
+  text-wrap: balance;
+}
+
+.jockey-results-hero__copy p {
+  max-width: 58ch;
+  margin: 0;
+  color: var(--jockey-text-soft);
+  font-size: 1.02rem;
+  line-height: 1.6;
+}
+
+.jockey-results-hero__panel {
+  display: grid;
+  gap: 12px;
+  justify-self: end;
+  width: min(100%, 310px);
+  padding: 18px;
+  border: 1px solid rgba(var(--racing-contrast-rgb), 0.26);
+  border-radius: 8px;
+  background: rgba(38, 62, 47, 0.74);
+  backdrop-filter: blur(14px);
+}
+
+.jockey-results-hero__panel strong {
+  color: var(--racing-accent-soft);
+  font-family: "Sora", sans-serif;
+  font-size: clamp(3rem, 6vw, 5.2rem);
+  line-height: 0.9;
+}
+
+.jockey-results-hero__panel p {
+  margin: 0;
+  color: var(--jockey-text-soft);
+  line-height: 1.4;
+}
+
+.jockey-results-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.jockey-results-stat {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  padding: 18px;
+  border: 1px solid rgba(var(--racing-contrast-rgb), 0.18);
+  border-radius: 8px;
+  background: rgba(var(--racing-contrast-rgb), 0.1);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
+}
+
+.jockey-results-stat:hover {
+  border-color: rgba(var(--racing-accent-rgb), 0.42);
+  background: rgba(var(--racing-contrast-rgb), 0.15);
+  transform: translateY(-2px);
+}
+
+.jockey-results-stat svg {
+  color: var(--racing-accent-soft);
+}
+
+.jockey-results-stat span,
+.jockey-results-stat small {
+  min-width: 0;
+  color: var(--jockey-text-muted);
+  font-weight: 900;
+}
+
+.jockey-results-stat strong {
+  min-width: 0;
+  color: var(--jockey-text-strong);
+  font-family: "Sora", sans-serif;
+  font-size: clamp(1.55rem, 3vw, 2.45rem);
+  line-height: 0.98;
+  overflow-wrap: anywhere;
+}
+
+.jockey-results-layout {
+  display: grid;
+  grid-template-columns: minmax(280px, 0.36fr) minmax(0, 1fr);
+  gap: 18px;
+  align-items: start;
+}
+
+.jockey-results-feature,
+.jockey-results-board {
+  border: 1px solid rgba(var(--racing-contrast-rgb), 0.2);
+  border-radius: 8px;
+  background: rgba(var(--racing-contrast-rgb), 0.1);
+  box-shadow: 0 20px 52px rgba(15, 30, 21, 0.18);
+}
+
+.jockey-results-feature {
+  position: sticky;
+  top: 18px;
+  overflow: hidden;
+  display: grid;
+}
+
+.jockey-results-feature > img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  filter: saturate(0.92) contrast(1.02);
+}
+
+.jockey-results-feature > div:not(.jockey-results-feature__metrics) {
+  display: grid;
+  gap: 10px;
+  padding: 18px;
+}
+
+.jockey-results-feature h2 {
+  margin: 0;
+  color: var(--jockey-text-strong);
+  font-family: "Sora", sans-serif;
+  font-size: clamp(1.65rem, 3vw, 2.55rem);
+  line-height: 0.98;
+}
+
+.jockey-results-feature p {
+  margin: 0;
+  color: var(--jockey-text-soft);
+  line-height: 1.55;
+}
+
+.jockey-results-feature__metrics {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  padding: 0 18px 18px;
+}
+
+.jockey-results-feature__metrics div,
+.jockey-results-row__metrics div {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid rgba(var(--racing-contrast-rgb), 0.16);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.065);
+}
+
+.jockey-results-feature__metrics span,
+.jockey-results-row__metrics span {
+  color: var(--jockey-text-muted);
+  font-size: 0.74rem;
+  font-weight: 1000;
+}
+
+.jockey-results-feature__metrics strong,
+.jockey-results-row__metrics strong {
+  min-width: 0;
+  color: var(--jockey-text-strong);
+  font-family: "Sora", sans-serif;
+  line-height: 1.05;
+  overflow-wrap: anywhere;
+}
+
+.jockey-results-board {
+  display: grid;
+  gap: 14px;
+  padding: 18px;
+}
+
+.jockey-results-board__header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.jockey-results-board__header h2 {
+  margin: 5px 0 0;
+  color: var(--jockey-text-strong);
+  font-family: "Sora", sans-serif;
+  font-size: clamp(1.8rem, 3vw, 2.8rem);
+  line-height: 1;
+}
+
+.jockey-results-list {
+  display: grid;
+  gap: 10px;
+}
+
+.jockey-results-row {
+  display: grid;
+  grid-template-columns: 82px minmax(170px, 1fr) minmax(300px, 0.9fr) auto;
+  align-items: center;
+  gap: 16px;
+  min-width: 0;
+  padding: 14px;
+  border: 1px solid rgba(var(--racing-contrast-rgb), 0.16);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.065);
+  transition: transform 180ms ease, background 180ms ease, border-color 180ms ease;
+}
+
+.jockey-results-row:hover {
+  border-color: var(--jockey-accent-border);
+  background: rgba(255, 255, 255, 0.095);
+  transform: translateY(-2px);
+}
+
+.jockey-results-row__date {
+  width: 70px;
+  min-height: 70px;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 2px;
+  border: 1px solid rgba(var(--racing-accent-rgb), 0.34);
+  border-radius: 8px;
+  color: var(--racing-accent-soft);
+  background: var(--jockey-accent-surface);
+  font-family: "Sora", sans-serif;
+  text-align: center;
+}
+
+.jockey-results-row__date span {
+  font-size: 0.76rem;
+  font-weight: 900;
+}
+
+.jockey-results-row__date strong {
+  font-size: 1.45rem;
+  line-height: 1;
+}
+
+.jockey-results-row__main {
+  min-width: 0;
+}
+
+.jockey-results-row__main h3 {
+  margin: 5px 0 8px;
+  color: var(--jockey-text-strong);
+  font-family: "Sora", sans-serif;
+  font-size: clamp(1.25rem, 2.2vw, 1.9rem);
+  line-height: 1.02;
+}
+
+.jockey-results-row__main p {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  color: var(--jockey-text-soft);
+  font-weight: 800;
+}
+
+.jockey-results-row__metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  min-width: 0;
+}
+
+.jockey-results-row > .jockey-badge {
+  justify-self: end;
+  white-space: nowrap;
+}
+
+.jockey-profile-page {
+  display: grid;
+  gap: 22px;
+  max-width: 1240px;
+  margin: 0 auto;
+}
+
+.jockey-profile-hero {
+  display: grid;
+  grid-template-columns: minmax(230px, 0.36fr) minmax(0, 1fr) minmax(240px, 0.34fr);
+  align-items: end;
+  gap: 18px;
+  padding: clamp(18px, 3vw, 28px);
+  border: 1px solid rgba(var(--racing-contrast-rgb), 0.22);
+  border-radius: 8px;
+  background:
+    radial-gradient(circle at 18% 12%, rgba(var(--racing-accent-rgb), 0.16), transparent 28%),
+    linear-gradient(135deg, rgba(var(--racing-contrast-rgb), 0.14), rgba(var(--racing-contrast-rgb), 0.06));
+  box-shadow: 0 24px 64px rgba(15, 30, 21, 0.22);
+}
+
+.jockey-profile-hero__portrait {
+  position: relative;
+  overflow: hidden;
+  min-height: 360px;
+  border: 1px solid rgba(var(--racing-contrast-rgb), 0.24);
+  border-radius: 8px;
+  background: rgba(var(--racing-contrast-rgb), 0.09);
+}
+
+.jockey-profile-hero__portrait::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(180deg, transparent 48%, rgba(20, 34, 26, 0.78));
+}
+
+.jockey-profile-hero__portrait img {
+  width: 100%;
+  height: 100%;
+  min-height: 360px;
+  object-fit: cover;
+  object-position: center top;
+  filter: saturate(0.94) contrast(1.02);
+  transition: transform 360ms ease;
+}
+
+.jockey-profile-hero__portrait:hover img {
+  transform: scale(1.035);
+}
+
+.jockey-profile-hero__portrait .jockey-badge {
+  position: absolute;
+  z-index: 1;
+  left: 16px;
+  bottom: 16px;
+  backdrop-filter: blur(10px);
+}
+
+.jockey-profile-hero__copy {
+  display: grid;
+  gap: 14px;
+  align-self: center;
+  padding: clamp(6px, 2vw, 20px);
+}
+
+.jockey-profile-hero__copy h1 {
+  margin: 0;
+  color: var(--jockey-text-strong);
+  font-family: "Sora", sans-serif;
+  font-size: clamp(3.6rem, 8vw, 7rem);
+  line-height: 0.84;
+  letter-spacing: 0;
+  text-wrap: balance;
+}
+
+.jockey-profile-hero__copy p {
+  max-width: 62ch;
+  margin: 0;
+  color: var(--jockey-text-soft);
+  font-size: 1.02rem;
+  line-height: 1.6;
+}
+
+.jockey-profile-hero__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.jockey-profile-hero__tags span {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 36px;
+  padding: 0 12px;
+  border: 1px solid rgba(var(--racing-contrast-rgb), 0.18);
+  border-radius: 999px;
+  color: var(--jockey-text-soft);
+  background: rgba(255, 255, 255, 0.07);
+  font-weight: 900;
+}
+
+.jockey-profile-hero__panel {
+  display: grid;
+  gap: 10px;
+  padding: 18px;
+  border: 1px solid rgba(var(--racing-accent-rgb), 0.28);
+  border-radius: 8px;
+  background: var(--jockey-accent-surface);
+}
+
+.jockey-profile-hero__panel strong {
+  color: var(--racing-accent-soft);
+  font-family: "Sora", sans-serif;
+  font-size: clamp(1.7rem, 3vw, 2.65rem);
+  line-height: 0.98;
+}
+
+.jockey-profile-hero__panel p {
+  margin: 0;
+  color: var(--jockey-text-soft);
+  line-height: 1.4;
+}
+
+.jockey-profile-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.jockey-profile-stat {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  padding: 18px;
+  border: 1px solid rgba(var(--racing-contrast-rgb), 0.18);
+  border-radius: 8px;
+  background: rgba(var(--racing-contrast-rgb), 0.1);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
+}
+
+.jockey-profile-stat:hover {
+  border-color: rgba(var(--racing-accent-rgb), 0.42);
+  background: rgba(var(--racing-contrast-rgb), 0.15);
+  transform: translateY(-2px);
+}
+
+.jockey-profile-stat svg {
+  color: var(--racing-accent-soft);
+}
+
+.jockey-profile-stat span,
+.jockey-profile-stat small {
+  min-width: 0;
+  color: var(--jockey-text-muted);
+  font-weight: 900;
+}
+
+.jockey-profile-stat strong {
+  min-width: 0;
+  color: var(--jockey-text-strong);
+  font-family: "Sora", sans-serif;
+  font-size: clamp(1.5rem, 3vw, 2.35rem);
+  line-height: 0.98;
+  overflow-wrap: anywhere;
+}
+
+.jockey-profile-layout {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 16px;
+  align-items: start;
+}
+
+.jockey-profile-card {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+  padding: 18px;
+  border: 1px solid rgba(var(--racing-contrast-rgb), 0.2);
+  border-radius: 8px;
+  background: rgba(var(--racing-contrast-rgb), 0.1);
+  box-shadow: 0 20px 52px rgba(15, 30, 21, 0.16);
+}
+
+.jockey-profile-card__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.jockey-profile-card__header h2 {
+  margin: 5px 0 0;
+  color: var(--jockey-text-strong);
+  font-family: "Sora", sans-serif;
+  font-size: clamp(1.55rem, 3vw, 2.35rem);
+  line-height: 1;
+}
+
+.jockey-profile-card__header > svg {
+  flex: 0 0 auto;
+  color: var(--racing-accent-soft);
+}
+
+.jockey-profile-contact {
+  grid-column: span 5;
+}
+
+.jockey-profile-license {
+  grid-column: span 7;
+}
+
+.jockey-profile-next {
+  grid-column: span 5;
+}
+
+.jockey-profile-result {
+  grid-column: span 3;
+}
+
+.jockey-profile-activity {
+  grid-column: span 4;
+}
+
+.jockey-profile-edit,
+.jockey-profile-violations {
+  grid-column: 1 / -1;
+}
+
+.jockey-profile-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.jockey-profile-form label {
+  display: grid;
+  gap: 7px;
+  min-width: 0;
+  color: var(--jockey-text-soft);
+  font-size: 0.84rem;
+  font-weight: 900;
+}
+
+.jockey-profile-form input,
+.jockey-profile-form select {
+  width: 100%;
+  min-height: 46px;
+  padding: 0 13px;
+  border: 1px solid rgba(var(--racing-contrast-rgb), 0.22);
+  border-radius: 8px;
+  color: var(--jockey-text-strong);
+  background: rgba(255, 255, 255, 0.07);
+  outline: 0;
+}
+
+.jockey-profile-form input:focus,
+.jockey-profile-form select:focus {
+  border-color: rgba(var(--racing-accent-rgb), 0.68);
+  box-shadow: 0 0 0 3px rgba(var(--racing-accent-rgb), 0.12);
+}
+
+.jockey-profile-form select option {
+  color: var(--racing-green-2);
+}
+
+.jockey-profile-form__actions {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 2px;
+}
+
+.jockey-form-message {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-right: auto;
+  color: var(--racing-success-soft);
+  font-weight: 850;
+}
+
+.jockey-form-message--error {
+  color: var(--racing-danger-soft);
+}
+
+.jockey-violation-list {
+  display: grid;
+  gap: 10px;
+}
+
+.jockey-violation-item {
+  display: grid;
+  gap: 12px;
+  padding: 15px;
+  border: 1px solid rgba(var(--racing-contrast-rgb), 0.16);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.055);
+}
+
+.jockey-violation-item__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.jockey-violation-item__header > div {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+}
+
+.jockey-violation-item__header strong {
+  color: var(--jockey-text-strong);
+  font-family: "Sora", sans-serif;
+}
+
+.jockey-violation-item__header small,
+.jockey-violation-item p,
+.jockey-violation-item__meta span {
+  color: var(--jockey-text-muted);
+  line-height: 1.45;
+}
+
+.jockey-violation-item p {
+  margin: 0;
+}
+
+.jockey-violation-item__meta {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px 14px;
+}
+
+.jockey-violation-item__meta span {
+  display: grid;
+  gap: 4px;
+  font-size: 0.82rem;
+}
+
+.jockey-violation-item__meta strong {
+  color: var(--jockey-text-soft);
+  overflow-wrap: anywhere;
+}
+
+.jockey-profile-empty {
+  padding: 20px;
+  border: 1px dashed rgba(var(--racing-contrast-rgb), 0.24);
+  border-radius: 8px;
+  color: var(--jockey-text-muted);
+  text-align: center;
+}
+
+.jockey-profile-detail-list,
+.jockey-profile-license__grid,
+.jockey-profile-result__metrics,
+.jockey-profile-activity__list {
+  display: grid;
+  gap: 10px;
+}
+
+.jockey-profile-detail-list div,
+.jockey-profile-license__grid div,
+.jockey-profile-result__metrics div,
+.jockey-profile-activity__item {
+  min-width: 0;
+  border: 1px solid rgba(var(--racing-contrast-rgb), 0.16);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.065);
+}
+
+.jockey-profile-detail-list div {
+  display: grid;
+  grid-template-columns: 18px 82px minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+  padding: 13px;
+}
+
+.jockey-profile-detail-list svg {
+  color: var(--racing-accent-soft);
+}
+
+.jockey-profile-detail-list span,
+.jockey-profile-license__grid span,
+.jockey-profile-result__metrics span {
+  color: var(--jockey-text-muted);
+  font-size: 0.78rem;
+  font-weight: 1000;
+}
+
+.jockey-profile-detail-list strong,
+.jockey-profile-license__grid strong,
+.jockey-profile-result__metrics strong,
+.jockey-profile-activity__item strong {
+  min-width: 0;
+  color: var(--jockey-text-strong);
+  font-family: "Sora", sans-serif;
+  line-height: 1.1;
+  overflow-wrap: anywhere;
+}
+
+.jockey-profile-license__grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.jockey-profile-license__grid div,
+.jockey-profile-result__metrics div {
+  display: grid;
+  gap: 7px;
+  padding: 14px;
+}
+
+.jockey-profile-next__body {
+  display: grid;
+  grid-template-columns: 94px minmax(0, 1fr);
+  align-items: center;
+  gap: 14px;
+}
+
+.jockey-profile-next__body > div:last-child {
+  display: grid;
+  gap: 6px;
+}
+
+.jockey-profile-next__body strong {
+  color: var(--jockey-text-strong);
+  font-family: "Sora", sans-serif;
+  font-size: 1.28rem;
+  line-height: 1.1;
+}
+
+.jockey-profile-next__body span,
+.jockey-profile-next__body small {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--jockey-text-soft);
+  line-height: 1.35;
+}
+
+.jockey-profile-result__metrics {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.jockey-profile-activity__item {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr);
+  align-items: start;
+  gap: 10px;
+  padding: 12px;
+}
+
+.jockey-profile-activity__item > span {
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(var(--racing-accent-rgb), 0.34);
+  border-radius: 8px;
+  color: var(--racing-accent-soft);
+  background: var(--jockey-accent-surface);
+  font-family: "Sora", sans-serif;
+  font-weight: 900;
+}
+
+.jockey-profile-activity__item div {
+  display: grid;
+  gap: 5px;
+}
+
+.jockey-profile-activity__item small {
+  color: var(--jockey-text-muted);
+  font-weight: 800;
+}
+
+.jockey-hero,
+.jockey-invitations-hero,
+.jockey-schedule-hero,
+.jockey-assignments-hero,
+.jockey-results-hero,
+.jockey-profile-hero {
+  border-color: var(--jockey-moss-border);
+  background: var(--jockey-moss-panel-soft);
+  box-shadow: 0 24px 70px rgba(8, 19, 13, 0.28);
+}
+
+.jockey-invitations-hero::after,
+.jockey-schedule-hero::after,
+.jockey-assignments-hero::after {
+  background:
+    linear-gradient(90deg, rgba(16, 32, 23, 0.98) 0%, rgba(22, 39, 29, 0.88) 48%, rgba(31, 53, 40, 0.62) 100%),
+    linear-gradient(180deg, rgba(10, 22, 15, 0.18), rgba(10, 22, 15, 0.62)),
+    radial-gradient(circle at 80% 18%, rgba(var(--racing-accent-rgb), 0.14), transparent 34%);
+}
+
+.jockey-results-hero::before {
+  background:
+    linear-gradient(90deg, rgba(16, 32, 23, 0.98) 0%, rgba(22, 39, 29, 0.84) 52%, rgba(31, 53, 40, 0.58) 100%),
+    linear-gradient(180deg, rgba(10, 22, 15, 0.12), rgba(10, 22, 15, 0.58)),
+    radial-gradient(circle at 18% 18%, rgba(var(--racing-accent-rgb), 0.16), transparent 28%);
+}
+
+.jockey-profile-hero {
+  background:
+    radial-gradient(circle at 18% 12%, rgba(var(--racing-accent-rgb), 0.1), transparent 28%),
+    linear-gradient(135deg, rgba(42, 64, 49, 0.78), rgba(18, 35, 25, 0.72));
+}
+
+.jockey-hero__panel,
+.jockey-invitations-hero__panel,
+.jockey-schedule-hero__panel,
+.jockey-assignments-hero__panel,
+.jockey-results-hero__panel,
+.jockey-profile-hero__panel,
+.jockey-stat-card,
+.jockey-card,
+.jockey-visual-card,
+.jockey-race-strip__item,
+.jockey-invitation-stat,
+.jockey-schedule-stat,
+.jockey-assignment-stat,
+.jockey-results-stat,
+.jockey-profile-stat,
+.jockey-invitation-board,
+.jockey-schedule-board,
+.jockey-assignment-board,
+.jockey-results-board,
+.jockey-profile-card,
+.jockey-assignment-profile,
+.jockey-results-feature,
+.jockey-invitation-card,
+.jockey-schedule-slot,
+.jockey-assignment-card,
+.jockey-results-row,
+.jockey-empty,
+.jockey-profile-empty {
+  border-color: var(--jockey-moss-border);
+  background: var(--jockey-moss-panel);
+}
+
+.jockey-hero__panel,
+.jockey-invitations-hero__panel,
+.jockey-schedule-hero__panel,
+.jockey-assignments-hero__panel,
+.jockey-results-hero__panel {
+  background: var(--jockey-moss-panel-strong);
+}
+
+.jockey-command-panel__meta div,
+.jockey-result-card__stats div,
+.jockey-invite-item,
+.jockey-assignment-item,
+.jockey-invitation-meta div,
+.jockey-invitation-review > div,
+.jockey-invitation-stage,
+.jockey-invitation-terms,
+.jockey-schedule-slot__meta div,
+.jockey-assignment-meta div,
+.jockey-results-feature__metrics div,
+.jockey-results-row__metrics div,
+.jockey-profile-detail-list div,
+.jockey-profile-license__grid div,
+.jockey-profile-result__metrics div,
+.jockey-profile-activity__item,
+.jockey-violation-item,
+.jockey-profile-hero__tags span,
+.jockey-profile-form input,
+.jockey-profile-form select {
+  border-color: rgba(214, 226, 202, 0.14);
+  background: rgba(19, 37, 27, 0.42);
+}
+
+.jockey-segmented,
+.jockey-nav,
+.jockey-topbar__actions .jockey-button,
+.jockey-icon-button {
+  border-color: var(--jockey-moss-border);
+  background: rgba(58, 82, 63, 0.42);
+}
+
+.jockey-invitations-hero > img,
+.jockey-schedule-hero > img,
+.jockey-assignments-hero > img,
+.jockey-results-hero > img,
+.jockey-hero > img {
+  filter: saturate(0.82) contrast(1.08) brightness(0.82);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .jockey-content,
+  .jockey-nav__link,
+  .jockey-button,
+  .jockey-icon-button,
+  .jockey-notification-popover,
+  .jockey-notification-item,
+  .jockey-notification-popover__footer,
+  .jockey-stat-card,
+  .jockey-card,
+  .jockey-visual-card,
+  .jockey-visual-card img,
+  .jockey-race-strip__item,
+  .jockey-invitation-stat,
+  .jockey-segmented button,
+  .jockey-invitation-card,
+  .jockey-invitation-card__media img,
+  .jockey-schedule-stat,
+  .jockey-schedule-slot,
+  .jockey-schedule-slot__media img,
+  .jockey-assignment-stat,
+  .jockey-assignment-card,
+  .jockey-assignment-card__media img,
+  .jockey-results-stat,
+  .jockey-results-row,
+  .jockey-profile-stat,
+  .jockey-profile-hero__portrait img {
+    animation: none;
+    transition: none;
+  }
+}
+
+@media (max-width: 1080px) {
+  .jockey-topbar,
+  .jockey-hero,
+  .jockey-cockpit-grid,
+  .jockey-dashboard-grid,
+  .jockey-dashboard-lower,
+  .jockey-invitations-hero,
+  .jockey-invitation-card,
+  .jockey-schedule-hero,
+  .jockey-schedule-slot,
+  .jockey-assignments-hero,
+  .jockey-assignment-layout,
+  .jockey-assignment-card,
+  .jockey-results-hero,
+  .jockey-results-layout,
+  .jockey-results-row,
+  .jockey-profile-hero {
+    grid-template-columns: 1fr;
+  }
+
+  .jockey-topbar {
+    display: grid;
+    justify-items: stretch;
+  }
+
+  .jockey-nav {
+    border-radius: 18px;
+  }
+
+  .jockey-stats,
+  .jockey-race-strip,
+  .jockey-invitation-stats,
+  .jockey-schedule-stats,
+  .jockey-assignment-stats,
+  .jockey-results-stats,
+  .jockey-profile-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .jockey-assignment-profile,
+  .jockey-results-feature {
+    position: static;
+  }
+
+  .jockey-results-hero__panel,
+  .jockey-results-row > .jockey-badge {
+    justify-self: start;
+  }
+
+  .jockey-profile-contact,
+  .jockey-profile-license,
+  .jockey-profile-next,
+  .jockey-profile-result,
+  .jockey-profile-activity,
+  .jockey-profile-edit,
+  .jockey-profile-violations {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 640px) {
+  .jockey-page {
+    padding-inline: 14px;
+  }
+
+  .jockey-topbar__actions,
+  .jockey-hero__actions,
+  .jockey-button,
+  .jockey-nav__link,
+  .jockey-notification-menu,
+  .jockey-notification-trigger {
+    width: 100%;
+  }
+
+  .jockey-stats,
+  .jockey-race-strip,
+  .jockey-command-panel__meta,
+  .jockey-next-race__body,
+  .jockey-result-card__stats,
+  .jockey-invitation-stats,
+  .jockey-invitation-meta,
+  .jockey-schedule-stats,
+  .jockey-schedule-slot__body,
+  .jockey-schedule-slot__meta,
+  .jockey-assignment-stats,
+  .jockey-assignment-meta,
+  .jockey-results-stats,
+  .jockey-results-row__metrics,
+  .jockey-results-feature__metrics,
+  .jockey-profile-stats,
+  .jockey-profile-license__grid,
+  .jockey-profile-next__body,
+  .jockey-profile-result__metrics {
+    grid-template-columns: 1fr;
+  }
+
+  .jockey-profile-form,
+  .jockey-violation-item__meta {
+    grid-template-columns: 1fr;
+  }
+
+  .jockey-profile-form__actions,
+  .jockey-violation-item__header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .jockey-profile-form__actions .jockey-button {
+    width: 100%;
+  }
+
+  .jockey-hero {
+    min-height: 560px;
+    align-items: end;
+    padding: 18px;
+  }
+
+  .jockey-invitations-hero {
+    min-height: 520px;
+    align-items: end;
+    padding: 18px;
+  }
+
+  .jockey-schedule-hero {
+    min-height: 520px;
+    align-items: end;
+    padding: 18px;
+  }
+
+  .jockey-assignments-hero {
+    min-height: 520px;
+    align-items: end;
+    padding: 18px;
+  }
+
+  .jockey-results-hero {
+    min-height: 540px;
+    align-items: end;
+    padding: 18px;
+  }
+
+  .jockey-hero__copy h1,
+  .jockey-invitations-hero__copy h1,
+  .jockey-schedule-hero__copy h1,
+  .jockey-assignments-hero__copy h1,
+  .jockey-results-hero__copy h1 {
+    max-width: 11ch;
+    font-size: clamp(2.35rem, 13vw, 3.65rem);
+  }
+
+  .jockey-profile-hero__copy h1 {
+    font-size: clamp(3rem, 16vw, 4.8rem);
+  }
+
+  .jockey-profile-hero__portrait,
+  .jockey-profile-hero__portrait img {
+    min-height: 420px;
+  }
+
+  .jockey-profile-detail-list div {
+    grid-template-columns: 18px minmax(0, 1fr);
+  }
+
+  .jockey-profile-detail-list span {
+    display: none;
+  }
+
+  .jockey-notification-popover {
+    right: auto;
+    left: 0;
+    width: min(100%, calc(100vw - 28px));
+    transform-origin: top left;
+  }
+
+  .jockey-notification-popover::before {
+    right: auto;
+    left: 18px;
+  }
+
+  .jockey-invite-item {
+    grid-template-columns: 1fr;
+    align-items: start;
+  }
+
+  .jockey-invitation-board__header,
+  .jockey-invitation-card__title,
+  .jockey-invitation-card__actions {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .jockey-schedule-board__header,
+  .jockey-schedule-slot__footer,
+  .jockey-assignment-board__header,
+  .jockey-assignment-card__title,
+  .jockey-results-board__header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .jockey-segmented,
+  .jockey-segmented button,
+  .jockey-invitation-card__actions .jockey-button {
+    width: 100%;
+  }
+
+  .jockey-invitation-card__title > strong {
+    max-width: none;
+    text-align: left;
+  }
+
+  .jockey-assignment-card__title > strong {
+    max-width: none;
+    text-align: left;
+  }
+
+  .jockey-visual-card {
+    min-height: 340px;
+  }
+}
+
+/* Invitation room refresh: clearer hierarchy, denser decision cards, calmer controls. */
+.jockey-invitations-page {
+  max-width: 1240px;
+  gap: 20px;
+}
+
+.jockey-invitations-page > *,
+.jockey-invitations-hero__panel,
+.jockey-invitation-board__header,
+.jockey-segmented {
+  min-width: 0;
+}
+
+.jockey-invitations-hero {
+  min-height: 394px;
+  grid-template-columns: minmax(0, 1.16fr) minmax(300px, 0.84fr);
+  gap: 32px;
+  padding: clamp(28px, 4.5vw, 56px);
+  border-radius: 22px;
+  border-color: rgba(214, 226, 202, 0.22);
+  box-shadow: 0 28px 80px rgba(8, 19, 13, 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.jockey-invitations-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.28;
+  background-image: linear-gradient(rgba(214, 226, 202, 0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(214, 226, 202, 0.06) 1px, transparent 1px);
+  background-size: 44px 44px;
+  mask-image: linear-gradient(90deg, black, transparent 72%);
+}
+
+.jockey-invitations-hero__copy {
+  position: relative;
+  z-index: 1;
+  align-self: center;
+  display: grid;
+  gap: 14px;
+}
+
+.jockey-invitations-hero__copy h1 {
+  max-width: 10.5ch;
+  font-size: clamp(2.7rem, 5.6vw, 5.15rem);
+  letter-spacing: -0.055em;
+}
+
+.jockey-invitations-hero__copy p:not(.jockey-kicker) {
+  max-width: 48ch;
+  margin-top: 4px;
+  font-size: 1rem;
+}
+
+.jockey-invitations-hero__signals {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  margin-top: 8px;
+  color: var(--jockey-text-muted);
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.jockey-invitations-hero__signals span {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.jockey-invitations-hero__signals b {
+  color: var(--racing-accent-soft);
+  font-family: "Sora", sans-serif;
+  font-size: 0.67rem;
+  letter-spacing: 0.08em;
+}
+
+.jockey-invitations-hero__panel {
+  align-self: end;
+  justify-self: end;
+  width: min(100%, 370px);
+  gap: 10px;
+  padding: 22px;
+  border-radius: 16px;
+  border-color: rgba(214, 226, 202, 0.25);
+  background: rgba(12, 28, 19, 0.76);
+  box-shadow: 0 22px 46px rgba(5, 15, 9, 0.26), inset 3px 0 0 var(--racing-accent);
+}
+
+.jockey-invitations-hero__panel-label {
+  color: var(--jockey-text-muted);
+  font-size: 0.69rem;
+  font-weight: 900;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+.jockey-invitations-hero__panel strong {
+  font-size: clamp(1.9rem, 3.2vw, 2.8rem);
+  letter-spacing: -0.045em;
+}
+
+.jockey-invitation-stats {
+  gap: 14px;
+}
+
+.jockey-invitation-stat {
+  grid-template-columns: 34px minmax(0, 1fr);
+  grid-template-areas: "icon label" "icon value" "icon note";
+  align-items: center;
+  min-height: 124px;
+  padding: 17px 18px;
+  border-radius: 16px;
+  border-color: rgba(214, 226, 202, 0.17);
+  background: linear-gradient(145deg, rgba(50, 77, 58, 0.62), rgba(23, 43, 31, 0.72));
+}
+
+.jockey-invitation-stat svg {
+  grid-area: icon;
+  align-self: start;
+  width: 30px;
+  height: 30px;
+  padding: 7px;
+  border: 1px solid rgba(var(--racing-accent-rgb), 0.3);
+  border-radius: 10px;
+  background: rgba(var(--racing-accent-rgb), 0.13);
+}
+
+.jockey-invitation-stat span {
+  grid-area: label;
+  font-size: 0.79rem;
+  font-weight: 800;
+}
+
+.jockey-invitation-stat strong {
+  grid-area: value;
+  font-size: clamp(1.75rem, 3vw, 2.5rem);
+  letter-spacing: -0.05em;
+}
+
+.jockey-invitation-stat small {
+  grid-area: note;
+  font-size: 0.74rem;
+}
+
+.jockey-invitation-board {
+  gap: 20px;
+  padding: clamp(18px, 2.5vw, 28px);
+  border-radius: 22px;
+  border-color: rgba(214, 226, 202, 0.2);
+  background: linear-gradient(180deg, rgba(45, 70, 53, 0.58), rgba(24, 45, 32, 0.78));
+  box-shadow: 0 24px 62px rgba(8, 19, 13, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.jockey-invitation-board__header {
+  align-items: end;
+  gap: 22px;
+}
+
+.jockey-invitation-board__heading {
+  display: flex;
+  align-items: end;
+  flex-wrap: wrap;
+  gap: 16px 22px;
+}
+
+.jockey-invitation-board__header h2 {
+  font-size: clamp(1.85rem, 3vw, 2.55rem);
+  letter-spacing: -0.045em;
+}
+
+.jockey-invitation-board__result-count {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding-bottom: 4px;
+  color: var(--jockey-text-muted);
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
+.jockey-invitation-board__result-count i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--racing-success-soft);
+  box-shadow: 0 0 0 4px rgba(114, 223, 138, 0.1);
+}
+
+.jockey-segmented {
+  gap: 4px;
+  padding: 5px;
+  border-radius: 14px;
+  background: rgba(12, 28, 19, 0.36);
+}
+
+.jockey-segmented button {
+  min-height: 38px;
+  gap: 7px;
+  padding: 0 12px;
+  border-radius: 10px;
+  font-size: 0.77rem;
+}
+
+.jockey-segmented button small {
+  min-width: 18px;
+  padding: 2px 5px;
+  border-radius: 6px;
+  color: var(--jockey-text-muted);
+  background: rgba(255, 255, 255, 0.08);
+  font-size: 0.64rem;
+  line-height: 1.2;
+}
+
+.jockey-segmented button:hover small,
+.jockey-segmented__active small {
+  color: var(--racing-green-2);
+  background: rgba(17, 31, 23, 0.12);
+}
+
+.jockey-invitation-list {
+  gap: 16px;
+}
+
+.jockey-invitation-card {
+  grid-template-columns: minmax(230px, 280px) minmax(0, 1fr);
+  border-radius: 18px;
+  border-color: rgba(214, 226, 202, 0.17);
+  background: rgba(18, 37, 26, 0.62);
+}
+
+.jockey-invitation-card:hover {
+  border-color: rgba(var(--racing-accent-rgb), 0.48);
+  background: rgba(24, 47, 33, 0.74);
+  box-shadow: 0 24px 54px rgba(8, 19, 13, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.07);
+}
+
+.jockey-invitation-card__media {
+  min-height: 360px;
+}
+
+.jockey-invitation-card__media .jockey-badge {
+  top: 16px;
+  left: 16px;
+}
+
+.jockey-invitation-card__body {
+  gap: 15px;
+  padding: 24px;
+}
+
+.jockey-invitation-card__title h3 {
+  font-size: clamp(1.9rem, 3vw, 2.65rem);
+  letter-spacing: -0.05em;
+}
+
+.jockey-invitation-card__owner {
+  display: grid;
+  justify-items: end;
+  gap: 5px;
+  max-width: 18ch;
+  text-align: right;
+}
+
+.jockey-invitation-card__owner span {
+  color: var(--jockey-text-muted);
+  font-size: 0.66rem;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.jockey-invitation-card__owner strong {
+  color: var(--racing-accent-soft);
+  font-size: 0.86rem;
+  line-height: 1.25;
+}
+
+.jockey-invitation-stage {
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr);
+  align-items: start;
+  gap: 10px;
+  padding: 13px 14px;
+  border: 1px solid rgba(var(--racing-accent-rgb), 0.22);
+  border-left: 3px solid var(--racing-accent);
+  border-radius: 12px;
+  background: rgba(var(--racing-accent-rgb), 0.08);
+}
+
+.jockey-invitation-stage__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  color: var(--racing-accent-soft);
+  background: rgba(var(--racing-accent-rgb), 0.16);
+}
+
+.jockey-invitation-stage__label {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--racing-accent-soft);
+  font-size: 0.68rem;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.jockey-invitation-stage p {
+  margin: 0;
+  color: var(--jockey-text-soft);
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+.jockey-invitation-meta {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.jockey-invitation-meta div,
+.jockey-invitation-review div {
+  border-radius: 11px;
+}
+
+.jockey-invitation-meta div {
+  padding: 11px;
+  background: rgba(10, 25, 16, 0.22);
+}
+
+.jockey-invitation-meta span {
+  font-size: 0.7rem;
+  letter-spacing: 0.02em;
+}
+
+.jockey-invitation-meta strong {
+  font-size: 0.82rem;
+}
+
+.jockey-invitation-review {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.jockey-invitation-review div {
+  padding: 13px;
+}
+
+.jockey-invitation-card__actions {
+  padding-top: 4px;
+  border-top: 1px solid rgba(214, 226, 202, 0.12);
+}
+
+.jockey-empty {
+  padding: 42px 24px;
+  border-radius: 14px;
+  border-style: dashed;
+  background: rgba(12, 28, 19, 0.24);
+}
+
+@media (max-width: 1080px) {
+  .jockey-invitation-card {
+    grid-template-columns: minmax(210px, 0.38fr) minmax(0, 1fr);
+  }
+
+  .jockey-invitation-meta {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .jockey-invitations-hero {
+    min-height: 560px;
+    grid-template-columns: 1fr;
+    padding: 22px;
+    border-radius: 18px;
+  }
+
+  .jockey-invitations-hero__copy {
+    align-self: end;
+  }
+
+  .jockey-invitations-hero__copy h1 {
+    max-width: 10ch;
+    font-size: clamp(2.6rem, 14vw, 4rem);
+  }
+
+  .jockey-invitations-hero__signals {
+    display: grid;
+    gap: 7px;
+  }
+
+  .jockey-invitations-hero__panel {
+    align-self: end;
+    justify-self: stretch;
+    width: 100%;
+  }
+
+  .jockey-invitation-board {
+    border-radius: 18px;
+  }
+
+  .jockey-invitation-card {
+    grid-template-columns: 1fr;
+  }
+
+  .jockey-invitation-card__media {
+    min-height: 250px;
+    max-height: 290px;
+  }
+
+  .jockey-invitation-board__header {
+    align-items: stretch;
+  }
+
+  .jockey-invitation-board__heading {
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .jockey-segmented {
+    width: 100%;
+    overflow-x: auto;
+    justify-content: flex-start;
+    scrollbar-width: none;
+  }
+
+  .jockey-segmented::-webkit-scrollbar {
+    display: none;
+  }
+
+  .jockey-segmented button {
+    flex: 0 0 auto;
+    width: auto;
+  }
+
+  .jockey-invitation-card__body {
+    padding: 20px;
+  }
+
+  .jockey-invitation-review {
+    grid-template-columns: 1fr;
+  }
+
+  .jockey-invitation-card__owner {
+    justify-items: start;
+    max-width: none;
+    text-align: left;
+  }
+}
+
+/* Schedule page refinement */
+.jockey-schedule-page {
+  gap: 24px;
+  max-width: 1240px;
+}
+
+.jockey-schedule-hero {
+  min-height: 410px;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 350px);
+  gap: clamp(24px, 5vw, 76px);
+  padding: clamp(28px, 5vw, 56px);
+  border-radius: 24px;
+  border-color: rgba(214, 226, 202, 0.22);
+  background: rgba(38, 61, 46, 0.62);
+  box-shadow: 0 28px 80px rgba(8, 19, 13, 0.3), inset 0 1px 0 rgba(255, 248, 234, 0.11);
+}
+
+.jockey-schedule-hero::after {
+  background:
+    linear-gradient(90deg, rgba(13, 29, 20, 0.98) 0%, rgba(20, 39, 28, 0.85) 50%, rgba(31, 53, 40, 0.44) 100%),
+    linear-gradient(180deg, rgba(10, 22, 15, 0.08), rgba(10, 22, 15, 0.62)),
+    radial-gradient(circle at 76% 18%, rgba(var(--racing-accent-rgb), 0.2), transparent 34%);
+}
+
+.jockey-schedule-hero__copy {
+  align-self: center;
+  max-width: 650px;
+}
+
+.jockey-schedule-hero__eyebrow,
+.jockey-schedule-hero__panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.jockey-schedule-hero__eyebrow > span {
+  color: rgba(var(--racing-contrast-rgb), 0.62);
+  font-size: 0.75rem;
+  font-weight: 750;
+  letter-spacing: 0.04em;
+}
+
+.jockey-schedule-hero__copy h1 {
+  max-width: 11ch;
+  margin-top: 18px;
+  font-size: clamp(2.8rem, 6vw, 5.5rem);
+  letter-spacing: -0.075em;
+  text-wrap: balance;
+}
+
+.jockey-schedule-hero__copy p:not(.jockey-kicker) {
+  max-width: 40ch;
+  margin-top: 22px;
+  color: rgba(var(--racing-contrast-rgb), 0.72);
+  font-size: 1.02rem;
+}
+
+.jockey-schedule-hero__action {
+  width: fit-content;
+  margin-top: 28px;
+  min-height: 48px;
+  border-radius: 12px;
+}
+
+.jockey-schedule-hero__panel {
+  align-self: end;
+  gap: 18px;
+  min-height: 226px;
+  padding: 22px;
+  border-radius: 20px;
+  border-color: rgba(214, 226, 202, 0.22);
+  background: rgba(10, 24, 16, 0.68);
+  box-shadow: inset 0 1px 0 rgba(255, 248, 234, 0.1), 0 20px 45px rgba(4, 13, 8, 0.24);
+}
+
+.jockey-schedule-hero__panel-head .jockey-kicker {
+  margin: 0;
+}
+
+.jockey-schedule-hero__panel-time {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(214, 226, 202, 0.14);
+}
+
+.jockey-schedule-hero__panel-time strong {
+  color: var(--jockey-text-strong);
+  font-family: "Sora", sans-serif;
+  font-size: clamp(1.8rem, 3vw, 2.7rem);
+  letter-spacing: -0.06em;
+}
+
+.jockey-schedule-hero__panel-time span {
+  color: var(--racing-accent-soft);
+  font-size: 0.86rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.jockey-schedule-hero__panel-copy {
+  display: grid;
+  gap: 8px;
+}
+
+.jockey-schedule-hero__panel-copy > strong {
+  color: var(--jockey-text-strong);
+  font-family: "Sora", sans-serif;
+  font-size: 1.25rem;
+  line-height: 1.12;
+}
+
+.jockey-schedule-hero__panel-copy p {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  color: var(--jockey-text-muted);
+  font-size: 0.86rem;
+}
+
+.jockey-schedule-stats {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.jockey-schedule-stat {
+  position: relative;
+  min-height: 136px;
+  padding: 18px;
+  border-radius: 16px;
+  background: rgba(42, 64, 49, 0.62);
+}
+
+.jockey-schedule-stat:first-child {
+  background: linear-gradient(145deg, rgba(var(--racing-accent-rgb), 0.18), rgba(42, 64, 49, 0.72));
+}
+
+.jockey-schedule-stat span {
+  font-size: 0.86rem;
+  font-weight: 750;
+}
+
+.jockey-schedule-stat strong {
+  margin-top: 3px;
+  font-size: clamp(1.8rem, 3vw, 2.5rem);
+}
+
+.jockey-schedule-stat small {
+  font-size: 0.72rem;
+}
+
+.jockey-schedule-board {
+  gap: 22px;
+  padding: clamp(20px, 3vw, 32px);
+  border-radius: 24px;
+  background: rgba(42, 64, 49, 0.56);
+  box-shadow: 0 24px 60px rgba(8, 19, 13, 0.2), inset 0 1px 0 rgba(255, 248, 234, 0.1);
+}
+
+.jockey-schedule-board__header {
+  align-items: flex-end;
+  gap: 28px;
+}
+
+.jockey-schedule-board__header h2 {
+  margin-top: 8px;
+  font-size: clamp(1.8rem, 3.2vw, 2.7rem);
+  letter-spacing: -0.06em;
+}
+
+.jockey-schedule-board__header p {
+  max-width: 42ch;
+  margin: 10px 0 0;
+  color: var(--jockey-text-muted);
+  font-size: 0.88rem;
+  line-height: 1.55;
+}
+
+.jockey-schedule-board__toolbar {
+  display: grid;
+  justify-items: end;
+  gap: 12px;
+}
+
+.jockey-schedule-board__count {
+  color: var(--jockey-text-muted);
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+.jockey-segmented {
+  max-width: 100%;
+  padding: 5px;
+  border-radius: 14px;
+  background: rgba(19, 37, 27, 0.62);
+  border-color: rgba(214, 226, 202, 0.16);
+}
+
+.jockey-segmented button {
+  min-height: 34px;
+  padding-inline: 12px;
+  border-radius: 9px;
+  color: rgba(var(--racing-contrast-rgb), 0.62);
+  font-size: 0.76rem;
+  font-weight: 800;
+  transition: color 180ms ease, background 180ms ease, transform 180ms ease;
+}
+
+.jockey-segmented button:hover {
+  color: var(--jockey-text-strong);
+  background: rgba(var(--racing-contrast-rgb), 0.08);
+  transform: translateY(-1px);
+}
+
+.jockey-segmented button.jockey-segmented__active {
+  color: #1a2b20;
+  background: var(--jockey-text-strong);
+  box-shadow: 0 8px 18px rgba(4, 13, 8, 0.22);
+}
+
+.jockey-schedule-list {
+  gap: 12px;
+}
+
+.jockey-schedule-slot {
+  grid-template-columns: minmax(190px, 0.33fr) minmax(0, 1fr);
+  border-radius: 20px;
+  border-color: rgba(214, 226, 202, 0.16);
+  background: rgba(19, 37, 27, 0.52);
+}
+
+.jockey-schedule-slot--next {
+  border-color: rgba(var(--racing-accent-rgb), 0.48);
+  box-shadow: 0 18px 42px rgba(9, 20, 13, 0.22), inset 3px 0 0 var(--racing-accent);
+}
+
+.jockey-schedule-slot__media {
+  min-height: 272px;
+}
+
+.jockey-schedule-slot__media::after {
+  background: linear-gradient(180deg, rgba(29, 48, 36, 0.02) 25%, rgba(15, 28, 20, 0.72) 100%);
+}
+
+.jockey-schedule-slot__media .jockey-badge {
+  top: 16px;
+  left: 16px;
+}
+
+.jockey-schedule-slot__next {
+  position: absolute;
+  z-index: 1;
+  right: 16px;
+  bottom: 16px;
+  padding: 7px 9px;
+  border: 1px solid rgba(255, 248, 234, 0.28);
+  border-radius: 8px;
+  color: var(--jockey-text-strong);
+  background: rgba(13, 29, 20, 0.56);
+  backdrop-filter: blur(10px);
+  font-size: 0.7rem;
+  font-weight: 850;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.jockey-schedule-slot__body {
+  grid-template-columns: 1fr;
+  gap: 16px;
+  padding: clamp(20px, 2.6vw, 28px);
+}
+
+.jockey-schedule-slot__topline {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.jockey-schedule-slot__time {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.jockey-schedule-slot__time span {
+  color: var(--racing-accent-soft);
+  font-size: 0.88rem;
+}
+
+.jockey-schedule-slot__time strong {
+  font-size: 1rem;
+}
+
+.jockey-schedule-slot__round {
+  padding-top: 2px;
+  color: var(--jockey-text-muted);
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  text-align: right;
+}
+
+.jockey-schedule-slot__race {
+  gap: 8px;
+}
+
+.jockey-schedule-slot__race h3 {
+  font-size: clamp(1.55rem, 3vw, 2.4rem);
+  letter-spacing: -0.06em;
+}
+
+.jockey-schedule-slot__race small {
+  color: rgba(var(--racing-contrast-rgb), 0.62);
+}
+
+.jockey-schedule-slot__meta {
+  gap: 10px;
+}
+
+.jockey-schedule-slot__meta div {
+  min-height: 70px;
+  padding: 13px 14px;
+  border-radius: 12px;
+  background: rgba(19, 37, 27, 0.54);
+}
+
+.jockey-schedule-slot__meta span {
+  color: rgba(var(--racing-contrast-rgb), 0.55);
+  font-size: 0.7rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.jockey-schedule-slot__meta strong {
+  font-size: 0.91rem;
+}
+
+.jockey-schedule-slot__footer {
+  padding-top: 2px;
+}
+
+.jockey-schedule-slot__footer small {
+  color: rgba(var(--racing-contrast-rgb), 0.55);
+  font-size: 0.74rem;
+}
+
+.jockey-schedule-slot__footer-mark {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--racing-accent-soft);
+  font-size: 0.72rem;
+  font-weight: 850;
+  white-space: nowrap;
+}
+
+.jockey-schedule-slot__footer-mark svg:first-child {
+  color: var(--racing-accent);
+}
+
+.jockey-empty {
+  min-height: 180px;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  border-radius: 16px;
+  color: var(--jockey-text-muted);
+  text-align: center;
+}
+
+@media (max-width: 1080px) {
+  .jockey-schedule-stats {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .jockey-schedule-board__header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .jockey-schedule-board__toolbar {
+    width: 100%;
+    justify-items: stretch;
+  }
+
+  .jockey-schedule-board__count {
+    align-self: start;
+  }
+
+  .jockey-schedule-slot {
+    grid-template-columns: minmax(170px, 0.32fr) minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .jockey-schedule-page {
+    gap: 16px;
+  }
+
+  .jockey-schedule-hero {
+    min-height: 570px;
+    grid-template-columns: 1fr;
+    align-items: end;
+    gap: 24px;
+    padding: 22px;
+    border-radius: 20px;
+  }
+
+  .jockey-schedule-hero__eyebrow {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .jockey-schedule-hero__copy h1 {
+    max-width: 10ch;
+    font-size: clamp(2.7rem, 14vw, 4.3rem);
+  }
+
+  .jockey-schedule-hero__action {
+    width: 100%;
+  }
+
+  .jockey-schedule-hero__panel {
+    min-height: 0;
+    padding: 18px;
+    border-radius: 16px;
+  }
+
+  .jockey-schedule-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .jockey-schedule-stat {
+    min-height: 124px;
+    padding: 15px;
+  }
+
+  .jockey-schedule-stat:first-child {
+    grid-column: 1 / -1;
+  }
+
+  .jockey-schedule-board {
+    padding: 18px 14px;
+    border-radius: 20px;
+  }
+
+  .jockey-schedule-board__header h2 {
+    font-size: 2rem;
+  }
+
+  .jockey-segmented {
+    width: 100%;
+    overflow-x: auto;
+    justify-content: flex-start;
+    scrollbar-width: none;
+  }
+
+  .jockey-segmented::-webkit-scrollbar {
+    display: none;
+  }
+
+  .jockey-segmented button {
+    flex: 0 0 auto;
+  }
+
+  .jockey-schedule-slot {
+    grid-template-columns: 1fr;
+    border-radius: 16px;
+  }
+
+  .jockey-schedule-slot__media {
+    min-height: 190px;
+    max-height: 220px;
+  }
+
+  .jockey-schedule-slot__body {
+    gap: 15px;
+    padding: 18px;
+  }
+
+  .jockey-schedule-slot__topline {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 7px;
+  }
+
+  .jockey-schedule-slot__round {
+    text-align: left;
+  }
+
+  .jockey-schedule-slot__footer {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 12px;
+  }
+}

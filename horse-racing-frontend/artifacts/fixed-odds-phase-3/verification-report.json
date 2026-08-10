@@ -1,0 +1,74 @@
+{
+  "passed": true,
+  "assertions": [
+    "Race betting route renders a win-only market, eight runners, and no embedded race viewer",
+    "Win-only selection resolves one runner, one odds price, and an enabled review action",
+    "Confirmation creates an accepted receipt and updates wallet balance dynamically",
+    "Mobile odds board has no horizontal page overflow or clipped runner rows",
+    "stop_betting locks runner, stake, review, and confirmation controls immediately",
+    "Backend API-mode submit sends the win-only bet payload and renders the pending receipt",
+    "Backend closes_at countdown renders in API mode and locks betting controls at zero"
+  ],
+  "screenshots": [
+    "fixed-odds-win-desktop-1440x1100.png",
+    "fixed-odds-mobile-390x844.png"
+  ],
+  "audits": {
+    "initial": {
+      "tabs": 0,
+      "runners": 8,
+      "heading": "Win market",
+      "note": "Win only: Pick the horse you expect to finish first. Other bet types are disabled until backend odds and settlement rules exist.",
+      "overflow": 0,
+      "viewer": 0
+    },
+    "winOnly": {
+      "filled": 1,
+      "odds": "2.10x",
+      "slip": "Win bet",
+      "reviewDisabled": false
+    },
+    "accepted": {
+      "receipt": 1,
+      "balance": "1,080 pts",
+      "message": "Bet accepted at 2.10x. Balance: 1,080 pts."
+    },
+    "mobile": {
+      "overflow": 0,
+      "boardWidth": 330,
+      "clippedRunners": 0
+    },
+    "locked": {
+      "runnerControlsLocked": true,
+      "stakeLocked": true,
+      "reviewLocked": true,
+      "modalClosed": true
+    },
+    "backendCountdown": {
+      "open": {
+        "countdown": "00:09",
+        "status": "Betting open",
+        "wallet": "1,200 TOKEN",
+        "currency": "TOKEN"
+      },
+      "submit": {
+        "receiptStatus": "Pending",
+        "receiptStake": "200 TOKEN",
+        "balance": "1,000 TOKEN"
+      },
+      "betCalls": [
+        {
+          "race_id": "race-backend-countdown",
+          "horse_id": "backend-horse-1",
+          "stake_amount": 200
+        }
+      ],
+      "locked": {
+        "countdown": "00:00",
+        "runnerControlsLocked": true,
+        "stakeLocked": true,
+        "reviewLocked": true
+      }
+    }
+  }
+}

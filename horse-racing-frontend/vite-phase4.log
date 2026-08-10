@@ -1,0 +1,59 @@
+
+  [32m[1mVITE[22m v5.4.21[39m  [2mready in [0m[1m258[22m[2m[0m ms[22m
+
+  [32m➜[39m  [1mLocal[22m:   [36mhttp://127.0.0.1:[1m5174[22m/[39m
+[2m2:06:54 AM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/spectator/Predictions.jsx, /src/pages/spectator/Leaderboard.jsx, /src/pages/spectator/PredictionDetail.jsx, /src/pages/spectator/Results.jsx, /src/pages/spectator/TournamentDetail.jsx, /src/pages/spectator/TournamentList.jsx[22m
+[2m2:06:54 AM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/spectator/Results.jsx, /src/pages/spectator/TournamentDetail.jsx, /src/pages/spectator/TournamentList.jsx, /src/pages/spectator/Leaderboard.jsx[22m
+[2m2:08:08 AM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/App.jsx[22m
+[2m2:08:08 AM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/spectator/TournamentDetail.jsx[22m
+[2m2:10:09 AM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/spectator/spectator.css[22m
+[2m2:12:52 AM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/spectator/TournamentDetail.jsx[22m
+[2m2:13:38 AM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/spectator/TournamentDetail.jsx[22m
+[2m2:13:38 AM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/spectator/spectator.css[22m
+[2m2:21:45 AM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/spectator/live-race/RaceViewer2D.jsx[22m
+[2m2:21:45 AM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/spectator/Predictions.jsx, /src/pages/spectator/Leaderboard.jsx, /src/pages/spectator/PredictionDetail.jsx, /src/pages/spectator/Results.jsx, /src/pages/spectator/TournamentDetail.jsx, /src/pages/spectator/TournamentList.jsx, /src/pages/spectator/RaceDetail.jsx[22m
+[2m2:21:45 AM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/spectator/RaceDetail.jsx[22m
+[2m2:21:56 AM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/spectator/RaceDetail.jsx[22m
+[2m2:22:38 AM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/spectator/live-race/RaceViewer2D.jsx[22m
+[2m2:22:38 AM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/spectator/RaceDetail.jsx[22m
+[2m2:22:38 AM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/spectator/spectator.css[22m
+[2m2:44:16 AM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/spectator/PredictionDetail.jsx[22m
+[2m2:44:16 AM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/App.jsx[22m
+[2m2:44:16 AM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/spectator/TournamentDetail.jsx[22m
+[2m2:44:16 AM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/spectator/RaceDetail.jsx[22m
+[2m2:46:14 AM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/spectator/spectator.css[22m
+[2m2:49:12 AM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/spectator/PredictionDetail.jsx[22m
+[2m2:49:12 AM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/spectator/spectator.css[22m
+[2m2:49:12 AM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/spectator/PredictionDetail.jsx[22m
+[2m3:09:55 AM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/spectator/PredictionDetail.jsx[22m
+[2m3:09:55 AM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/spectator/PredictionDetail.jsx[22m
+[2m3:09:55 AM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/spectator/PredictionDetail.jsx[22m
+[2m3:10:53 AM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/spectator/PredictionDetail.jsx[22m
+[2m3:10:53 AM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/spectator/PredictionDetail.jsx[22m
+[2m3:10:53 AM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/spectator/PredictionDetail.jsx[22m
+[2m3:10:53 AM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/spectator/spectator.css[22m
+[2m3:11:39 AM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/spectator/PredictionDetail.jsx[22m
+[2m3:11:39 AM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/spectator/PredictionDetail.jsx[22m
+[2m6:36:55 AM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/spectator/Predictions.jsx[22m
+[2m6:38:16 AM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/spectator/spectator.css[22m
+[2m6:41:41 AM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/layouts/MainLayout.jsx[22m
+[2m6:42:07 AM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/spectator/spectator.css[22m
+[2m6:54:22 AM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/spectator/PredictionDetail.jsx, /src/pages/spectator/RaceDetail.jsx[22m
+[2m6:54:22 AM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/spectator/live-race/RaceViewer2D.jsx[22m
+[2m6:54:22 AM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/spectator/live-race/RaceViewer2D.jsx[22m
+[2m6:54:22 AM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/spectator/live-race/RaceViewer2D.jsx[22m
+[2m6:54:22 AM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/spectator/live-race/RaceViewer2D.jsx[22m
+[2m6:55:48 AM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/spectator/live-race/RaceViewer2D.jsx[22m
+[2m6:55:48 AM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/spectator/spectator.css[22m
+[2m7:00:10 AM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/spectator/live-race/RaceViewer2D.jsx[22m
+[2m7:00:11 AM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/spectator/spectator.css[22m
+[2m7:00:59 AM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/spectator/spectator.css[22m
+[2m7:04:15 AM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/spectator/PredictionDetail.jsx, /src/pages/spectator/RaceDetail.jsx[22m
+[2m7:04:15 AM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/spectator/RaceDetail.jsx[22m
+[2m7:04:15 AM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/spectator/PredictionDetail.jsx[22m
+[2m7:04:15 AM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/spectator/live-race/RaceViewer2D.jsx[22m
+[2m7:04:15 AM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/spectator/live-race/RaceViewer2D.jsx[22m
+[2m7:04:43 AM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/spectator/live-race/RaceViewer2D.jsx[22m
+[2m7:04:43 AM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/spectator/spectator.css[22m
+[2m7:05:30 AM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/spectator/RaceDetail.jsx[22m
+[2m7:05:30 AM[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/spectator/PredictionDetail.jsx[22m

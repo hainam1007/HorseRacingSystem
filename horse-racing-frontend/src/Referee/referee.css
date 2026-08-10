@@ -1,0 +1,2701 @@
+.referee-page {
+  --referee-ink: var(--racing-text-strong);
+  --referee-copy: var(--racing-text-soft);
+  --referee-muted: var(--racing-text-muted);
+  --referee-line: rgba(var(--racing-contrast-rgb), 0.18);
+  --referee-surface: rgba(var(--racing-contrast-rgb), 0.065);
+  --referee-orange: var(--racing-accent-strong);
+  background:
+    radial-gradient(circle at 78% 4%, rgba(var(--racing-accent-rgb), 0.11), transparent 24rem),
+    linear-gradient(135deg, rgba(var(--racing-contrast-rgb), 0.025) 25%, transparent 25%) 0 0 / 2.4rem 2.4rem,
+    var(--racing-green);
+  color: var(--referee-ink);
+  min-height: 100dvh;
+  padding: 0;
+}
+
+.referee-page .sr-only {
+  clip: rect(0, 0, 0, 0);
+  clip-path: inset(50%);
+  height: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}
+
+.referee-skip-link {
+  background: var(--racing-contrast);
+  border-radius: 0 0 6px 0;
+  color: var(--racing-green);
+  font-weight: 800;
+  left: 0;
+  padding: 0.7rem 1rem;
+  position: fixed;
+  top: 0;
+  transform: translateY(-120%);
+  transition: transform 160ms ease;
+  z-index: 20;
+}
+
+.referee-skip-link:focus {
+  transform: translateY(0);
+}
+
+.referee-page::before {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 160 160' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.32'/%3E%3C/svg%3E");
+  content: "";
+  inset: 0;
+  opacity: 0.025;
+  pointer-events: none;
+  position: fixed;
+  z-index: 0;
+}
+
+.referee-page .referee-shell {
+  gap: 0;
+  grid-template-columns: 16.5rem minmax(0, 1fr);
+  min-height: 100dvh;
+  position: relative;
+  z-index: 1;
+}
+
+.referee-page .referee-sidebar,
+.referee-page .referee-content {
+  backdrop-filter: none;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.referee-page .referee-sidebar {
+  background: rgba(7, 20, 13, 0.58);
+  border-right: 1px solid var(--referee-line);
+  gap: 1.55rem;
+  padding: 1.5rem 1.25rem;
+  position: sticky;
+  top: 0;
+  height: 100dvh;
+}
+
+.referee-brand-row {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+}
+
+.referee-brand-row .brand-text {
+  display: none;
+}
+
+.referee-console-tag {
+  color: var(--referee-muted);
+  font-size: 0.59rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+}
+
+.referee-duty-state {
+  align-items: center;
+  border-bottom: 1px solid var(--referee-line);
+  border-top: 1px solid var(--referee-line);
+  display: flex;
+  gap: 0.7rem;
+  padding: 0.9rem 0;
+}
+
+.referee-duty-state__signal,
+.referee-focus-card__pulse {
+  background: var(--referee-orange);
+  border-radius: 50%;
+  box-shadow: 0 0 0 0.3rem rgba(var(--racing-accent-rgb), 0.12);
+  flex: 0 0 auto;
+  height: 0.5rem;
+  width: 0.5rem;
+}
+
+.referee-duty-state div {
+  display: grid;
+  gap: 0.15rem;
+}
+
+.referee-duty-state strong {
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.referee-duty-state span:last-child {
+  color: var(--referee-muted);
+  font-size: 0.68rem;
+}
+
+.referee-page .referee-nav {
+  gap: 0.35rem;
+}
+
+.referee-page .referee-nav a {
+  align-items: center;
+  border-left: 2px solid transparent;
+  border-radius: 0 6px 6px 0;
+  color: var(--referee-muted);
+  display: flex;
+  gap: 0.75rem;
+  min-height: 2.8rem;
+  padding: 0 0.85rem;
+  transition: background 180ms ease, border-color 180ms ease, color 180ms ease, transform 180ms ease;
+}
+
+.referee-page .referee-nav a:hover {
+  background: rgba(var(--racing-contrast-rgb), 0.06);
+  color: var(--referee-ink);
+  transform: translateX(2px);
+}
+
+.referee-page .referee-nav a.active {
+  background: rgba(var(--racing-accent-rgb), 0.1);
+  border-color: var(--referee-orange);
+  color: var(--racing-accent-soft);
+}
+
+.referee-authority {
+  border: 1px solid var(--referee-line);
+  border-radius: 8px;
+  display: grid;
+  gap: 0.75rem;
+  margin-top: auto;
+  padding: 1rem;
+}
+
+.referee-authority__heading,
+.referee-boundary {
+  align-items: center;
+  display: flex;
+  gap: 0.55rem;
+}
+
+.referee-authority__heading {
+  color: var(--racing-accent-soft);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.referee-authority p {
+  color: var(--referee-copy);
+  font-size: 0.77rem;
+  line-height: 1.55;
+  margin: 0;
+}
+
+.referee-boundary {
+  border-top: 1px solid var(--referee-line);
+  color: var(--referee-muted);
+  font-size: 0.68rem;
+  line-height: 1.4;
+  padding-top: 0.7rem;
+}
+
+.referee-page .referee-user-row {
+  border-top: 0;
+  margin-top: 0;
+  padding-top: 0;
+}
+
+.referee-page .referee-avatar {
+  background: var(--racing-accent-strong);
+  border-radius: 6px;
+  color: var(--racing-green-2);
+  font-weight: 900;
+}
+
+.referee-page .referee-content {
+  gap: 0;
+  max-width: 100%;
+  overflow: visible;
+  padding: 0;
+}
+
+.referee-page .referee-header {
+  align-items: end;
+  border-bottom: 1px solid var(--referee-line);
+  min-height: 12.5rem;
+  padding: 2.4rem clamp(1.5rem, 4vw, 4.5rem) 2rem;
+  position: relative;
+}
+
+.referee-page .referee-header::after {
+  bottom: -1px;
+  content: "";
+  height: 2px;
+  left: clamp(1.5rem, 4vw, 4.5rem);
+  position: absolute;
+  width: 5.5rem;
+  background: var(--referee-orange);
+}
+
+.referee-header__copy {
+  max-width: 56rem;
+}
+
+.referee-page .admin-header__eyebrow,
+.referee-page .admin-panel__eyebrow {
+  color: var(--racing-accent);
+  font-size: 0.68rem;
+  letter-spacing: 0.2em;
+}
+
+.referee-page .referee-header h1 {
+  color: var(--referee-ink);
+  font-size: clamp(2.5rem, 5vw, 5rem);
+  letter-spacing: -0.065em;
+  line-height: 0.9;
+  margin-top: 0.9rem;
+  max-width: 14ch;
+  text-wrap: balance;
+}
+
+.referee-page .admin-header__description {
+  color: var(--referee-copy);
+  font-size: 0.94rem;
+  line-height: 1.65;
+  max-width: 66ch;
+  text-wrap: pretty;
+}
+
+.referee-page .referee-content__body {
+  display: grid;
+  gap: 1rem;
+  padding: 1.6rem clamp(1.5rem, 4vw, 4.5rem) 4rem;
+}
+
+.referee-page .admin-header__button {
+  background: var(--referee-orange);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 6px;
+  box-shadow: 0 0.75rem 2rem rgba(5, 16, 10, 0.25);
+  color: var(--racing-green-2);
+  gap: 0.5rem;
+  min-height: 2.65rem;
+  padding-inline: 1rem;
+}
+
+.referee-page .admin-header__button--ghost {
+  background: transparent;
+  border-color: rgba(var(--racing-contrast-rgb), 0.3);
+  box-shadow: none;
+  color: var(--referee-ink);
+}
+
+.referee-page .admin-header__button:hover {
+  filter: brightness(1.06);
+  transform: translateY(-2px);
+}
+
+.referee-page .admin-header__button:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.referee-closure-tabs {
+  align-items: center;
+  background: rgba(var(--racing-contrast-rgb), 0.06);
+  border: 1px solid var(--referee-line);
+  border-radius: 8px;
+  display: inline-flex;
+  gap: 0.35rem;
+  padding: 0.35rem;
+}
+
+.referee-closure-tabs button {
+  background: transparent;
+  border: 0;
+  border-radius: 6px;
+  color: var(--referee-muted);
+  cursor: pointer;
+  font-weight: 800;
+  padding: 0.65rem 0.95rem;
+}
+
+.referee-closure-tabs button.is-active {
+  background: var(--racing-contrast);
+  color: var(--racing-green);
+}
+
+.referee-page :is(a, button, input, select, textarea):focus-visible {
+  outline: 2px solid var(--racing-accent);
+  outline-offset: 3px;
+}
+
+.referee-page .admin-panel,
+.referee-page .admin-metric-card {
+  background: var(--referee-surface);
+  border: 1px solid var(--referee-line);
+  border-radius: 8px;
+  padding: 1.2rem;
+}
+
+.referee-page .admin-panel p,
+.referee-page .admin-header__description,
+.referee-page .admin-list li,
+.referee-page .admin-metric-card__note {
+  color: var(--referee-copy);
+}
+
+.referee-command-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: minmax(13rem, 0.75fr) minmax(11rem, 0.55fr) minmax(21rem, 1.4fr);
+}
+
+.referee-command-card--primary {
+  background: var(--racing-contrast);
+  border-radius: 8px;
+  color: var(--racing-green-2);
+  display: flex;
+  flex-direction: column;
+  min-height: 18rem;
+  padding: 1.25rem;
+}
+
+.referee-command-card__top,
+.referee-command-card__foot {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+}
+
+.referee-command-card__top {
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.referee-command-card--primary > strong {
+  font-family: "Sora", sans-serif;
+  font-size: clamp(5rem, 9vw, 8rem);
+  letter-spacing: -0.08em;
+  line-height: 0.8;
+  margin-top: auto;
+}
+
+.referee-command-card--primary > p {
+  color: var(--racing-green-muted);
+  font-size: 0.86rem;
+  margin: 0.7rem 0 1.25rem;
+}
+
+.referee-command-card__foot {
+  border-top: 1px solid rgba(23, 38, 29, 0.2);
+  font-size: 0.75rem;
+  justify-content: flex-start;
+  gap: 0.45rem;
+  padding-top: 0.8rem;
+}
+
+.referee-command-stack {
+  display: grid;
+  gap: 1rem;
+  grid-template-rows: 1fr 1fr;
+}
+
+.referee-command-stack article {
+  align-items: end;
+  background: rgba(var(--racing-contrast-rgb), 0.07);
+  border: 1px solid var(--referee-line);
+  border-radius: 8px;
+  display: flex;
+  justify-content: space-between;
+  padding: 1rem;
+}
+
+.referee-command-stack article > svg {
+  color: var(--racing-accent);
+  align-self: start;
+}
+
+.referee-command-stack div {
+  display: grid;
+  justify-items: end;
+}
+
+.referee-command-stack strong {
+  font-family: "Sora", sans-serif;
+  font-size: 2.5rem;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.referee-command-stack span {
+  color: var(--referee-muted);
+  font-size: 0.7rem;
+}
+
+.referee-focus-card {
+  background: rgba(7, 20, 13, 0.55);
+  border: 1px solid rgba(var(--racing-accent-rgb), 0.35);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  min-height: 18rem;
+  padding: 1.25rem;
+}
+
+.referee-focus-card__label {
+  align-items: center;
+  color: var(--racing-accent-soft);
+  display: flex;
+  font-size: 0.67rem;
+  font-weight: 800;
+  gap: 0.6rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.referee-focus-card h2 {
+  font-family: "Sora", sans-serif;
+  font-size: clamp(1.6rem, 3vw, 2.6rem);
+  letter-spacing: -0.055em;
+  line-height: 1;
+  margin: 0.3rem 0 0;
+}
+
+.referee-focus-card p {
+  color: var(--referee-muted);
+  font-size: 0.73rem;
+  margin: 0;
+}
+
+.referee-focus-card dl {
+  display: grid;
+  gap: 0.55rem;
+  margin: auto 0 0;
+}
+
+.referee-focus-card dl div {
+  align-items: center;
+  border-bottom: 1px solid var(--referee-line);
+  display: flex;
+  justify-content: space-between;
+  padding-bottom: 0.55rem;
+}
+
+.referee-focus-card dt {
+  color: var(--referee-muted);
+  font-size: 0.68rem;
+}
+
+.referee-focus-card dd {
+  font-size: 0.78rem;
+  margin: 0;
+}
+
+.referee-focus-card > a,
+.referee-section-heading > a,
+.referee-race-card__footer a {
+  align-items: center;
+  color: var(--racing-accent-soft);
+  display: inline-flex;
+  font-size: 0.78rem;
+  font-weight: 700;
+  gap: 0.4rem;
+  width: fit-content;
+}
+
+.referee-phase-rail {
+  border-bottom: 1px solid var(--referee-line);
+  border-top: 1px solid var(--referee-line);
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.referee-phase-rail article {
+  align-items: center;
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: auto auto 1fr;
+  padding: 1rem 1.25rem;
+}
+
+.referee-phase-rail article + article {
+  border-left: 1px solid var(--referee-line);
+}
+
+.referee-phase-rail__index {
+  color: var(--racing-accent);
+  font-family: "Sora", sans-serif;
+  font-size: 0.66rem;
+}
+
+.referee-phase-rail svg {
+  color: var(--referee-muted);
+}
+
+.referee-phase-rail article > div:last-child {
+  display: grid;
+  gap: 0.12rem;
+}
+
+.referee-phase-rail strong {
+  font-size: 0.8rem;
+}
+
+.referee-phase-rail span {
+  color: var(--referee-muted);
+  font-size: 0.68rem;
+}
+
+.referee-page .referee-section-heading {
+  align-items: end;
+  display: flex;
+  justify-content: space-between;
+}
+
+.referee-page .referee-section-heading h2 {
+  margin-top: 0.25rem;
+}
+
+.referee-page .admin-data-table__wrap {
+  border-radius: 4px;
+}
+
+.referee-page .admin-data-table {
+  color: var(--referee-copy);
+}
+
+.referee-page .admin-data-table th {
+  color: var(--referee-muted);
+  font-size: 0.66rem;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+
+.referee-page .admin-data-table :is(th, td) {
+  border-bottom-color: var(--referee-line);
+  padding-block: 0.85rem;
+}
+
+.referee-page .admin-data-table tbody tr {
+  transition: background 160ms ease;
+}
+
+.referee-page .admin-data-table tbody tr:hover {
+  background: rgba(var(--racing-contrast-rgb), 0.055);
+}
+
+.referee-page .referee-table-link {
+  align-items: center;
+  color: var(--referee-ink);
+  display: inline-flex;
+  gap: 0.45rem;
+  text-decoration: none;
+}
+
+.referee-table-subline {
+  color: var(--referee-muted);
+  display: block;
+  font-size: 0.7rem;
+  margin-top: 0.15rem;
+}
+
+.referee-filter-bar {
+  align-items: center;
+  border-bottom: 1px solid var(--referee-line);
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: auto minmax(15rem, 1fr) minmax(10rem, auto);
+  padding: 0.25rem 0 1.25rem;
+}
+
+.referee-filter-bar__count,
+.referee-search-field,
+.referee-select-field {
+  align-items: center;
+  display: flex;
+}
+
+.referee-filter-bar__count {
+  color: var(--referee-muted);
+  font-size: 0.72rem;
+  gap: 0.45rem;
+  padding-right: 0.5rem;
+}
+
+.referee-search-field,
+.referee-select-field {
+  background: rgba(var(--racing-contrast-rgb), 0.06);
+  border: 1px solid var(--referee-line);
+  border-radius: 6px;
+  min-height: 2.8rem;
+}
+
+.referee-search-field {
+  gap: 0.65rem;
+  padding: 0 0.85rem;
+}
+
+.referee-search-field svg {
+  color: var(--referee-muted);
+  flex: 0 0 auto;
+}
+
+.referee-filter-bar input,
+.referee-filter-bar select {
+  background: transparent;
+  border: 0;
+  color: var(--referee-ink);
+  min-height: 2.7rem;
+  outline: 0;
+  width: 100%;
+}
+
+.referee-filter-bar input::placeholder {
+  color: var(--referee-muted);
+}
+
+.referee-select-field {
+  padding-inline: 0.65rem;
+}
+
+.referee-select-field option {
+  background: var(--racing-green);
+}
+
+.referee-search-field:focus-within,
+.referee-select-field:focus-within {
+  border-color: var(--racing-accent);
+  box-shadow: 0 0 0 3px rgba(var(--racing-accent-rgb), 0.14);
+}
+
+.referee-page .referee-race-grid {
+  gap: 0.9rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.referee-page .referee-race-card {
+  display: grid;
+  gap: 0;
+  grid-template-columns: 4rem 1fr;
+  overflow: hidden;
+  padding: 0;
+}
+
+.referee-race-card__rail {
+  align-items: center;
+  background: rgba(var(--racing-contrast-rgb), 0.055);
+  border-right: 1px solid var(--referee-line);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 1rem 0.7rem;
+}
+
+.referee-race-card__rail span {
+  color: var(--referee-muted);
+  font-size: 0.55rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  writing-mode: vertical-rl;
+}
+
+.referee-race-card__rail strong {
+  color: var(--racing-accent);
+  font-family: "Sora", sans-serif;
+  font-size: 1.6rem;
+}
+
+.referee-race-card__body {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 1.15rem;
+}
+
+.referee-page .referee-race-card__header {
+  margin-bottom: 1rem;
+}
+
+.referee-page .referee-race-card__header h2 {
+  color: var(--referee-ink);
+  font-size: 1.35rem;
+  text-wrap: balance;
+}
+
+.referee-page .referee-race-card__meta {
+  gap: 0.7rem 1rem;
+  margin-bottom: 1.2rem;
+}
+
+.referee-page .referee-race-card__meta > div {
+  align-items: center;
+  color: var(--referee-copy);
+  display: flex;
+  font-size: 0.75rem;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.referee-page .referee-race-card__meta svg {
+  color: var(--racing-accent);
+  flex: 0 0 auto;
+}
+
+.referee-race-card__footer {
+  align-items: center;
+  border-top: 1px solid var(--referee-line);
+  display: flex;
+  justify-content: space-between;
+  margin-top: auto;
+  padding-top: 0.8rem;
+}
+
+.referee-race-card__footer > span {
+  color: var(--referee-muted);
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.referee-empty-state {
+  align-items: center;
+  display: flex !important;
+  gap: 1rem;
+  min-height: 8rem;
+}
+
+.referee-empty-state svg {
+  color: var(--racing-accent);
+}
+
+.referee-empty-state h2,
+.referee-empty-state p {
+  margin: 0;
+}
+
+.referee-violation-summary {
+  border-bottom: 1px solid var(--referee-line);
+  border-top: 1px solid var(--referee-line);
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.referee-violation-summary article {
+  display: grid;
+  gap: 0.35rem;
+  padding: 1rem 1.2rem;
+}
+
+.referee-violation-summary article + article {
+  border-left: 1px solid var(--referee-line);
+}
+
+.referee-violation-summary span {
+  color: var(--referee-muted);
+  font-size: 0.68rem;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.referee-violation-summary strong {
+  font-family: "Sora", sans-serif;
+  font-size: clamp(1.8rem, 3vw, 2.7rem);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.referee-row-actions {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.referee-row-actions button {
+  align-items: center;
+  background: transparent;
+  border: 1px solid var(--referee-line);
+  border-radius: 4px;
+  color: var(--referee-copy);
+  display: inline-flex;
+  height: 2rem;
+  justify-content: center;
+  transition: background 160ms ease, border-color 160ms ease, color 160ms ease;
+  width: 2rem;
+}
+
+.referee-row-actions button:hover {
+  background: rgba(var(--racing-accent-rgb), 0.1);
+  border-color: rgba(var(--racing-accent-rgb), 0.45);
+  color: var(--racing-accent-soft);
+}
+
+.referee-page .referee-violation-modal {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  width: min(65rem, calc(100vw - 36px));
+  height: min(88dvh, 56rem);
+  max-height: 88dvh;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid rgba(var(--racing-contrast-rgb), 0.2);
+  border-radius: 6px;
+  background: var(--racing-surface);
+}
+
+.referee-violation-modal__header,
+.referee-violation-modal__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 18px;
+  background: var(--racing-surface-raised);
+}
+
+.referee-violation-modal__header {
+  border-bottom: 1px solid var(--referee-line);
+}
+
+.referee-violation-modal__title {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.referee-violation-modal__title h2 {
+  margin: 0 8px 0 0;
+  color: var(--referee-ink);
+  font: 700 1.2rem/1.25 "Sora", sans-serif;
+  letter-spacing: 0;
+}
+
+.referee-violation-modal__close {
+  display: grid;
+  flex: 0 0 36px;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  place-items: center;
+  border: 1px solid var(--referee-line);
+  border-radius: 4px;
+  background: transparent;
+  color: var(--referee-copy);
+  cursor: pointer;
+}
+
+.referee-violation-modal__close:hover:not(:disabled) {
+  border-color: rgba(var(--racing-accent-rgb), 0.55);
+  color: var(--racing-accent-soft);
+}
+
+.referee-violation-modal__body {
+  display: grid;
+  grid-template-columns: minmax(16rem, 0.72fr) minmax(24rem, 1.28fr);
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.referee-violation-modal__context,
+.referee-violation-modal__decision {
+  display: grid;
+  align-content: start;
+  gap: 18px;
+  min-width: 0;
+  padding: 18px;
+}
+
+.referee-violation-modal__context {
+  border-right: 1px solid var(--referee-line);
+  background: rgba(var(--racing-contrast-rgb), 0.025);
+}
+
+.referee-violation-modal__context section {
+  display: grid;
+  gap: 10px;
+}
+
+.referee-violation-modal__context section + section {
+  padding-top: 18px;
+  border-top: 1px solid var(--referee-line);
+}
+
+.referee-violation-modal__context h3 {
+  margin: 0;
+  color: var(--referee-ink);
+  font: 700 0.84rem/1.3 "Sora", sans-serif;
+  letter-spacing: 0;
+}
+
+.referee-violation-facts {
+  display: grid;
+  gap: 0;
+  margin: 0;
+}
+
+.referee-violation-facts div {
+  display: grid;
+  grid-template-columns: 6rem minmax(0, 1fr);
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(var(--racing-contrast-rgb), 0.09);
+}
+
+.referee-violation-facts dt {
+  color: var(--referee-muted);
+  font-size: 0.75rem;
+}
+
+.referee-violation-facts dd {
+  margin: 0;
+  color: var(--referee-ink);
+  font-size: 0.78rem;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.referee-violation-description,
+.referee-violation-empty-copy,
+.referee-violation-modal__context blockquote {
+  margin: 0;
+  color: var(--referee-copy);
+  font-size: 0.8rem;
+  line-height: 1.55;
+}
+
+.referee-violation-modal__context blockquote {
+  padding-left: 10px;
+  border-left: 2px solid var(--racing-accent);
+}
+
+.referee-violation-evidence {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.referee-violation-evidence a {
+  display: grid;
+  grid-template-rows: 72px auto;
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--referee-line);
+  border-radius: 4px;
+  color: var(--referee-copy);
+  text-decoration: none;
+}
+
+.referee-violation-evidence :is(img, span) {
+  display: grid;
+  width: 100%;
+  height: 72px;
+  object-fit: cover;
+  place-items: center;
+  background: var(--racing-green);
+  color: var(--racing-accent);
+}
+
+.referee-violation-evidence strong {
+  padding: 7px 8px;
+  overflow: hidden;
+  font-size: 0.7rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.referee-violation-decision-note span {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.referee-violation-decision-note b {
+  color: var(--racing-accent-soft);
+  font-size: 0.68rem;
+  text-transform: uppercase;
+}
+
+.referee-violation-decision-note textarea {
+  min-height: 88px;
+}
+
+.referee-final-decision-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  padding: 10px 12px;
+  border-left: 3px solid var(--racing-success);
+  background: rgba(var(--racing-success-rgb), 0.08);
+  color: var(--racing-success-soft);
+  font-size: 0.76rem;
+  line-height: 1.45;
+}
+
+.referee-final-decision-note--locked {
+  border-left-color: var(--racing-accent);
+  background: rgba(var(--racing-accent-rgb), 0.08);
+  color: var(--racing-accent-soft);
+}
+
+.referee-violation-modal__footer {
+  border-top: 1px solid var(--referee-line);
+}
+
+.referee-violation-modal__footer > div {
+  display: flex;
+  gap: 8px;
+}
+
+@media (max-width: 800px) {
+  .referee-page .referee-violation-modal {
+    width: min(100%, calc(100vw - 20px));
+    height: 94dvh;
+    max-height: 94dvh;
+  }
+
+  .referee-violation-modal__body {
+    grid-template-columns: 1fr;
+  }
+
+  .referee-violation-modal__context {
+    border-right: 0;
+    border-bottom: 1px solid var(--referee-line);
+  }
+}
+
+@media (max-width: 560px) {
+  .referee-violation-modal__header,
+  .referee-violation-modal__footer {
+    padding: 12px;
+  }
+
+  .referee-violation-modal__context,
+  .referee-violation-modal__decision {
+    padding: 14px 12px;
+  }
+
+  .referee-violation-modal__footer {
+    align-items: stretch;
+    flex-direction: column-reverse;
+  }
+
+  .referee-violation-modal__footer > div,
+  .referee-violation-modal__footer .admin-header__button {
+    width: 100%;
+  }
+
+  .referee-violation-modal__footer .admin-header__button {
+    justify-content: center;
+  }
+}
+
+.referee-violation-form-grid {
+  display: grid;
+  gap: 0.8rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.referee-policy-preview {
+  background: rgba(var(--racing-contrast-rgb), 0.055);
+  border-left: 2px solid var(--racing-accent);
+  border-radius: 0 6px 6px 0;
+  display: grid;
+  gap: 0.5rem;
+  padding: 0.9rem 1rem;
+}
+
+.referee-policy-preview--review {
+  background: rgba(240, 166, 44, 0.08);
+}
+
+.referee-policy-preview > div {
+  align-items: center;
+  color: var(--racing-accent-soft);
+  display: flex;
+  font-size: 0.68rem;
+  font-weight: 800;
+  gap: 0.5rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.referee-policy-preview strong {
+  color: var(--referee-ink);
+  font-size: 0.9rem;
+}
+
+.referee-policy-preview p,
+.referee-policy-preview small {
+  color: var(--referee-copy);
+  font-size: 0.78rem;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.referee-policy-preview small {
+  color: var(--referee-muted);
+}
+
+.referee-decision-copy {
+  border-bottom: 1px solid var(--referee-line);
+  border-top: 1px solid var(--referee-line);
+  display: grid;
+  gap: 0.7rem;
+  padding: 0.9rem 0;
+}
+
+.referee-decision-copy p,
+.referee-decision-copy blockquote {
+  color: var(--referee-copy);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.referee-evidence-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.referee-evidence-links a {
+  border-bottom: 1px solid rgba(var(--racing-accent-rgb), 0.55);
+  color: var(--racing-accent-soft);
+  font-size: 0.76rem;
+  padding-bottom: 0.12rem;
+}
+
+.referee-decision-copy blockquote {
+  border-left: 2px solid var(--referee-line);
+  color: var(--referee-muted);
+  font-size: 0.82rem;
+  padding-left: 0.8rem;
+}
+
+.referee-admin-review-note {
+  align-items: center;
+  color: var(--racing-accent-soft);
+  display: inline-flex;
+  font-size: 0.78rem;
+  font-weight: 700;
+  gap: 0.45rem;
+}
+
+.referee-page .referee-action-grid {
+  gap: 0.7rem;
+}
+
+.referee-page .referee-action-card {
+  border-color: var(--referee-line);
+  border-radius: 6px;
+  padding: 1rem;
+}
+
+.referee-page .referee-action-card p {
+  color: var(--referee-copy);
+  font-size: 0.82rem;
+}
+
+.referee-page .admin-field :is(input, select, textarea) {
+  border-color: var(--referee-line);
+  border-radius: 6px;
+}
+
+.referee-page .admin-field span {
+  color: var(--referee-copy);
+}
+
+.referee-page .admin-live-state {
+  border-radius: 6px;
+}
+
+.referee-page .referee-status-badge {
+  border-radius: 4px;
+  font-size: 0.66rem;
+  letter-spacing: 0.06em;
+  padding: 0.28rem 0.5rem;
+  text-transform: uppercase;
+}
+
+/* Violation ledger: keep the incident column stable so long names do not
+   change the rhythm of the whole table. The :has selector scopes this to
+   the table that owns the row action controls. */
+.referee-page .admin-panel:has(.referee-row-actions) .admin-data-table {
+  min-width: 980px;
+  table-layout: fixed;
+}
+
+.referee-page .admin-panel:has(.referee-row-actions) .admin-data-table th,
+.referee-page .admin-panel:has(.referee-row-actions) .admin-data-table td {
+  vertical-align: middle;
+}
+
+.referee-page .admin-panel:has(.referee-row-actions) .admin-data-table th:nth-child(1),
+.referee-page .admin-panel:has(.referee-row-actions) .admin-data-table td:nth-child(1) {
+  width: 18%;
+}
+
+.referee-page .admin-panel:has(.referee-row-actions) .admin-data-table th:nth-child(2),
+.referee-page .admin-panel:has(.referee-row-actions) .admin-data-table td:nth-child(2) {
+  width: 15%;
+}
+
+.referee-page .admin-panel:has(.referee-row-actions) .admin-data-table th:nth-child(3),
+.referee-page .admin-panel:has(.referee-row-actions) .admin-data-table td:nth-child(3) {
+  width: 10%;
+}
+
+.referee-page .admin-panel:has(.referee-row-actions) .admin-data-table th:nth-child(4),
+.referee-page .admin-panel:has(.referee-row-actions) .admin-data-table td:nth-child(4) {
+  width: 28%;
+}
+
+.referee-page .admin-panel:has(.referee-row-actions) .admin-data-table th:nth-child(5),
+.referee-page .admin-panel:has(.referee-row-actions) .admin-data-table td:nth-child(5) {
+  width: 13%;
+}
+
+.referee-page .admin-panel:has(.referee-row-actions) .admin-data-table th:nth-child(6),
+.referee-page .admin-panel:has(.referee-row-actions) .admin-data-table td:nth-child(6) {
+  width: 8%;
+  white-space: nowrap;
+}
+
+.referee-page .admin-panel:has(.referee-row-actions) .admin-data-table th:nth-child(7),
+.referee-page .admin-panel:has(.referee-row-actions) .admin-data-table td:nth-child(7) {
+  width: 8%;
+}
+
+.referee-page .admin-panel:has(.referee-row-actions) .admin-data-table td:first-child strong {
+  display: block;
+  overflow: hidden;
+  color: var(--referee-ink);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.referee-page .admin-panel:has(.referee-row-actions) .admin-data-table td:first-child .referee-table-subline {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.referee-page .admin-panel:has(.referee-row-actions) .admin-data-table td:nth-child(2),
+.referee-page .admin-panel:has(.referee-row-actions) .admin-data-table td:nth-child(3) {
+  white-space: nowrap;
+}
+
+.referee-page .admin-panel:has(.referee-row-actions) .admin-data-table td:nth-child(7) {
+  padding-inline: 0.65rem;
+}
+
+@media (max-width: 760px) {
+  .referee-page .admin-panel:has(.referee-row-actions) .admin-data-table {
+    min-width: 900px;
+  }
+}
+
+@media (max-width: 1180px) {
+  .referee-page .referee-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .referee-page .referee-sidebar {
+    align-items: center;
+    border-bottom: 1px solid var(--referee-line);
+    border-right: 0;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    height: auto;
+    padding: 0.8rem 1.25rem;
+    position: static;
+  }
+
+  .referee-duty-state,
+  .referee-authority {
+    display: none;
+  }
+
+  .referee-page .referee-nav {
+    display: flex;
+    justify-content: center;
+  }
+
+  .referee-page .referee-user-row {
+    justify-self: end;
+  }
+
+  .referee-page .referee-header {
+    min-height: 10.5rem;
+  }
+
+  .referee-command-grid {
+    grid-template-columns: minmax(12rem, 0.7fr) minmax(10rem, 0.5fr) minmax(19rem, 1.2fr);
+  }
+}
+
+@media (max-width: 900px) {
+  .referee-command-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .referee-focus-card {
+    grid-column: 1 / -1;
+  }
+
+  .referee-page .referee-race-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 700px) {
+  .referee-page .referee-sidebar {
+    align-items: stretch;
+    grid-template-columns: 1fr auto;
+  }
+
+  .referee-page .referee-nav {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    justify-content: stretch;
+  }
+
+  .referee-page .referee-nav a {
+    flex: 1;
+    justify-content: center;
+  }
+
+  .referee-page .referee-user-row .admin-user-info {
+    display: none;
+  }
+
+  .referee-page .referee-header {
+    align-items: flex-start;
+    min-height: auto;
+    padding-block: 2rem 1.5rem;
+  }
+
+  .referee-page .referee-header h1 {
+    font-size: clamp(2.4rem, 12vw, 3.8rem);
+  }
+
+  .referee-page .admin-header__actions,
+  .referee-page .admin-header__actions > * {
+    justify-content: center;
+    width: 100%;
+  }
+
+  .referee-page .referee-content__body {
+    padding-bottom: 2.5rem;
+  }
+
+  .referee-command-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .referee-command-card--primary {
+    min-height: 14rem;
+  }
+
+  .referee-command-stack {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: none;
+  }
+
+  .referee-focus-card {
+    grid-column: auto;
+  }
+
+  .referee-phase-rail {
+    grid-template-columns: 1fr;
+  }
+
+  .referee-phase-rail article + article {
+    border-left: 0;
+    border-top: 1px solid var(--referee-line);
+  }
+
+  .referee-filter-bar {
+    grid-template-columns: 1fr;
+  }
+
+  .referee-violation-summary {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .referee-violation-summary article:nth-child(3) {
+    border-left: 0;
+    border-top: 1px solid var(--referee-line);
+  }
+
+  .referee-violation-summary article:nth-child(4) {
+    border-top: 1px solid var(--referee-line);
+  }
+
+  .referee-filter-bar__count {
+    padding: 0;
+  }
+
+  .referee-page .referee-section-heading {
+    align-items: flex-start;
+    gap: 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .referee-console-tag {
+    display: none;
+  }
+
+  .referee-page .referee-sidebar {
+    padding-inline: 0.85rem;
+  }
+
+  .referee-page .referee-nav a {
+    font-size: 0.76rem;
+    padding-inline: 0.55rem;
+  }
+
+  .referee-page .referee-header,
+  .referee-page .referee-content__body {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .referee-page .referee-header::after {
+    left: 1rem;
+  }
+
+  .referee-command-stack {
+    grid-template-columns: 1fr;
+  }
+
+  .referee-violation-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .referee-page .referee-race-card {
+    grid-template-columns: 3rem 1fr;
+  }
+
+  .referee-page .referee-race-card__header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .referee-page .referee-race-card__meta {
+    grid-template-columns: 1fr;
+  }
+
+  .referee-race-card__footer {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .referee-page *,
+  .referee-page *::before,
+  .referee-page *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Violation detail — focused review workspace */
+.referee-page .admin-modal:has(.referee-violation-modal) {
+  background: rgba(2, 7, 4, 0.78);
+  backdrop-filter: blur(16px) saturate(1.12);
+}
+
+.referee-page .referee-violation-modal {
+  position: relative;
+  width: min(74rem, calc(100vw - 32px));
+  height: min(90dvh, 60rem);
+  max-height: 90dvh;
+  border: 1px solid rgba(var(--racing-accent-rgb), 0.34);
+  border-radius: 16px;
+  background: var(--racing-surface);
+  box-shadow: 0 2rem 7rem rgba(2, 7, 4, 0.68), 0 0 0 1px rgba(255, 255, 255, 0.025) inset;
+}
+
+.referee-page .referee-violation-modal__header {
+  position: relative;
+  min-height: 6.1rem;
+  padding: 1.25rem 1.5rem;
+  background: linear-gradient(120deg, rgba(var(--racing-accent-rgb), 0.12), rgba(var(--racing-contrast-rgb), 0.045) 46%, rgba(4, 13, 8, 0.22));
+}
+
+.referee-page .referee-violation-modal__header::before {
+  position: absolute;
+  top: 0;
+  left: 1.5rem;
+  width: 4.5rem;
+  height: 3px;
+  background: var(--racing-accent);
+  content: "";
+}
+
+.referee-violation-modal__header-main,
+.referee-violation-modal__header-actions,
+.referee-violation-modal__title {
+  display: flex;
+  align-items: center;
+}
+
+.referee-violation-modal__header-main {
+  min-width: 0;
+  gap: 0.85rem;
+}
+
+.referee-violation-modal__case-mark {
+  display: grid;
+  flex: 0 0 2.6rem;
+  width: 2.6rem;
+  height: 2.6rem;
+  place-items: center;
+  border: 1px solid rgba(var(--racing-accent-rgb), 0.42);
+  border-radius: 0.75rem;
+  background: rgba(var(--racing-accent-rgb), 0.14);
+  color: var(--racing-accent-soft);
+  box-shadow: 0 0.55rem 1.5rem rgba(var(--racing-accent-rgb), 0.12);
+}
+
+.referee-page .referee-violation-modal__case-id {
+  margin-left: 0.55rem;
+  color: var(--referee-muted);
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+}
+
+.referee-page .referee-violation-modal__title h2 {
+  font-size: clamp(1.35rem, 2vw, 1.75rem);
+  letter-spacing: -0.04em;
+}
+
+.referee-violation-modal__header-actions {
+  gap: 0.7rem;
+}
+
+.referee-violation-modal__status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.42rem 0.65rem;
+  border: 1px solid rgba(var(--racing-accent-rgb), 0.3);
+  border-radius: 999px;
+  background: rgba(var(--racing-accent-rgb), 0.1);
+  color: var(--racing-accent-soft);
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.referee-violation-modal__status > span {
+  width: 0.42rem;
+  height: 0.42rem;
+  border-radius: 50%;
+  background: currentColor;
+  box-shadow: 0 0 0 0.22rem rgba(var(--racing-accent-rgb), 0.12);
+}
+
+.referee-violation-modal__status--green { border-color: rgba(var(--racing-success-rgb), 0.35); background: rgba(var(--racing-success-rgb), 0.1); color: var(--racing-success-soft); }
+.referee-violation-modal__status--gray { border-color: rgba(var(--racing-contrast-rgb), 0.22); background: rgba(var(--racing-contrast-rgb), 0.06); color: var(--referee-muted); }
+.referee-violation-modal__status--blue { border-color: rgba(142, 186, 214, 0.34); background: rgba(142, 186, 214, 0.1); color: #c7e1ef; }
+
+.referee-page .referee-violation-modal__close {
+  width: 2.25rem;
+  height: 2.25rem;
+  flex-basis: 2.25rem;
+  border-radius: 0.65rem;
+  background: rgba(var(--racing-contrast-rgb), 0.035);
+  transition: transform 180ms ease, background 180ms ease, border-color 180ms ease;
+}
+
+.referee-page .referee-violation-modal__close:hover:not(:disabled) {
+  transform: rotate(4deg);
+  background: rgba(var(--racing-accent-rgb), 0.12);
+}
+
+.referee-page .referee-violation-modal__body {
+  grid-template-columns: minmax(18rem, 0.72fr) minmax(28rem, 1.28fr);
+  overflow: hidden;
+}
+
+.referee-page .referee-violation-modal__context,
+.referee-page .referee-violation-modal__decision {
+  overflow-y: auto;
+  padding: 1.5rem;
+  scrollbar-color: rgba(var(--racing-accent-rgb), 0.4) transparent;
+}
+
+.referee-page .referee-violation-modal__context {
+  background: linear-gradient(180deg, rgba(var(--racing-contrast-rgb), 0.045), rgba(var(--racing-contrast-rgb), 0.015));
+  border-right-color: rgba(var(--racing-contrast-rgb), 0.13);
+}
+
+.referee-violation-context__lead {
+  display: grid;
+  gap: 0.38rem;
+  padding: 1rem 1.05rem 1.05rem;
+  border: 1px solid rgba(var(--racing-accent-rgb), 0.23);
+  border-left: 3px solid var(--racing-accent);
+  border-radius: 0.8rem;
+  background: rgba(var(--racing-accent-rgb), 0.08);
+}
+
+.referee-violation-context__lead span,
+.referee-violation-context__lead small {
+  color: var(--referee-muted);
+  font-size: 0.68rem;
+}
+
+.referee-violation-context__lead span {
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.referee-violation-context__lead strong {
+  color: var(--referee-ink);
+  font: 700 1.1rem/1.2 "Sora", sans-serif;
+  overflow-wrap: anywhere;
+}
+
+.referee-page .referee-violation-modal__context section + section {
+  padding-top: 1.35rem;
+  border-top-color: rgba(var(--racing-contrast-rgb), 0.12);
+}
+
+.referee-page .referee-violation-modal__context h3 {
+  color: var(--racing-accent-soft);
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.referee-page .referee-violation-facts div {
+  grid-template-columns: 5.5rem minmax(0, 1fr);
+  padding: 0.65rem 0;
+  border-bottom-color: rgba(var(--racing-contrast-rgb), 0.1);
+}
+
+.referee-page .referee-violation-facts dd {
+  font-size: 0.8rem;
+}
+
+.referee-page .referee-violation-description {
+  padding: 0.85rem 0.9rem;
+  border-radius: 0.6rem;
+  background: rgba(var(--racing-contrast-rgb), 0.045);
+  color: var(--referee-ink);
+}
+
+.referee-page .referee-violation-evidence a {
+  border-color: rgba(var(--racing-contrast-rgb), 0.16);
+  border-radius: 0.65rem;
+  background: rgba(var(--racing-contrast-rgb), 0.035);
+  transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
+}
+
+.referee-page .referee-violation-evidence a:hover {
+  transform: translateY(-2px);
+  border-color: rgba(var(--racing-accent-rgb), 0.5);
+  background: rgba(var(--racing-accent-rgb), 0.08);
+}
+
+.referee-page .referee-violation-evidence :is(img, span) {
+  background: rgba(3, 12, 7, 0.6);
+}
+
+.referee-page .referee-violation-modal__decision {
+  gap: 1.2rem;
+  background: rgba(2, 9, 5, 0.16);
+}
+
+.referee-decision-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-bottom: 0.15rem;
+}
+
+.referee-decision-heading h3 {
+  margin: 0.35rem 0 0;
+  color: var(--referee-ink);
+  font: 700 1.2rem/1.2 "Sora", sans-serif;
+  letter-spacing: -0.025em;
+}
+
+.referee-decision-heading > span {
+  padding-bottom: 0.15rem;
+  color: var(--referee-muted);
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.referee-page .referee-penalty-audit {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.65rem;
+}
+
+.referee-page .referee-penalty-audit > div {
+  min-height: 5.1rem;
+  padding: 0.85rem;
+  border-color: rgba(var(--racing-contrast-rgb), 0.14);
+  border-radius: 0.7rem;
+  background: rgba(var(--racing-contrast-rgb), 0.04);
+}
+
+.referee-page .referee-penalty-audit > div:first-child {
+  border-color: rgba(var(--racing-accent-rgb), 0.32);
+  background: rgba(var(--racing-accent-rgb), 0.09);
+}
+
+.referee-page .referee-penalty-audit span {
+  margin-bottom: 0.45rem;
+  font-size: 0.61rem;
+  letter-spacing: 0.08em;
+}
+
+.referee-page .referee-penalty-audit strong,
+.referee-page .referee-penalty-audit p {
+  font-size: 0.8rem;
+  line-height: 1.4;
+}
+
+.referee-page .referee-penalty-audit > div:last-child:nth-child(4) {
+  grid-column: 1 / -1;
+  min-height: auto;
+}
+
+.referee-page .penalty-editor {
+  gap: 1.15rem;
+  padding-top: 0.15rem;
+}
+
+.referee-page .penalty-editor__comparison {
+  padding: 1rem;
+  border-color: rgba(var(--racing-accent-rgb), 0.28);
+  border-radius: 0.8rem;
+  background: linear-gradient(110deg, rgba(var(--racing-accent-rgb), 0.1), rgba(var(--racing-contrast-rgb), 0.035));
+}
+
+.referee-page .penalty-choice {
+  border-color: rgba(var(--racing-contrast-rgb), 0.14);
+  border-radius: 0.65rem;
+  background: rgba(var(--racing-contrast-rgb), 0.025);
+  transition: border-color 180ms ease, background 180ms ease, transform 180ms ease;
+}
+
+.referee-page .penalty-choice:hover:not(.penalty-choice--disabled) {
+  transform: translateY(-1px);
+  border-color: rgba(var(--racing-accent-rgb), 0.36);
+}
+
+.referee-page .referee-violation-decision-note textarea {
+  min-height: 7rem;
+  border-color: rgba(var(--racing-accent-rgb), 0.27);
+  background: rgba(var(--racing-contrast-rgb), 0.045);
+}
+
+.referee-page .referee-violation-modal__footer {
+  min-height: 4.5rem;
+  padding: 0.9rem 1.5rem;
+  background: rgba(3, 12, 7, 0.72);
+}
+
+.referee-violation-modal__footer-note {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--referee-muted);
+  font-size: 0.7rem;
+}
+
+.referee-violation-modal__footer-dot {
+  width: 0.42rem;
+  height: 0.42rem;
+  border-radius: 50%;
+  background: var(--racing-success);
+  box-shadow: 0 0 0 0.2rem rgba(var(--racing-success-rgb), 0.1);
+}
+
+.referee-page .referee-violation-modal__footer > div:nth-child(2),
+.referee-page .referee-violation-modal__footer > div:nth-child(3) {
+  display: flex;
+  gap: 0.5rem;
+}
+
+@media (max-width: 900px) {
+  .referee-page .referee-violation-modal__body {
+    grid-template-columns: minmax(16rem, 0.75fr) minmax(24rem, 1.25fr);
+  }
+
+  .referee-page .referee-penalty-audit {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 800px) {
+  .referee-page .referee-violation-modal {
+    width: min(100%, calc(100vw - 20px));
+    height: 94dvh;
+    max-height: 94dvh;
+  }
+
+  .referee-page .referee-violation-modal__body {
+    grid-template-columns: 1fr;
+    overflow-y: auto;
+  }
+
+  .referee-page .referee-violation-modal__context,
+  .referee-page .referee-violation-modal__decision {
+    overflow: visible;
+  }
+
+  .referee-page .referee-violation-modal__context {
+    border-right: 0;
+    border-bottom: 1px solid var(--referee-line);
+  }
+}
+
+@media (max-width: 560px) {
+  .referee-page .referee-violation-modal__header {
+    align-items: flex-start;
+    padding: 1.1rem 1rem;
+  }
+
+  .referee-page .referee-violation-modal__header-actions {
+    align-items: flex-end;
+    flex-direction: column-reverse;
+  }
+
+  .referee-page .referee-violation-modal__status {
+    font-size: 0.58rem;
+  }
+
+  .referee-page .referee-violation-modal__case-id {
+    display: block;
+    margin: 0.35rem 0 0;
+  }
+
+  .referee-page .referee-violation-modal__context,
+  .referee-page .referee-violation-modal__decision {
+    padding: 1.15rem 1rem;
+  }
+
+  .referee-page .referee-decision-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .referee-page .referee-penalty-audit {
+    grid-template-columns: 1fr;
+  }
+
+  .referee-page .referee-penalty-audit > div:last-child:nth-child(4) {
+    grid-column: auto;
+  }
+
+  .referee-page .referee-violation-modal__footer {
+    align-items: stretch;
+    flex-direction: column;
+    padding: 0.9rem 1rem;
+  }
+
+  .referee-page .referee-violation-modal__footer-note {
+    order: 4;
+  }
+
+  .referee-page .referee-violation-modal__footer > div:nth-child(2),
+  .referee-page .referee-violation-modal__footer > div:nth-child(3),
+  .referee-page .referee-violation-modal__footer .admin-header__button {
+    width: 100%;
+  }
+
+  .referee-page .referee-violation-modal__footer > div:nth-child(2),
+  .referee-page .referee-violation-modal__footer > div:nth-child(3) {
+    justify-content: stretch;
+  }
+
+  .referee-page .referee-violation-modal__footer .admin-header__button {
+    justify-content: center;
+  }
+}
+
+/* Optimized Horse Inspection Workspace */
+.referee-global-actions-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  background: rgba(var(--racing-contrast-rgb), 0.08);
+  border: 1px solid var(--referee-line);
+  border-radius: 8px;
+  padding: 14px 20px;
+  margin-bottom: 24px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.referee-global-actions-bar__title {
+  font-size: 0.9rem;
+  color: var(--referee-muted);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.referee-global-actions-bar__buttons {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.referee-global-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+}
+
+.referee-global-btn--pass {
+  background: rgba(var(--racing-accent-rgb), 0.15);
+  color: var(--racing-accent);
+  border-color: rgba(var(--racing-accent-rgb), 0.4);
+}
+
+.referee-global-btn--pass:hover:not(:disabled) {
+  background: rgba(var(--racing-accent-rgb), 0.25);
+  transform: translateY(-1px);
+}
+
+.referee-global-btn--save {
+  background: var(--racing-accent-strong);
+  color: var(--racing-green);
+}
+
+.referee-global-btn--save:hover:not(:disabled) {
+  background: var(--racing-accent-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(var(--racing-accent-rgb), 0.25);
+}
+
+.referee-global-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Inspection Cards Layout */
+.referee-inspection-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
+  gap: 20px;
+  margin-top: 16px;
+}
+
+@media (max-width: 900px) {
+  .referee-inspection-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.referee-inspection-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--referee-line);
+  background: rgba(var(--racing-contrast-rgb), 0.05);
+  border-radius: 8px;
+  padding: 18px !important;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.referee-inspection-card:hover {
+  border-color: rgba(var(--racing-accent-rgb), 0.35);
+  box-shadow: 0 8px 24px rgba(8, 24, 14, 0.25);
+}
+
+.referee-inspection-card__header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  border-bottom: 1px solid var(--referee-line);
+  padding-bottom: 10px;
+  margin-bottom: 12px;
+}
+
+.referee-inspection-card__title-group h2 {
+  font-family: 'Sora', sans-serif;
+  font-size: 1.15rem !important;
+  margin: 2px 0 0 0 !important;
+  color: var(--referee-ink);
+}
+
+.referee-info-grid-compact {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 16px;
+  font-size: 0.8rem;
+  color: var(--referee-copy);
+  background: rgba(0, 0, 0, 0.15);
+  padding: 10px 14px;
+  border-radius: 6px;
+  margin-bottom: 14px;
+}
+
+.referee-info-grid-compact > div {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px dashed rgba(var(--racing-contrast-rgb), 0.08);
+  padding-bottom: 4px;
+}
+
+.referee-info-grid-compact .referee-info-label {
+  color: var(--referee-muted);
+  font-weight: 500;
+}
+
+/* Compact Checklist Grid */
+.referee-checklist-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 16px;
+}
+
+.referee-checklist-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.referee-checklist-title-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--racing-accent);
+  letter-spacing: 0.05em;
+}
+
+.referee-single-pass-btn {
+  background: transparent;
+  border: 1px solid rgba(var(--racing-accent-rgb), 0.35);
+  color: var(--racing-accent);
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.referee-single-pass-btn:hover {
+  background: rgba(var(--racing-accent-rgb), 0.15);
+  border-color: var(--racing-accent);
+}
+
+.referee-checklist-grid-compact {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 8px 12px;
+  background: rgba(255, 255, 255, 0.02);
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid rgba(var(--racing-contrast-rgb), 0.08);
+}
+
+.referee-check-item-compact {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.76rem;
+  color: var(--referee-copy);
+  cursor: pointer;
+  user-select: none;
+}
+
+.referee-check-item-compact input[type="checkbox"] {
+  accent-color: var(--racing-accent-strong);
+  cursor: pointer;
+}
+
+.referee-card-form-grid {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  gap: 12px;
+  margin-top: auto;
+  border-top: 1px solid var(--referee-line);
+  padding-top: 14px;
+}
+
+.referee-card-form-grid .admin-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+}
+
+.referee-card-form-grid .admin-field span {
+  font-size: 0.75rem;
+  color: var(--referee-muted);
+}
+
+/* New incident form — separate layout from the detail review modal */
+.referee-page .referee-violation-modal--form {
+  display: block;
+  width: min(58rem, calc(100vw - 32px));
+  height: auto;
+  max-height: min(92dvh, 64rem);
+  padding: 0;
+  overflow-y: auto;
+  border: 1px solid rgba(var(--racing-accent-rgb), 0.34);
+  border-radius: 16px;
+  background: var(--racing-surface);
+  box-shadow: 0 2rem 7rem rgba(2, 7, 4, 0.68), 0 0 0 1px rgba(255, 255, 255, 0.025) inset;
+}
+
+.referee-page .referee-incident-form__header {
+  position: relative;
+  gap: 0.45rem;
+  padding: 1.5rem 1.75rem 1.3rem;
+  border-bottom: 1px solid rgba(var(--racing-contrast-rgb), 0.13);
+  background: linear-gradient(120deg, rgba(var(--racing-accent-rgb), 0.12), rgba(var(--racing-contrast-rgb), 0.035) 52%, rgba(4, 13, 8, 0.24));
+}
+
+.referee-page .referee-incident-form__header::before {
+  position: absolute;
+  top: 0;
+  left: 1.75rem;
+  width: 4.5rem;
+  height: 3px;
+  background: var(--racing-accent);
+  content: "";
+}
+
+.referee-page .referee-incident-form__header h2 {
+  margin: 0.15rem 0 0;
+  color: var(--referee-ink);
+  font: 700 clamp(1.45rem, 3vw, 2rem)/1.12 "Sora", sans-serif;
+  letter-spacing: -0.045em;
+}
+
+.referee-page .referee-incident-form {
+  gap: 1.2rem;
+  padding: 1.45rem 1.75rem 1.55rem;
+}
+
+.referee-page .referee-incident-form__fields {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem 1.1rem;
+}
+
+.referee-page .referee-incident-form__fields .admin-field {
+  gap: 0.45rem;
+}
+
+.referee-page .referee-incident-form__fields .admin-field > span,
+.referee-page .referee-incident-form > .admin-field > span {
+  color: var(--referee-copy);
+  font-size: 0.7rem;
+  font-weight: 750;
+  letter-spacing: 0.02em;
+}
+
+.referee-page .referee-incident-form__fields .admin-field:last-child {
+  max-width: calc(50% - 0.55rem);
+}
+
+.referee-page .referee-incident-form :is(input, select, textarea) {
+  border: 1px solid rgba(var(--racing-contrast-rgb), 0.16);
+  border-radius: 0.65rem;
+  background: rgba(4, 13, 8, 0.62);
+  color: var(--referee-ink);
+  transition: border-color 180ms ease, background 180ms ease, box-shadow 180ms ease;
+}
+
+.referee-page .referee-incident-form :is(input, select) {
+  min-height: 2.85rem;
+  padding: 0 0.85rem;
+}
+
+.referee-page .referee-incident-form textarea {
+  min-height: 8.5rem;
+  padding: 0.85rem 0.95rem;
+  line-height: 1.5;
+  resize: vertical;
+}
+
+.referee-page .referee-incident-form :is(input, select, textarea):hover {
+  border-color: rgba(var(--racing-accent-rgb), 0.4);
+  background: rgba(4, 13, 8, 0.78);
+}
+
+.referee-page .referee-incident-form :is(input, select, textarea):focus {
+  border-color: var(--racing-accent);
+  box-shadow: 0 0 0 0.22rem rgba(var(--racing-accent-rgb), 0.1);
+  outline: none;
+}
+
+.referee-page .referee-incident-form textarea::placeholder,
+.referee-page .referee-incident-form input::placeholder {
+  color: rgba(238, 231, 212, 0.46);
+}
+
+.referee-page .referee-incident-form .referee-evidence-upload {
+  gap: 0.85rem;
+  padding: 1.1rem 1.15rem;
+  border: 1px dashed rgba(var(--racing-accent-rgb), 0.32);
+  border-radius: 0.85rem;
+  background: rgba(var(--racing-contrast-rgb), 0.028);
+}
+
+.referee-page .referee-incident-form .referee-evidence-upload__heading {
+  align-items: center;
+}
+
+.referee-page .referee-incident-form .referee-evidence-upload__heading > div {
+  color: var(--referee-ink);
+  font-size: 0.92rem;
+}
+
+.referee-page .referee-incident-form .referee-evidence-upload__heading > div svg {
+  color: var(--racing-accent-soft);
+}
+
+.referee-page .referee-incident-form .referee-evidence-upload small {
+  color: var(--referee-muted);
+  font-size: 0.72rem;
+  line-height: 1.45;
+}
+
+.referee-page .referee-incident-form .referee-evidence-upload__list > div {
+  border-radius: 0.55rem;
+  background: rgba(var(--racing-contrast-rgb), 0.045);
+}
+
+.referee-page .referee-incident-form .referee-policy-preview {
+  gap: 0.55rem;
+  padding: 1rem 1.1rem;
+  border: 1px solid rgba(var(--racing-accent-rgb), 0.22);
+  border-left: 3px solid var(--racing-accent);
+  border-radius: 0 0.8rem 0.8rem 0;
+  background: linear-gradient(110deg, rgba(var(--racing-accent-rgb), 0.1), rgba(var(--racing-contrast-rgb), 0.035));
+}
+
+.referee-page .referee-incident-form .referee-policy-preview > div {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  color: var(--racing-accent-soft);
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.referee-page .referee-incident-form .referee-policy-preview strong {
+  color: var(--referee-ink);
+  font: 700 1rem/1.3 "Sora", sans-serif;
+}
+
+.referee-page .referee-incident-form .referee-policy-preview p,
+.referee-page .referee-incident-form .referee-policy-preview small {
+  margin: 0;
+  color: var(--referee-copy);
+  line-height: 1.45;
+}
+
+.referee-page .referee-incident-form .referee-policy-preview small {
+  color: var(--referee-muted);
+  font-size: 0.7rem;
+}
+
+.referee-page .referee-incident-form__actions {
+  justify-content: flex-end;
+  gap: 0.7rem;
+  padding-top: 0.2rem;
+}
+
+.referee-page .referee-incident-form__actions .admin-header__button {
+  min-width: 8.5rem;
+  justify-content: center;
+}
+
+@media (max-width: 640px) {
+  .referee-page .referee-violation-modal--form {
+    width: min(100%, calc(100vw - 20px));
+    max-height: 94dvh;
+  }
+
+  .referee-page .referee-incident-form__header {
+    padding: 1.25rem 1.1rem 1.1rem;
+  }
+
+  .referee-page .referee-incident-form__header::before {
+    left: 1.1rem;
+  }
+
+  .referee-page .referee-incident-form {
+    gap: 1rem;
+    padding: 1.15rem 1.1rem 1.25rem;
+  }
+
+  .referee-page .referee-incident-form__fields {
+    grid-template-columns: 1fr;
+    gap: 0.9rem;
+  }
+
+  .referee-page .referee-incident-form__fields .admin-field:last-child {
+    max-width: none;
+  }
+
+  .referee-page .referee-incident-form__actions,
+  .referee-page .referee-incident-form__actions .admin-header__button {
+    width: 100%;
+  }
+
+  .referee-page .referee-incident-form__actions {
+    flex-direction: column-reverse;
+  }
+}
+
+.referee-card-form-grid select {
+  background: var(--racing-green);
+  color: var(--referee-ink);
+  border: 1px solid var(--referee-line);
+  border-radius: 6px;
+  padding: 6px 10px;
+  height: 34px;
+  outline: none;
+}
+
+.referee-card-form-grid select:focus {
+  border-color: var(--racing-accent);
+}
+
+.referee-card-form-grid textarea {
+  background: var(--racing-green);
+  color: var(--referee-ink);
+  border: 1px solid var(--referee-line);
+  border-radius: 6px;
+  padding: 6px 10px;
+  height: 34px;
+  resize: none;
+  outline: none;
+}
+
+.referee-card-form-grid textarea:focus {
+  border-color: var(--racing-accent);
+}
+
+.referee-card-footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 12px;
+}
+
+.referee-save-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(var(--racing-accent-rgb), 0.1);
+  color: var(--racing-accent);
+  border: 1px solid rgba(var(--racing-accent-rgb), 0.4);
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.referee-save-btn:hover:not(:disabled) {
+  background: rgba(var(--racing-accent-rgb), 0.2);
+  border-color: var(--racing-accent);
+  transform: translateY(-1px);
+}
+
+.referee-result-editor {
+  min-width: 760px;
+}
+
+.referee-result-editor input {
+  width: 100%;
+  min-height: 34px;
+  padding: 0 8px;
+  border: 1px solid var(--referee-line);
+  border-radius: 5px;
+  background: var(--racing-green);
+  color: var(--referee-ink);
+  font: inherit;
+  font-size: 0.76rem;
+}
+
+.referee-result-editor input:focus {
+  border-color: var(--racing-accent);
+  outline: none;
+}
+
+.referee-result-editor input:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.referee-evidence-upload {
+  display: grid;
+  gap: 10px;
+  padding: 14px;
+  border: 1px solid var(--referee-line);
+  border-radius: 6px;
+}
+
+.referee-evidence-upload__heading,
+.referee-evidence-upload__heading > div,
+.referee-evidence-upload__list > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.referee-evidence-upload__heading > div {
+  justify-content: flex-start;
+  font-weight: 700;
+}
+
+.referee-evidence-upload input[type="file"] {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  overflow: hidden;
+  opacity: 0;
+}
+
+.referee-evidence-upload__list {
+  display: grid;
+  gap: 8px;
+}
+
+.referee-evidence-upload__list > div {
+  min-width: 0;
+  padding: 8px 10px;
+  background: var(--referee-surface);
+  border: 1px solid var(--referee-line);
+}
+
+.referee-evidence-upload__list span,
+.referee-evidence-upload__list a {
+  min-width: 0;
+  overflow: hidden;
+  color: inherit;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.referee-evidence-upload__list button {
+  display: grid;
+  flex: 0 0 32px;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #ff9a8f;
+  cursor: pointer;
+  place-items: center;
+}
+
+.referee-penalty-audit {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.referee-penalty-audit > div {
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid var(--referee-line);
+  border-radius: 6px;
+  background: var(--referee-surface);
+}
+
+.referee-penalty-audit span {
+  display: block;
+  margin-bottom: 5px;
+  color: var(--referee-muted);
+  font-size: 0.76rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.referee-penalty-audit strong,
+.referee-penalty-audit p {
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 700px) {
+  .referee-evidence-upload__heading {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .referee-evidence-upload__heading .admin-header__button {
+    justify-content: center;
+    width: 100%;
+  }
+
+  .referee-penalty-audit {
+    grid-template-columns: 1fr;
+  }
+}
+
+.referee-phase-strip {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin-bottom: 16px;
+  border: 1px solid var(--referee-line);
+  border-radius: 6px;
+  overflow: hidden;
+  background: rgba(8, 20, 17, 0.52);
+}
+
+.referee-phase-strip a,
+.referee-phase-strip span {
+  min-width: 0;
+  padding: 10px 12px;
+  border-right: 1px solid var(--referee-line);
+  color: var(--referee-muted);
+  font-size: 0.76rem;
+  font-weight: 700;
+  text-align: center;
+  text-decoration: none;
+}
+
+.referee-phase-strip > :last-child {
+  border-right: 0;
+}
+
+.referee-phase-strip .active {
+  background: rgba(var(--racing-accent-rgb), 0.14);
+  color: var(--racing-accent);
+}
+
+.referee-inspection-workspace {
+  display: grid;
+  gap: 16px;
+}
+
+.referee-inspection-workspace__runner-list {
+  max-height: 370px;
+  overflow: auto;
+}
+
+.referee-inspection-workspace__runner-list progress {
+  display: block;
+  width: 96px;
+  height: 5px;
+  margin-top: 5px;
+  accent-color: var(--racing-accent);
+}
+
+.referee-inspection-workspace__runner-list tbody tr {
+  cursor: pointer;
+}
+
+.referee-inspection-workspace__runner-list tbody tr:focus-visible {
+  outline: 2px solid var(--racing-accent);
+  outline-offset: -2px;
+}
+
+.referee-inspection-workspace__runner--selected {
+  box-shadow: inset 3px 0 0 var(--racing-accent);
+}
+
+.referee-inspection-workspace__selected-icon {
+  display: grid;
+  width: 24px;
+  height: 24px;
+  place-items: center;
+  margin-left: auto;
+  border-radius: 50%;
+  background: rgba(var(--racing-accent-rgb), 0.16);
+  color: var(--racing-accent);
+}
+
+.referee-inspection-workspace__detail {
+  margin: 0;
+  border-top: 1px solid var(--referee-line);
+  border-radius: 0;
+  padding-top: 18px;
+}
+
+.referee-inspection-workspace__confirmation {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  align-items: center;
+  border-left: 3px solid var(--racing-accent);
+}
+
+.referee-inspection-workspace__confirmation-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.referee-inspection-workspace__issues {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.referee-inspection-workspace__issues ul {
+  margin: 7px 0 0;
+  padding-left: 18px;
+}
+
+.referee-inspection-workspace__issues button {
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-weight: 700;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.referee-monitor-entry,
+.referee-monitor-timeline {
+  border-left: 3px solid rgba(var(--racing-accent-rgb), 0.42);
+}
+
+@media (max-width: 760px) {
+  .referee-phase-strip {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .referee-phase-strip a,
+  .referee-phase-strip span {
+    border-bottom: 1px solid var(--referee-line);
+  }
+
+  .referee-inspection-workspace__confirmation {
+    align-items: stretch;
+    flex-direction: column;
+  }
+}

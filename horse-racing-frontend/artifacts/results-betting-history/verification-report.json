@@ -1,0 +1,98 @@
+{
+  "passed": true,
+  "assertions": [
+    "Results betting history renders won, lost, and pending bets with backend payouts",
+    "Mobile results betting history has no horizontal overflow or clipped tabs"
+  ],
+  "screenshots": [
+    "results-betting-history-desktop-1440x1000.png",
+    "results-betting-history-mobile-390x844.png"
+  ],
+  "audits": {
+    "history": {
+      "heading": "Settled prediction history",
+      "summary": "3 total bets2 settled250 TOKEN paid",
+      "statuses": [
+        "Published",
+        "Won",
+        "Lost",
+        "Pending"
+      ],
+      "returns": [
+        "250 TOKEN",
+        "0 TOKEN",
+        "90 TOKEN"
+      ],
+      "overflow": 0
+    },
+    "mobile": {
+      "overflow": 0,
+      "innerWidth": 390,
+      "clientWidth": 390,
+      "resultsPage": 330,
+      "dashboard": 370,
+      "content": 330,
+      "heroGrid": "276px",
+      "boardWidth": 330,
+      "clippedTabs": 0,
+      "offenders": [
+        {
+          "tag": "TABLE",
+          "className": "data-table",
+          "left": 47,
+          "right": 767,
+          "width": 720
+        },
+        {
+          "tag": "THEAD",
+          "className": "",
+          "left": 47,
+          "right": 767,
+          "width": 720
+        },
+        {
+          "tag": "TR",
+          "className": "",
+          "left": 47,
+          "right": 767,
+          "width": 720
+        },
+        {
+          "tag": "TH",
+          "className": "",
+          "left": 259,
+          "right": 471,
+          "width": 212
+        },
+        {
+          "tag": "TH",
+          "className": "",
+          "left": 471,
+          "right": 566,
+          "width": 95
+        },
+        {
+          "tag": "TH",
+          "className": "",
+          "left": 566,
+          "right": 671,
+          "width": 106
+        },
+        {
+          "tag": "TH",
+          "className": "",
+          "left": 671,
+          "right": 767,
+          "width": 96
+        },
+        {
+          "tag": "TBODY",
+          "className": "",
+          "left": 47,
+          "right": 767,
+          "width": 720
+        }
+      ]
+    }
+  }
+}

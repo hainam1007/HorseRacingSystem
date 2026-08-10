@@ -1,0 +1,9 @@
+{
+  "passed": true,
+  "assertions": [
+    "Accepted the versioned canonical market contract",
+    "Rejected unknown versions, statuses, race IDs, and missing runner availability",
+    "Accepted a receipt containing server-owned accepted odds and potential return",
+    "Rejected malformed or mismatched accepted receipts"
+  ]
+}
