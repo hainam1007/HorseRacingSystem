@@ -1,27 +1,47 @@
 name: horse-racing-system
 
-# Backend runs in Docker and connects to the Postgres instance already running
-# on the host machine (the one pgAdmin is pointing at). No DB container here —
-# `host.docker.internal:host-gateway` makes the host's port 5432 reachable
-# from inside the container on Docker Desktop (Windows/macOS).
+# Stack: PostgreSQL 16 (named volume) + Node.js backend (Sequelize → postgres).
+# All secrets are injected from the host's .env at the compose level — never
+# baked into the image. `.env` is excluded by `.dockerignore`.
 
 services:
+  postgres:
+    image: postgres:18-alpine
+    container_name: horse-racing-postgres
+    restart: unless-stopped
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-horse_racing}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+    ports:
+      - "${POSTGRES_HOST_PORT:-5432}:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-horse_racing}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
   backend:
     build:
       context: .
       dockerfile: horse-racing-backend/Dockerfile
     container_name: horse-racing-backend
     restart: unless-stopped
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+    depends_on:
+      postgres:
+        condition: service_healthy
     environment:
       NODE_ENV: production
       PORT: 3000
-      # Point at the host's Postgres (pgAdmin DB).
-      PGHOST: host.docker.internal
-      PGPORT: ${POSTGRES_HOST_PORT:-5432}
+      # Use the docker-compose service name so DNS resolves to the postgres container.
+      PGHOST: postgres
+      PGPORT: 5432
       PGUSER: ${POSTGRES_USER:-postgres}
-      PGPASSWORD: ${POSTGRES_PASSWORD:-12345}
+      PGPASSWORD: ${POSTGRES_PASSWORD:-postgres}
       PGDATABASE: ${POSTGRES_DB:-horse_racing}
       # Pass through secret-bearing values from the host .env if present.
       JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET in .env}
@@ -50,7 +70,9 @@ services:
       MOCK_PAYMENT_WEBHOOK_SECRET: ${MOCK_PAYMENT_WEBHOOK_SECRET:-SUPER_SECURE_MOCK_SECRET_12345}
       PROBABILITY_ENGINE_MODE: ${PROBABILITY_ENGINE_MODE:-local}
       PROBABILITY_ENGINE_PYTHON: ${PROBABILITY_ENGINE_PYTHON:-python}
-      # Local DB already has the schema applied — don't re-apply.
-      DB_AUTO_APPLY_SCHEMA: ${DB_AUTO_APPLY_SCHEMA:-false}
+      DB_AUTO_APPLY_SCHEMA: ${DB_AUTO_APPLY_SCHEMA:-true}
     ports:
       - "${BACKEND_HOST_PORT:-3000}:3000"
+
+volumes:
+  postgres-data:
