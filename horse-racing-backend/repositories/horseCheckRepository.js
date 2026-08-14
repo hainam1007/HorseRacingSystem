@@ -1,59 +1,60 @@
-const { HorseCheck } = require('../models');
+const { loadSequelizeModels } = require('../models/sequelize/index.js');
 
-function basePopulate(query) {
-  return query
-    .populate('race_id')
-    .populate({
-      path: 'horse_id',
-      populate: {
-        path: 'owner_id',
-        populate: {
-          path: 'user_id',
-          select: 'full_name email'
-        }
-      }
-    })
-    .populate({
-      path: 'jockey_id',
-      populate: {
-        path: 'user_id',
-        select: 'full_name email'
-      }
-    })
-    .populate({
-      path: 'referee_id',
-      populate: {
-        path: 'user_id',
-        select: 'full_name email'
-      }
-    });
+function getModels() { return loadSequelizeModels().models; }
+
+function defaultInclude() {
+  const { Race, Horse, HorseOwner, Jockey, RaceReferee, User } = getModels();
+  return [
+    { model: Race, as: 'race' },
+    {
+      model: Horse,
+      as: 'horse',
+      include: [{ model: HorseOwner, as: 'owner', include: [{ model: User, as: 'user', attributes: ['full_name', 'email'] }] }]
+    },
+    {
+      model: Jockey,
+      as: 'jockey',
+      include: [{ model: User, as: 'user', attributes: ['full_name', 'email'] }]
+    },
+    {
+      model: RaceReferee,
+      as: 'referee',
+      include: [{ model: User, as: 'user', attributes: ['full_name', 'email'] }]
+    }
+  ];
 }
 
 async function create(data) {
+  const { HorseCheck } = getModels();
   return HorseCheck.create(data);
 }
 
-async function find(filter) {
-  return basePopulate(HorseCheck.find(filter || {}).sort({ checked_at: -1 }));
+async function find(filter = {}) {
+  const { HorseCheck } = getModels();
+  return HorseCheck.findAll({ where: filter, include: defaultInclude(), order: [['checked_at', 'DESC']] });
 }
 
 async function findById(id) {
-  return basePopulate(HorseCheck.findById(id));
+  const { HorseCheck } = getModels();
+  return HorseCheck.findByPk(id, { include: defaultInclude() });
 }
 
 async function findByRaceAndHorse(raceId, horseId) {
-  return HorseCheck.findOne({ race_id: raceId, horse_id: horseId });
+  const { HorseCheck } = getModels();
+  return HorseCheck.findOne({ where: { race_id: raceId, horse_id: horseId } });
 }
 
-async function findOne(filter) {
-  return basePopulate(HorseCheck.findOne(filter || {}));
+async function findOne(filter = {}) {
+  const { HorseCheck } = getModels();
+  return HorseCheck.findOne({ where: filter, include: defaultInclude() });
 }
 
 async function updateById(id, data) {
-  return HorseCheck.findByIdAndUpdate(id, data, {
-    returnDocument: 'after',
-    runValidators: true
-  });
+  const { HorseCheck } = getModels();
+  const instance = await HorseCheck.findByPk(id);
+  if (!instance) return null;
+  await instance.update(data);
+  return instance;
 }
 
 module.exports = {

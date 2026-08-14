@@ -1,0 +1,13 @@
+[
+  {
+    "id": "cb03f085-ef76-5281-90b3-8143b2f2a8d7",
+    "package_id": "PKG_500K",
+    "label": "500,000 VND Demo Package",
+    "vnd_price": 500000,
+    "token_received": 500,
+    "bonus_token": 50,
+    "is_active": true,
+    "created_at": "2026-07-30T04:45:37.992Z",
+    "updated_at": "2026-07-30T04:45:37.992Z"
+  }
+]

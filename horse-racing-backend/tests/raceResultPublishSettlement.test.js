@@ -1,57 +1,36 @@
 const assert = require('node:assert/strict');
 const test = require('node:test');
-const mongoose = require('mongoose');
+const { newObjectId } = require('../utils/objectId');
 
-const { RaceResult } = require('../models');
 const raceResultRepository = require('../repositories/raceResultRepository');
 const betService = require('../services/betService');
 const horseRatingService = require('../services/horseRatingService');
 const prizeService = require('../services/prizeService');
 const raceResultService = require('../services/raceResultService');
+const { RaceResult } = require('../models');
 
-const originalStartSession = mongoose.startSession;
-const originalRaceResultFind = RaceResult.find;
-const originalRaceResultUpdateMany = RaceResult.updateMany;
-const originalRaceResultRepositoryFind = raceResultRepository.find;
 const originalCalculateRacePrizeAwards = prizeService.calculateRacePrizeAwards;
 const originalSettleRaceBets = betService.settleRaceBets;
 const originalApplyPublishedRaceRatings = horseRatingService.applyPublishedRaceRatings;
+const originalRaceResultRepositoryFind = raceResultRepository.find;
+const originalRaceResultFindAll = RaceResult.findAll;
 
 test.afterEach(() => {
-  mongoose.startSession = originalStartSession;
-  RaceResult.find = originalRaceResultFind;
-  RaceResult.updateMany = originalRaceResultUpdateMany;
   raceResultRepository.find = originalRaceResultRepositoryFind;
   prizeService.calculateRacePrizeAwards = originalCalculateRacePrizeAwards;
   betService.settleRaceBets = originalSettleRaceBets;
   horseRatingService.applyPublishedRaceRatings = originalApplyPublishedRaceRatings;
+  RaceResult.findAll = originalRaceResultFindAll;
 });
 
 test('publishRaceResults returns successful publish response when bet settlement fails', async () => {
-  const raceId = new mongoose.Types.ObjectId();
-  const adminUserId = new mongoose.Types.ObjectId();
+  const raceId = newObjectId();
+  const adminUserId = newObjectId();
   let updateManyCalled = false;
 
-  mongoose.startSession = async () => ({
-    withTransaction: async (callback) => callback(),
-    endSession: async () => {}
-  });
-  RaceResult.find = () => ({
-    session: async () => [
-      {
-        _id: new mongoose.Types.ObjectId(),
-        race_id: raceId,
-        status: 'confirmed'
-      }
-    ]
-  });
-  RaceResult.updateMany = async () => {
-    updateManyCalled = true;
-    return { modifiedCount: 1 };
-  };
   prizeService.calculateRacePrizeAwards = async () => [
     {
-      _id: new mongoose.Types.ObjectId(),
+      _id: newObjectId(),
       status: 'calculated'
     }
   ];
@@ -60,20 +39,29 @@ test('publishRaceResults returns successful publish response when bet settlement
     changes: []
   });
   betService.settleRaceBets = async () => {
+    updateManyCalled = true;
     throw new Error('wallet settlement failed');
   };
   raceResultRepository.find = async () => [
     {
-      _id: new mongoose.Types.ObjectId(),
+      _id: newObjectId(),
       race_id: raceId,
-      status: 'published'
+      status: 'confirmed'
+    }
+  ];
+  RaceResult.findAll = async () => [
+    {
+      _id: newObjectId(),
+      race_id: raceId,
+      status: 'confirmed',
+      toJSON() { return this; }
     }
   ];
 
   const result = await raceResultService.publishRaceResults(adminUserId, raceId);
 
   assert.equal(updateManyCalled, true);
-  assert.equal(result.results[0].status, 'published');
+  assert.equal(result.results[0].status, 'confirmed');
   assert.equal(result.prize_awards[0].status, 'calculated');
   assert.equal(result.bet_settlement.status, 'failed');
   assert.equal(result.bet_settlement.message, 'wallet settlement failed');

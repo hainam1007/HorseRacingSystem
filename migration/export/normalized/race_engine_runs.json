@@ -1,0 +1,92 @@
+[
+  {
+    "id": "c0d93f55-9c11-57c7-85f9-9c8e7c88eca0",
+    "race_id": "bb4f094f-a85e-58e6-a5db-3725e1724fe7",
+    "engine_run_id": "ENGINE-HIST-1",
+    "status": "completed",
+    "started_at": "2026-07-03T02:00:00.000Z",
+    "completed_at": "2026-07-03T02:15:00.000Z",
+    "created_at": "2026-07-30T04:45:26.190Z",
+    "updated_at": "2026-07-30T04:45:26.190Z"
+  },
+  {
+    "id": "397a6f9b-b81a-52b8-b12c-d42ad960c694",
+    "race_id": "2ddfccc9-b137-52e7-9238-e1266602f589",
+    "engine_run_id": "ENGINE-HIST-2",
+    "status": "completed",
+    "started_at": "2026-07-05T08:00:00.000Z",
+    "completed_at": "2026-07-05T08:15:00.000Z",
+    "created_at": "2026-07-30T04:45:28.333Z",
+    "updated_at": "2026-07-30T04:45:28.333Z"
+  },
+  {
+    "id": "a860cd07-6e89-5ff5-925b-2ee049110136",
+    "race_id": "93ff3d27-31a2-5e45-a9b3-06bab82f9daf",
+    "engine_run_id": "ENGINE-HIST-3",
+    "status": "completed",
+    "started_at": "2026-07-07T02:00:00.000Z",
+    "completed_at": "2026-07-07T02:15:00.000Z",
+    "created_at": "2026-07-30T04:45:30.477Z",
+    "updated_at": "2026-07-30T04:45:30.477Z"
+  },
+  {
+    "id": "31f8633c-a3d1-5c63-8f4a-185ec324866b",
+    "race_id": "23756a7a-17a6-56f5-989a-3226cc1f30f7",
+    "engine_run_id": "ENGINE-HIST-4",
+    "status": "completed",
+    "started_at": "2026-07-09T08:00:00.000Z",
+    "completed_at": "2026-07-09T08:15:00.000Z",
+    "created_at": "2026-07-30T04:45:32.636Z",
+    "updated_at": "2026-07-30T04:45:32.636Z"
+  },
+  {
+    "id": "abfe26b4-46db-50fd-9d0d-edf52f4deeac",
+    "race_id": "22de2553-1df9-5946-8e35-63b5d41f528f",
+    "engine_run_id": "ENGINE-HIST-5",
+    "status": "completed",
+    "started_at": "2026-07-11T02:00:00.000Z",
+    "completed_at": "2026-07-11T02:15:00.000Z",
+    "created_at": "2026-07-30T04:45:34.749Z",
+    "updated_at": "2026-07-30T04:45:34.749Z"
+  },
+  {
+    "id": "3f043ade-9780-5b79-8857-ee591f672a68",
+    "race_id": "08387fd4-a614-5cdd-a770-bfc9fa9ea69e",
+    "engine_run_id": "ENGINE-HIST-6",
+    "status": "completed",
+    "started_at": "2026-07-13T08:00:00.000Z",
+    "completed_at": "2026-07-13T08:15:00.000Z",
+    "created_at": "2026-07-30T04:45:36.887Z",
+    "updated_at": "2026-07-30T04:45:36.887Z"
+  },
+  {
+    "id": "fd652941-9472-5737-b744-73e1c0426c14",
+    "race_id": "f8ea600d-1b70-5fc2-b961-74be4f49a097",
+    "engine_run_id": "e939b870-169b-4cf9-a97d-55944807c7d7",
+    "status": "completed",
+    "started_at": "2026-07-30T05:59:21.858Z",
+    "created_at": "2026-07-30T05:59:21.858Z",
+    "updated_at": "2026-07-30T05:59:22.792Z",
+    "completed_at": "2026-07-30T05:59:22.792Z"
+  },
+  {
+    "id": "2e02ed71-ee7f-518c-9b7f-141461b18d18",
+    "race_id": "3394deb1-5116-5a94-a7a4-2d87f147aeea",
+    "engine_run_id": "7687c155-328c-4e9a-9d98-28521fb6d298",
+    "status": "completed",
+    "started_at": "2026-08-10T14:24:43.781Z",
+    "created_at": "2026-08-10T14:24:43.782Z",
+    "updated_at": "2026-08-10T14:24:44.733Z",
+    "completed_at": "2026-08-10T14:24:44.732Z"
+  },
+  {
+    "id": "95baa785-b746-5bb8-b801-7eb49736f20e",
+    "race_id": "e279b503-2031-5c9a-80ac-b599aaa46fc3",
+    "engine_run_id": "5b5dac72-68db-4bbc-9ebb-c2336cbd78b0",
+    "status": "completed",
+    "started_at": "2026-08-13T06:25:38.813Z",
+    "created_at": "2026-08-13T06:25:38.813Z",
+    "updated_at": "2026-08-13T06:25:45.474Z",
+    "completed_at": "2026-08-13T06:25:45.474Z"
+  }
+]

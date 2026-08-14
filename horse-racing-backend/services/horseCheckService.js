@@ -7,12 +7,15 @@ const {
   VIOLATION_STATUS
 } = require('../constants/statuses');
 const { getViolationPenaltyPolicy } = require('../constants/violationPenaltyPolicy');
-const { Horse, HorseCheck, Jockey, RaceResult } = require('../models');
+const { Op } = require('sequelize');
+const { loadSequelizeModels } = require('../models/sequelize/index.js');
 const horseCheckRepository = require('../repositories/horseCheckRepository');
 const profileRepository = require('../repositories/profileRepository');
 const raceRepository = require('../repositories/raceRepository');
 const raceResultRepository = require('../repositories/raceResultRepository');
 const violationRepository = require('../repositories/violationRepository');
+
+function getModels() { return loadSequelizeModels().models; }
 
 function hasRole(req, role) {
   return (req.roles || req.auth.roles || []).includes(role);
@@ -96,10 +99,11 @@ async function ensurePassedPreRaceCheck(race, horse, phase) {
 }
 
 async function createHorseCheck(req, payload) {
+  const { Horse, Jockey } = getModels();
   const [race, horse, jockey] = await Promise.all([
     raceRepository.findById(payload.race_id),
-    Horse.findById(payload.horse_id),
-    payload.jockey_id ? Jockey.findById(payload.jockey_id) : Promise.resolve(null)
+    Horse.findByPk(payload.horse_id),
+    payload.jockey_id ? Jockey.findByPk(payload.jockey_id) : Promise.resolve(null)
   ]);
 
   if (!race) {
@@ -255,9 +259,9 @@ async function ensureBulkPostRaceIsOpen(raceId, phase) {
     return;
   }
 
-  const lockedResultCount = await RaceResult.countDocuments({
-    race_id: raceId,
-    status: { $in: ['confirmed', 'published'] }
+  const { RaceResult, Horse, Jockey, HorseCheck } = getModels();
+  const lockedResultCount = await RaceResult.count({
+    where: { race_id: raceId, status: { [Op.in]: ['confirmed', 'published'] } }
   });
 
   if (lockedResultCount > 0) {
@@ -282,27 +286,24 @@ async function bulkSaveHorseChecks(req, payload) {
   const jockeyIds = payload.checks.map(function(check) {
     return check.jockey_id;
   }).filter(Boolean);
+  const { Horse, Jockey, HorseCheck } = getModels();
   const [horses, jockeys, existingChecks, preRaceChecks] = await Promise.all([
-    Horse.find({ _id: { $in: horseIds } }),
-    jockeyIds.length ? Jockey.find({ _id: { $in: jockeyIds } }) : Promise.resolve([]),
-    HorseCheck.find({
-      race_id: race._id,
-      horse_id: { $in: horseIds },
-      phase: payload.phase
+    Horse.findAll({ where: { id: { [Op.in]: horseIds } } }),
+    jockeyIds.length ? Jockey.findAll({ where: { id: { [Op.in]: jockeyIds } } }) : Promise.resolve([]),
+    HorseCheck.findAll({
+      where: { race_id: race._id, horse_id: { [Op.in]: horseIds }, phase: payload.phase }
     }),
     payload.phase === HORSE_CHECK_PHASE.POST_RACE
-      ? HorseCheck.find({
-        race_id: race._id,
-        horse_id: { $in: horseIds },
-        phase: HORSE_CHECK_PHASE.PRE_RACE
+      ? HorseCheck.findAll({
+        where: { race_id: race._id, horse_id: { [Op.in]: horseIds }, phase: HORSE_CHECK_PHASE.PRE_RACE }
       })
       : Promise.resolve([])
   ]);
   const horseMap = new Map(horses.map(function(horse) {
-    return [horse._id.toString(), horse];
+    return [horse.id.toString(), horse];
   }));
   const jockeyMap = new Map(jockeys.map(function(jockey) {
-    return [jockey._id.toString(), jockey];
+    return [jockey.id.toString(), jockey];
   }));
   const existingByHorse = new Map(existingChecks.map(function(check) {
     return [idString(check.horse_id), check];

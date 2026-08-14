@@ -1,32 +1,23 @@
-const { RaceEngineRun } = require('../models');
+const { loadSequelizeModels } = require('../models/sequelize/index.js');
 
-async function create(data, options) {
-  const docs = await RaceEngineRun.create([data], options || {});
+function getModels() { return loadSequelizeModels().models; }
 
-  return docs[0];
+async function create(data) {
+  const { RaceEngineRun } = getModels();
+  return RaceEngineRun.create(data);
 }
 
-async function findOne(filter, options) {
-  const query = RaceEngineRun.findOne(filter || {});
-
-  if (options && options.session) {
-    query.session(options.session);
-  }
-
-  return query;
+async function findOne(filter = {}) {
+  const { RaceEngineRun } = getModels();
+  return RaceEngineRun.findOne({ where: filter });
 }
 
-async function updateById(id, data, options) {
-  const updateOptions = {
-    returnDocument: 'after',
-    runValidators: true
-  };
-
-  if (options && options.session) {
-    updateOptions.session = options.session;
-  }
-
-  return RaceEngineRun.findByIdAndUpdate(id, data, updateOptions);
+async function updateById(id, data) {
+  const { RaceEngineRun } = getModels();
+  const instance = await RaceEngineRun.findByPk(id);
+  if (!instance) return null;
+  await instance.update(data);
+  return instance;
 }
 
 module.exports = {

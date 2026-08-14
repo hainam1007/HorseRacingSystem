@@ -172,10 +172,9 @@ async function listAllRewards(query = {}) {
     filter.name = { $regex: new RegExp(query.search, "i") };
   }
 
-  const sort = {};
   const sortField = query.sort || "created_at";
-  const sortOrder = query.order === "asc" ? 1 : -1;
-  sort[sortField] = sortOrder;
+  const sortOrder = query.order === "asc" ? "ASC" : "DESC";
+  const sort = [[sortField, sortOrder]];
 
   const [items, total] = await Promise.all([
     rewardRepository.findAllItemsAdmin(filter, sort, skip, limit),

@@ -13,7 +13,7 @@ import {
   UsersRound,
 } from "lucide-react";
 import LoadingSkeleton from "../../components/LoadingSkeleton.jsx";
-import { findAcceptedPrimaryAssignment, toOwnerScheduleEntry } from "./ownerAdapters";
+import { findAcceptedPrimaryAssignment, findPrimaryAssignmentForRegistration, toOwnerScheduleEntry } from "./ownerAdapters";
 import { useOwnerHorses, useOwnerJockeyAssignments, useOwnerJockeys, useOwnerPrizeAwards, useOwnerProfile, useOwnerRegistrations } from "./useOwnerData";
 
 const quickActions = [
@@ -36,10 +36,12 @@ const horseImages = [
 ];
 
 const isMongoObjectId = (value) => /^[a-f\d]{24}$/i.test(String(value || ""));
+const isUuidLike = (value) => /^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i.test(String(value || ""));
 
 const compactRecordCode = (prefix, value) => {
   if (!value) return prefix;
   if (isMongoObjectId(value)) return `${prefix}-${String(value).slice(-6).toUpperCase()}`;
+  if (isUuidLike(value)) return `${prefix}-${String(value).slice(-6).toUpperCase()}`;
   return value;
 };
 
@@ -88,7 +90,8 @@ function OwnerDashboard() {
   const registrations = liveRegistrations;
   const schedule = registrations.map((registration) => toOwnerScheduleEntry(
     registration,
-    findAcceptedPrimaryAssignment(liveAssignments, registration)
+    findPrimaryAssignmentForRegistration(liveAssignments, registration)
+      ?? findAcceptedPrimaryAssignment(liveAssignments, registration)
   ));
   const nextRace = schedule.find((race) => race.date !== "Date unavailable");
   const isLoading = horsesLoading || jockeysLoading || profileLoading || registrationsLoading || assignmentsLoading || awardsLoading;

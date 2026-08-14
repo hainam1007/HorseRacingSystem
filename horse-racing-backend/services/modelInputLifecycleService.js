@@ -2,14 +2,16 @@ const ApiError = require('../utils/ApiError');
 const { ODDS_MARKET_STATUS } = require('../constants/statuses');
 const raceOddsMarketRepository = require('../repositories/raceOddsMarketRepository');
 const raceRepository = require('../repositories/raceRepository');
-const { Bet } = require('../models');
+const { loadSequelizeModels } = require('../models/sequelize/index.js');
+
+function getModels() { return loadSequelizeModels().models; }
 
 async function prepareModelInputMutation(raceId) {
   const market = await raceOddsMarketRepository.findByRaceId(raceId);
 
   if (!market) return { market: null, stale: false };
 
-  const betCount = await Bet.countDocuments({ race_id: raceId });
+  const betCount = await getModels().Bet.count({ where: { race_id: raceId } });
   if (betCount > 0 || [ODDS_MARKET_STATUS.OPEN, ODDS_MARKET_STATUS.CLOSED, ODDS_MARKET_STATUS.SETTLED].includes(market.status)) {
     throw new ApiError(409, 'Model input cannot change after betting has opened or bets have been placed', {
       market_status: market.status,

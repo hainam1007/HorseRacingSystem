@@ -38,6 +38,11 @@ var errorHandler = require("./middlewares/errorHandler");
 
 var app = express();
 
+// Disable ETag-based caching so client always receives the latest populated
+// response after backend changes (e.g. when adding new Sequelize includes).
+app.set("etag", false);
+app.disable("x-powered-by");
+
 var configuredCorsOrigins = (process.env.CORS_ALLOWED_ORIGINS || "")
   .split(",")
   .map(function (origin) {

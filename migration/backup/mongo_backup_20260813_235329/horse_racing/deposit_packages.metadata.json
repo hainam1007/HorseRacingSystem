@@ -1,0 +1,1 @@
+{"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_"},{"v":{"$numberInt":"2"},"key":{"package_id":{"$numberInt":"1"}},"name":"package_id_1","unique":true},{"v":{"$numberInt":"2"},"key":{"is_active":{"$numberInt":"1"}},"name":"is_active_1"}],"uuid":"9d3f60e491384a1e802365a24264f1cc","collectionName":"deposit_packages","type":"collection"}

@@ -1,0 +1,34 @@
+[
+  {
+    "id": "97688248-0a9c-5358-82a3-b221a9149333",
+    "user_id": "720ce35b-d138-528b-9268-c370a88f7dca",
+    "stable_name": "Hartwell Racing Stable",
+    "address": "District 11, Ho Chi Minh City",
+    "license_number": "OWN-VN-2026-001",
+    "status": "active"
+  },
+  {
+    "id": "65aeedca-82b7-5e5d-82f6-675345697b59",
+    "user_id": "6975b880-d89a-50db-80b3-425e51159351",
+    "stable_name": "Mekong Crown Stable",
+    "address": "Thu Duc City, Ho Chi Minh City",
+    "license_number": "OWN-VN-2026-002",
+    "status": "active"
+  },
+  {
+    "id": "7de3c2ad-a749-5ea1-9272-692cf7881571",
+    "user_id": "60b20f18-3fa6-5a86-8dcb-ed55de0ef84b",
+    "stable_name": "Golden Lotus Racing",
+    "address": "Hai Chau District, Da Nang",
+    "license_number": "OWN-VN-2026-003",
+    "status": "active"
+  },
+  {
+    "id": "8cf67f58-00d1-570d-b9d8-4e4500a69b3e",
+    "user_id": "9a2ef0ac-0b91-5663-911b-6d02a728dcb5",
+    "address": "16 Dong Da, Xuan Huong, Da Lat",
+    "license_number": "00C-102",
+    "stable_name": "Da Lat Stable",
+    "status": "active"
+  }
+]

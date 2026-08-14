@@ -1,0 +1,533 @@
+[
+  {
+    "id": "8038ff5f-da17-5c92-930e-8ec4fdd976e0",
+    "race_run_id": "e39ffec9-7ad2-50df-a8d3-f95fd28b87dd",
+    "horse_id": "06c1b636-94a7-5846-ba0d-37b35f0b5a86",
+    "jockey_id": "7f492225-1d92-580e-a57b-084a8b38b283",
+    "position": 1,
+    "finish_time": 70.11,
+    "score": 100
+  },
+  {
+    "id": "0b353d9e-d013-5eef-af9c-6f5ead9c243b",
+    "race_run_id": "e39ffec9-7ad2-50df-a8d3-f95fd28b87dd",
+    "horse_id": "77773457-dafe-5c6e-ac86-0bb6052df27d",
+    "jockey_id": "bad1273c-693e-5da0-81ad-1a3510b1e6af",
+    "position": 2,
+    "finish_time": 71.46,
+    "score": 95
+  },
+  {
+    "id": "1f7f8b5e-a7ab-5b84-932a-d4ad71a0b885",
+    "race_run_id": "e39ffec9-7ad2-50df-a8d3-f95fd28b87dd",
+    "horse_id": "eaf77e79-edab-5037-a0b6-c7b7c5e14198",
+    "jockey_id": "38129496-f0ca-5f05-a8f4-8b904ddd51bc",
+    "position": 3,
+    "finish_time": 72.81,
+    "score": 90
+  },
+  {
+    "id": "53d805f2-39b3-59f0-be01-347f2fc05072",
+    "race_run_id": "e39ffec9-7ad2-50df-a8d3-f95fd28b87dd",
+    "horse_id": "6b094181-e78c-5f24-9c2a-f93e20b86446",
+    "jockey_id": "2a3a9b70-0271-53d5-b3bf-cd7fb80d278a",
+    "position": 4,
+    "finish_time": 74.16,
+    "score": 85
+  },
+  {
+    "id": "73c302c1-fd63-59fa-94dc-573fd31697d8",
+    "race_run_id": "e39ffec9-7ad2-50df-a8d3-f95fd28b87dd",
+    "horse_id": "f24d157b-7b1a-51a5-b4e1-5bcae8fd4e2a",
+    "jockey_id": "d1f7e06d-4b72-571e-83be-e173d4567f78",
+    "position": 5,
+    "finish_time": 75.51,
+    "score": 80
+  },
+  {
+    "id": "89b68291-b63a-5d55-a026-e40d031b908c",
+    "race_run_id": "a5f4da47-0326-59b7-a250-66db833b4fde",
+    "horse_id": "77773457-dafe-5c6e-ac86-0bb6052df27d",
+    "jockey_id": "bad1273c-693e-5da0-81ad-1a3510b1e6af",
+    "position": 1,
+    "finish_time": 70.22,
+    "score": 100
+  },
+  {
+    "id": "17bc4f8e-4fd3-5272-b1c6-666b28ee26fa",
+    "race_run_id": "a5f4da47-0326-59b7-a250-66db833b4fde",
+    "horse_id": "eaf77e79-edab-5037-a0b6-c7b7c5e14198",
+    "jockey_id": "38129496-f0ca-5f05-a8f4-8b904ddd51bc",
+    "position": 2,
+    "finish_time": 71.57,
+    "score": 95
+  },
+  {
+    "id": "30e046d1-de09-5965-b598-0fdf4cda6420",
+    "race_run_id": "a5f4da47-0326-59b7-a250-66db833b4fde",
+    "horse_id": "6b094181-e78c-5f24-9c2a-f93e20b86446",
+    "jockey_id": "2a3a9b70-0271-53d5-b3bf-cd7fb80d278a",
+    "position": 3,
+    "finish_time": 72.92,
+    "score": 90
+  },
+  {
+    "id": "b152abb3-2280-5732-a319-94413393c4b6",
+    "race_run_id": "a5f4da47-0326-59b7-a250-66db833b4fde",
+    "horse_id": "f24d157b-7b1a-51a5-b4e1-5bcae8fd4e2a",
+    "jockey_id": "d1f7e06d-4b72-571e-83be-e173d4567f78",
+    "position": 4,
+    "finish_time": 74.27,
+    "score": 85
+  },
+  {
+    "id": "f604b792-e8b0-5b1d-ba30-8ca374ae21b7",
+    "race_run_id": "a5f4da47-0326-59b7-a250-66db833b4fde",
+    "horse_id": "06c1b636-94a7-5846-ba0d-37b35f0b5a86",
+    "jockey_id": "7f492225-1d92-580e-a57b-084a8b38b283",
+    "position": 5,
+    "finish_time": 75.62,
+    "score": 80
+  },
+  {
+    "id": "e7ee2634-157c-5732-8972-f925459268c9",
+    "race_run_id": "f40a8eec-2740-51f7-8d2b-a075c482f95b",
+    "horse_id": "eaf77e79-edab-5037-a0b6-c7b7c5e14198",
+    "jockey_id": "38129496-f0ca-5f05-a8f4-8b904ddd51bc",
+    "position": 1,
+    "finish_time": 70.33,
+    "score": 100
+  },
+  {
+    "id": "5bad5117-819d-5747-9c5a-f795f5fe7afc",
+    "race_run_id": "f40a8eec-2740-51f7-8d2b-a075c482f95b",
+    "horse_id": "6b094181-e78c-5f24-9c2a-f93e20b86446",
+    "jockey_id": "2a3a9b70-0271-53d5-b3bf-cd7fb80d278a",
+    "position": 2,
+    "finish_time": 71.68,
+    "score": 95
+  },
+  {
+    "id": "18d5d1ed-d90c-5f73-9d5c-eefeff6f59df",
+    "race_run_id": "f40a8eec-2740-51f7-8d2b-a075c482f95b",
+    "horse_id": "f24d157b-7b1a-51a5-b4e1-5bcae8fd4e2a",
+    "jockey_id": "d1f7e06d-4b72-571e-83be-e173d4567f78",
+    "position": 3,
+    "finish_time": 73.03,
+    "score": 90
+  },
+  {
+    "id": "514c2f3a-de5d-5d6f-9d7d-b951277ae066",
+    "race_run_id": "f40a8eec-2740-51f7-8d2b-a075c482f95b",
+    "horse_id": "06c1b636-94a7-5846-ba0d-37b35f0b5a86",
+    "jockey_id": "7f492225-1d92-580e-a57b-084a8b38b283",
+    "position": 4,
+    "finish_time": 74.38,
+    "score": 85
+  },
+  {
+    "id": "9d3fb86a-d083-5808-a56d-f5dd02a18c54",
+    "race_run_id": "f40a8eec-2740-51f7-8d2b-a075c482f95b",
+    "horse_id": "77773457-dafe-5c6e-ac86-0bb6052df27d",
+    "jockey_id": "bad1273c-693e-5da0-81ad-1a3510b1e6af",
+    "position": 5,
+    "finish_time": 75.73,
+    "score": 80
+  },
+  {
+    "id": "866aad94-251d-50e5-a255-a79e25c1ae52",
+    "race_run_id": "d92dd0bc-7b7a-56df-9555-507c82d20952",
+    "horse_id": "6b094181-e78c-5f24-9c2a-f93e20b86446",
+    "jockey_id": "2a3a9b70-0271-53d5-b3bf-cd7fb80d278a",
+    "position": 1,
+    "finish_time": 70.44,
+    "score": 100
+  },
+  {
+    "id": "d83e8fe5-b44a-5327-a734-89c4e835dd60",
+    "race_run_id": "d92dd0bc-7b7a-56df-9555-507c82d20952",
+    "horse_id": "f24d157b-7b1a-51a5-b4e1-5bcae8fd4e2a",
+    "jockey_id": "d1f7e06d-4b72-571e-83be-e173d4567f78",
+    "position": 2,
+    "finish_time": 71.79,
+    "score": 95
+  },
+  {
+    "id": "145a8153-b070-5ec2-baa1-94290f594580",
+    "race_run_id": "d92dd0bc-7b7a-56df-9555-507c82d20952",
+    "horse_id": "06c1b636-94a7-5846-ba0d-37b35f0b5a86",
+    "jockey_id": "7f492225-1d92-580e-a57b-084a8b38b283",
+    "position": 3,
+    "finish_time": 73.14,
+    "score": 90
+  },
+  {
+    "id": "adca082a-74a3-5873-acab-a9a41029ec2a",
+    "race_run_id": "d92dd0bc-7b7a-56df-9555-507c82d20952",
+    "horse_id": "77773457-dafe-5c6e-ac86-0bb6052df27d",
+    "jockey_id": "bad1273c-693e-5da0-81ad-1a3510b1e6af",
+    "position": 4,
+    "finish_time": 74.49,
+    "score": 85
+  },
+  {
+    "id": "b9401da1-3833-5ace-a23d-e1086d404959",
+    "race_run_id": "d92dd0bc-7b7a-56df-9555-507c82d20952",
+    "horse_id": "eaf77e79-edab-5037-a0b6-c7b7c5e14198",
+    "jockey_id": "38129496-f0ca-5f05-a8f4-8b904ddd51bc",
+    "position": 5,
+    "finish_time": 75.84,
+    "score": 80
+  },
+  {
+    "id": "63d51e1d-602b-533a-a98c-883e4ec22351",
+    "race_run_id": "75b72432-95ad-5154-b178-28a9c201af50",
+    "horse_id": "f24d157b-7b1a-51a5-b4e1-5bcae8fd4e2a",
+    "jockey_id": "d1f7e06d-4b72-571e-83be-e173d4567f78",
+    "position": 1,
+    "finish_time": 70.55,
+    "score": 100
+  },
+  {
+    "id": "4c2cd153-19c7-5f88-84a3-0b7af2a79fed",
+    "race_run_id": "75b72432-95ad-5154-b178-28a9c201af50",
+    "horse_id": "06c1b636-94a7-5846-ba0d-37b35f0b5a86",
+    "jockey_id": "7f492225-1d92-580e-a57b-084a8b38b283",
+    "position": 2,
+    "finish_time": 71.9,
+    "score": 95
+  },
+  {
+    "id": "b7254a61-8939-5b69-a528-dc99265c63a9",
+    "race_run_id": "75b72432-95ad-5154-b178-28a9c201af50",
+    "horse_id": "77773457-dafe-5c6e-ac86-0bb6052df27d",
+    "jockey_id": "bad1273c-693e-5da0-81ad-1a3510b1e6af",
+    "position": 3,
+    "finish_time": 73.25,
+    "score": 90
+  },
+  {
+    "id": "182d4a00-da44-51f8-aca8-d7b8155afbbf",
+    "race_run_id": "75b72432-95ad-5154-b178-28a9c201af50",
+    "horse_id": "eaf77e79-edab-5037-a0b6-c7b7c5e14198",
+    "jockey_id": "38129496-f0ca-5f05-a8f4-8b904ddd51bc",
+    "position": 4,
+    "finish_time": 74.6,
+    "score": 85
+  },
+  {
+    "id": "1edd600f-dd15-56ee-aca2-5c5cdd35f554",
+    "race_run_id": "75b72432-95ad-5154-b178-28a9c201af50",
+    "horse_id": "6b094181-e78c-5f24-9c2a-f93e20b86446",
+    "jockey_id": "2a3a9b70-0271-53d5-b3bf-cd7fb80d278a",
+    "position": 5,
+    "finish_time": 75.95,
+    "score": 80
+  },
+  {
+    "id": "3f6307cd-8593-542f-8455-754e611cf26c",
+    "race_run_id": "877802e9-8904-5af3-aaba-950a7f34d386",
+    "horse_id": "06c1b636-94a7-5846-ba0d-37b35f0b5a86",
+    "jockey_id": "7f492225-1d92-580e-a57b-084a8b38b283",
+    "position": 1,
+    "finish_time": 70.66,
+    "score": 100
+  },
+  {
+    "id": "0bdf40a4-ba9c-5b12-ad8f-98b9821e8ed6",
+    "race_run_id": "877802e9-8904-5af3-aaba-950a7f34d386",
+    "horse_id": "77773457-dafe-5c6e-ac86-0bb6052df27d",
+    "jockey_id": "bad1273c-693e-5da0-81ad-1a3510b1e6af",
+    "position": 2,
+    "finish_time": 72.01,
+    "score": 95
+  },
+  {
+    "id": "f994c8ec-1a4b-5c7f-8309-804ac92fd38b",
+    "race_run_id": "877802e9-8904-5af3-aaba-950a7f34d386",
+    "horse_id": "eaf77e79-edab-5037-a0b6-c7b7c5e14198",
+    "jockey_id": "38129496-f0ca-5f05-a8f4-8b904ddd51bc",
+    "position": 3,
+    "finish_time": 73.36,
+    "score": 90
+  },
+  {
+    "id": "7f01c321-fbba-517e-b739-e235e87ddec0",
+    "race_run_id": "877802e9-8904-5af3-aaba-950a7f34d386",
+    "horse_id": "6b094181-e78c-5f24-9c2a-f93e20b86446",
+    "jockey_id": "2a3a9b70-0271-53d5-b3bf-cd7fb80d278a",
+    "position": 4,
+    "finish_time": 74.71,
+    "score": 85
+  },
+  {
+    "id": "17d5467f-5a79-5fb0-8a50-22b74f8f40bd",
+    "race_run_id": "877802e9-8904-5af3-aaba-950a7f34d386",
+    "horse_id": "f24d157b-7b1a-51a5-b4e1-5bcae8fd4e2a",
+    "jockey_id": "d1f7e06d-4b72-571e-83be-e173d4567f78",
+    "position": 5,
+    "finish_time": 76.06,
+    "score": 80
+  },
+  {
+    "id": "818e9be1-1eea-599b-8cbd-380a8850f89b",
+    "race_run_id": "280240d8-9091-5649-83e7-2cb13ceec9bf",
+    "horse_id": "f24d157b-7b1a-51a5-b4e1-5bcae8fd4e2a",
+    "jockey_id": "d1f7e06d-4b72-571e-83be-e173d4567f78",
+    "position": 1,
+    "finish_time": 60.03,
+    "score": 100
+  },
+  {
+    "id": "5bf47311-5692-587b-91ae-22d669057e56",
+    "race_run_id": "280240d8-9091-5649-83e7-2cb13ceec9bf",
+    "horse_id": "6b094181-e78c-5f24-9c2a-f93e20b86446",
+    "jockey_id": "2a3a9b70-0271-53d5-b3bf-cd7fb80d278a",
+    "position": 2,
+    "finish_time": 60.573,
+    "score": 90
+  },
+  {
+    "id": "fc146c21-9785-5cc9-b958-aaa31334875e",
+    "race_run_id": "280240d8-9091-5649-83e7-2cb13ceec9bf",
+    "horse_id": "6c8b7ca2-0877-5694-8a58-23ac6cd74973",
+    "jockey_id": "9dab3be0-69fb-5ccc-94b0-ea9472ad72a4",
+    "position": 3,
+    "finish_time": 61.268,
+    "score": 80
+  },
+  {
+    "id": "8fb99ab7-7ee1-5c7f-8e76-fa6f9067773d",
+    "race_run_id": "280240d8-9091-5649-83e7-2cb13ceec9bf",
+    "horse_id": "06c1b636-94a7-5846-ba0d-37b35f0b5a86",
+    "jockey_id": "7f492225-1d92-580e-a57b-084a8b38b283",
+    "position": 4,
+    "finish_time": 61.687,
+    "score": 60
+  },
+  {
+    "id": "e1d69562-2c6a-5ce9-97f5-2e40549c5c8f",
+    "race_run_id": "280240d8-9091-5649-83e7-2cb13ceec9bf",
+    "horse_id": "eaf77e79-edab-5037-a0b6-c7b7c5e14198",
+    "jockey_id": "38129496-f0ca-5f05-a8f4-8b904ddd51bc",
+    "position": 5,
+    "finish_time": 62.01,
+    "score": 50
+  },
+  {
+    "id": "1c0c7bc1-34ae-5b68-9cd5-f2a03acb47e8",
+    "race_run_id": "280240d8-9091-5649-83e7-2cb13ceec9bf",
+    "horse_id": "77773457-dafe-5c6e-ac86-0bb6052df27d",
+    "jockey_id": "bad1273c-693e-5da0-81ad-1a3510b1e6af",
+    "position": 6,
+    "finish_time": 62.621,
+    "score": 50
+  },
+  {
+    "id": "15e34f0d-ac97-5628-8055-2e3318c10c6c",
+    "race_run_id": "8bce25b4-bfde-5d7b-94c5-87192f78efc2",
+    "horse_id": "77773457-dafe-5c6e-ac86-0bb6052df27d",
+    "jockey_id": "bad1273c-693e-5da0-81ad-1a3510b1e6af",
+    "position": 1,
+    "finish_time": 60.051,
+    "score": 100
+  },
+  {
+    "id": "f4d573a0-859d-542b-9ec0-63d02dbc7cc5",
+    "race_run_id": "8bce25b4-bfde-5d7b-94c5-87192f78efc2",
+    "horse_id": "eaf77e79-edab-5037-a0b6-c7b7c5e14198",
+    "jockey_id": "38129496-f0ca-5f05-a8f4-8b904ddd51bc",
+    "position": 2,
+    "finish_time": 60.697,
+    "score": 90
+  },
+  {
+    "id": "3b52e290-7616-5ff6-85ca-7af3be7999e7",
+    "race_run_id": "8bce25b4-bfde-5d7b-94c5-87192f78efc2",
+    "horse_id": "6b094181-e78c-5f24-9c2a-f93e20b86446",
+    "jockey_id": "2a3a9b70-0271-53d5-b3bf-cd7fb80d278a",
+    "position": 3,
+    "finish_time": 61.193,
+    "score": 80
+  },
+  {
+    "id": "6787a618-fda1-5799-af59-a74fd0e1c6bc",
+    "race_run_id": "8bce25b4-bfde-5d7b-94c5-87192f78efc2",
+    "horse_id": "06c1b636-94a7-5846-ba0d-37b35f0b5a86",
+    "jockey_id": "7f492225-1d92-580e-a57b-084a8b38b283",
+    "position": 4,
+    "finish_time": 61.562,
+    "score": 60
+  },
+  {
+    "id": "f34b6bdd-16b2-5b81-aaac-7170983ddf8f",
+    "race_run_id": "8bce25b4-bfde-5d7b-94c5-87192f78efc2",
+    "horse_id": "6c8b7ca2-0877-5694-8a58-23ac6cd74973",
+    "jockey_id": "9dab3be0-69fb-5ccc-94b0-ea9472ad72a4",
+    "position": 5,
+    "finish_time": 62.165,
+    "score": 50
+  },
+  {
+    "id": "50153e22-0613-53fe-b65c-0e0926f90b33",
+    "race_run_id": "c8ce85c9-6354-5328-968f-892f6e629e78",
+    "horse_id": "6b094181-e78c-5f24-9c2a-f93e20b86446",
+    "jockey_id": "2a3a9b70-0271-53d5-b3bf-cd7fb80d278a",
+    "position": 1,
+    "finish_time": 60.219,
+    "score": 100
+  },
+  {
+    "id": "7cc15b3e-217e-59e2-b461-4c2306821cfa",
+    "race_run_id": "c8ce85c9-6354-5328-968f-892f6e629e78",
+    "horse_id": "06c1b636-94a7-5846-ba0d-37b35f0b5a86",
+    "jockey_id": "7f492225-1d92-580e-a57b-084a8b38b283",
+    "position": 2,
+    "finish_time": 60.731,
+    "score": 90
+  },
+  {
+    "id": "e929f6c5-9adc-54f6-b18f-24c6759901d7",
+    "race_run_id": "c8ce85c9-6354-5328-968f-892f6e629e78",
+    "horse_id": "77773457-dafe-5c6e-ac86-0bb6052df27d",
+    "jockey_id": "bad1273c-693e-5da0-81ad-1a3510b1e6af",
+    "position": 3,
+    "finish_time": 61.001,
+    "score": 80
+  },
+  {
+    "id": "ab76281e-c566-571d-ad74-5df63ace7a3d",
+    "race_run_id": "c8ce85c9-6354-5328-968f-892f6e629e78",
+    "horse_id": "f24d157b-7b1a-51a5-b4e1-5bcae8fd4e2a",
+    "jockey_id": "d1f7e06d-4b72-571e-83be-e173d4567f78",
+    "position": 4,
+    "finish_time": 61.642,
+    "score": 60
+  },
+  {
+    "id": "e451f57f-1fd1-5a96-8324-4a871fc7aa02",
+    "race_run_id": "c8ce85c9-6354-5328-968f-892f6e629e78",
+    "horse_id": "eaf77e79-edab-5037-a0b6-c7b7c5e14198",
+    "jockey_id": "38129496-f0ca-5f05-a8f4-8b904ddd51bc",
+    "position": 5,
+    "finish_time": 62.012,
+    "score": 50
+  },
+  {
+    "id": "316a088e-9960-573c-ba8c-4065dc255519",
+    "race_run_id": "8e929f93-0900-57cb-9120-92e9bb6ff424",
+    "horse_id": "06c1b636-94a7-5846-ba0d-37b35f0b5a86",
+    "jockey_id": "7f492225-1d92-580e-a57b-084a8b38b283",
+    "position": 1,
+    "finish_time": 60.106,
+    "score": 100
+  },
+  {
+    "id": "02d47224-3b18-5f57-932c-3f7e5d5c98c1",
+    "race_run_id": "8e929f93-0900-57cb-9120-92e9bb6ff424",
+    "horse_id": "eaf77e79-edab-5037-a0b6-c7b7c5e14198",
+    "jockey_id": "38129496-f0ca-5f05-a8f4-8b904ddd51bc",
+    "position": 2,
+    "finish_time": 60.663,
+    "score": 90
+  },
+  {
+    "id": "80ec156c-f427-5ade-b467-673e767eec77",
+    "race_run_id": "8e929f93-0900-57cb-9120-92e9bb6ff424",
+    "horse_id": "77773457-dafe-5c6e-ac86-0bb6052df27d",
+    "jockey_id": "bad1273c-693e-5da0-81ad-1a3510b1e6af",
+    "position": 3,
+    "finish_time": 61.185,
+    "score": 80
+  },
+  {
+    "id": "3af8cde5-2efc-52a8-84de-66f01679e37f",
+    "race_run_id": "8e929f93-0900-57cb-9120-92e9bb6ff424",
+    "horse_id": "6b094181-e78c-5f24-9c2a-f93e20b86446",
+    "jockey_id": "2a3a9b70-0271-53d5-b3bf-cd7fb80d278a",
+    "position": 4,
+    "finish_time": 61.768,
+    "score": 60
+  },
+  {
+    "id": "7490c0d0-e9a4-536b-a4ff-247c7d8fa131",
+    "race_run_id": "8e929f93-0900-57cb-9120-92e9bb6ff424",
+    "horse_id": "f24d157b-7b1a-51a5-b4e1-5bcae8fd4e2a",
+    "jockey_id": "d1f7e06d-4b72-571e-83be-e173d4567f78",
+    "position": 5,
+    "finish_time": 62.002,
+    "score": 50
+  },
+  {
+    "id": "063d2100-bb08-54d1-9ffa-c3ab5a231054",
+    "race_run_id": "b0ea1399-f3ef-537a-b43a-8d7544499407",
+    "horse_id": "dbe3265e-e388-5ea9-8a21-8e1fa43282ae",
+    "jockey_id": "bad1273c-693e-5da0-81ad-1a3510b1e6af",
+    "position": 1,
+    "finish_time": 60.236,
+    "score": 100
+  },
+  {
+    "id": "e9a0dcfe-f909-52e8-96a1-58da0330fb4a",
+    "race_run_id": "b0ea1399-f3ef-537a-b43a-8d7544499407",
+    "horse_id": "9055f70d-6b4d-5029-b095-27590dd97aae",
+    "jockey_id": "d1f7e06d-4b72-571e-83be-e173d4567f78",
+    "position": 2,
+    "finish_time": 60.777,
+    "score": 90
+  },
+  {
+    "id": "a50a4809-98c0-5606-a4df-cd8f8f4eff3c",
+    "race_run_id": "b0ea1399-f3ef-537a-b43a-8d7544499407",
+    "horse_id": "f24d157b-7b1a-51a5-b4e1-5bcae8fd4e2a",
+    "jockey_id": "da6a18ef-c58e-5671-985e-d9c9e528a9ac",
+    "position": 3,
+    "finish_time": 61.215,
+    "score": 80
+  },
+  {
+    "id": "20a10f2e-3a92-598a-8d95-4a09d9a06cae",
+    "race_run_id": "b0ea1399-f3ef-537a-b43a-8d7544499407",
+    "horse_id": "fb0ab038-ef88-5e16-92ad-a6d550f07093",
+    "jockey_id": "9dab3be0-69fb-5ccc-94b0-ea9472ad72a4",
+    "position": 4,
+    "finish_time": 61.611,
+    "score": 60
+  },
+  {
+    "id": "3a4c1d6a-ca1e-5bb1-b39e-77c2b9d846ee",
+    "race_run_id": "b0ea1399-f3ef-537a-b43a-8d7544499407",
+    "horse_id": "2abfd28f-ec4a-5b20-ad84-e3c24f61eca9",
+    "jockey_id": "38129496-f0ca-5f05-a8f4-8b904ddd51bc",
+    "position": 5,
+    "finish_time": 62.276,
+    "score": 50
+  },
+  {
+    "id": "21146ce6-1c51-57b7-9252-d514a38ea3d6",
+    "race_run_id": "b0ea1399-f3ef-537a-b43a-8d7544499407",
+    "horse_id": "db624752-8ea2-5522-9b8c-c42e3bba4d29",
+    "jockey_id": "7f492225-1d92-580e-a57b-084a8b38b283",
+    "position": 6,
+    "finish_time": 62.626,
+    "score": 50
+  },
+  {
+    "id": "4e776e72-ebc2-51f7-bc61-178768e08819",
+    "race_run_id": "6580f638-25c8-540c-9a8e-4f27699a2198",
+    "horse_id": "ccf08545-8b27-55a2-bcf5-708191acde7f",
+    "jockey_id": "9dab3be0-69fb-5ccc-94b0-ea9472ad72a4",
+    "position": 1,
+    "finish_time": 60.259,
+    "score": 100
+  },
+  {
+    "id": "4213283c-b660-55c6-8b5b-83d8c881f0a0",
+    "race_run_id": "6580f638-25c8-540c-9a8e-4f27699a2198",
+    "horse_id": "dbe3265e-e388-5ea9-8a21-8e1fa43282ae",
+    "jockey_id": "da6a18ef-c58e-5671-985e-d9c9e528a9ac",
+    "position": 2,
+    "finish_time": 60.651,
+    "score": 90
+  }
+]

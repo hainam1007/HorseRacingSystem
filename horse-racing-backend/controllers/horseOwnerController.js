@@ -2,7 +2,11 @@ const horseOwnerService = require('../services/horseOwnerService');
 const { sendSuccess } = require('../utils/apiResponse');
 
 function getCurrentUser(req) {
-  return Object.assign({}, req.user.toObject ? req.user.toObject() : req.user, {
+  const user = req.user.toObject ? req.user.toObject() : req.user;
+  // req.user from Sequelize auth has `id` but service layer expects `_id`
+  const id = user.id !== undefined ? user.id : user._id;
+  return Object.assign({}, user, {
+    _id: id,
     roles: req.auth ? req.auth.roles : []
   });
 }

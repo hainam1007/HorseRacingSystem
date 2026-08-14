@@ -1,8 +1,10 @@
 #!/usr/bin/env node
 
-// BẮT BUỘC ĐẶT LÊN DÒNG 1 ĐỂ ÉP NODE.JS OVERRIDE CACHE BIẾN MÔI TRƯỜNG
+// Load .env WITHOUT overriding values that are already set in the environment.
+// In Docker, PGHOST/PGUSER/etc. are injected by compose and must win over the
+// developer's local .env file (which is not even shipped in the image).
 const dotenv = require("dotenv");
-const result = dotenv.config({ override: true });
+const result = dotenv.config({ override: false });
 
 if (process.env.NODE_ENV !== "production") {
   console.log("================= BOOTSTRAP ENV CHECK =================");
@@ -10,7 +12,7 @@ if (process.env.NODE_ENV !== "production") {
   if (result.error) {
     console.error("⚠️ Không tìm thấy file .env", result.error.message);
   } else {
-    console.log("✅ Đã load file .env thành công!");
+    console.log("✅ Đã nạp file .env thành công!");
     console.log(
       "➜ MOMO_SECRET_KEY:",
       process.env.MOMO_SECRET_KEY ? "Đã nạp" : "Bị thiếu"
@@ -24,35 +26,33 @@ if (process.env.NODE_ENV !== "production") {
   console.log("=======================================================");
 }
 
-/**
- * Module dependencies.
- */
+// Re-load to silence dotenv's "injected env" log without overriding anything.
+require("dotenv").config({ override: false, quiet: true });
 
-require("dotenv").config({ quiet: true });
-
-var app = require("../app");
-var connectDatabase = require("../config/database").connectDatabase;
-var debug = require("debug")("horse-racing:server");
-var http = require("http");
+const app = require("../app");
+const debug = require("debug")("horse-racing:server");
+const http = require("http");
 
 /**
- * Get port from environment and store in Express.
+ * Application runtime — PostgreSQL/Sequelize only.
+ *
+ * The legacy dual-mode driver switch was removed. The server always
+ * initializes Sequelize at boot.
  */
 
-var port = normalizePort(process.env.PORT || "3000");
+const port = normalizePort(process.env.PORT || "3000");
 app.set("port", port);
 
-/**
- * Create HTTP server.
- */
-
-var server = http.createServer(app);
+const server = http.createServer(app);
 
 startServer();
 
 async function startServer() {
   try {
-    await connectDatabase();
+    const { loadSequelizeModels } = require("../models/sequelize/index.js");
+    const { sequelize } = loadSequelizeModels();
+    await sequelize.authenticate();
+    console.log("[sequelize] connected — storage driver = postgres");
     server.listen(port);
     server.on("error", onError);
     server.on("listening", onListening);
@@ -65,9 +65,8 @@ async function startServer() {
 /**
  * Normalize a port into a number, string, or false.
  */
-
 function normalizePort(val) {
-  var port = parseInt(val, 10);
+  const port = parseInt(val, 10);
 
   if (isNaN(port)) {
     // named pipe
@@ -85,13 +84,12 @@ function normalizePort(val) {
 /**
  * Event listener for HTTP server "error" event.
  */
-
 function onError(error) {
   if (error.syscall !== "listen") {
     throw error;
   }
 
-  var bind = typeof port === "string" ? "Pipe " + port : "Port " + port;
+  const bind = typeof port === "string" ? "Pipe " + port : "Port " + port;
 
   // handle specific listen errors with friendly messages
   switch (error.code) {
@@ -111,9 +109,8 @@ function onError(error) {
 /**
  * Event listener for HTTP server "listening" event.
  */
-
 function onListening() {
-  var addr = server.address();
-  var bind = typeof addr === "string" ? "pipe " + addr : "port " + addr.port;
+  const addr = server.address();
+  const bind = typeof addr === "string" ? "pipe " + addr : "port " + addr.port;
   debug("Listening on " + bind);
 }

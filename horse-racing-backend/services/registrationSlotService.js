@@ -1,88 +1,105 @@
-const { Race, Registration } = require('../models');
 const ApiError = require('../utils/ApiError');
 const { REGISTRATION_STATUS } = require('../constants/statuses');
+const { Op, literal } = require('sequelize');
+const { loadSequelizeModels } = require('../models/sequelize/index.js');
+
+function getModels() { return loadSequelizeModels().models; }
+function getSequelize() { return loadSequelizeModels().sequelize; }
+
+function toSerializableRace(raceInstance) {
+  if (!raceInstance) return null;
+  const plain = raceInstance.toJSON ? raceInstance.toJSON() : raceInstance;
+  return { ...plain, _id: plain.id };
+}
 
 function activeRegistrationFilter(raceId, now) {
   return {
     race_id: raceId,
-    $or: [
+    [Op.or]: [
       { status: REGISTRATION_STATUS.APPROVED },
       {
         status: REGISTRATION_STATUS.PENDING,
         payment_status: 'pending',
-        payment_expires_at: { $gt: now }
+        payment_expires_at: { [Op.gt]: now }
       }
     ]
   };
 }
 
 async function initializeRaceSlots(raceId) {
-  const race = await Race.findById(raceId).select(
-    'registration_slots_initialized registration_slot_count'
-  );
+  const { Race, Registration } = getModels();
+  const race = await Race.findByPk(raceId, {
+    attributes: ['id', 'registration_slots_initialized', 'registration_slot_count']
+  });
 
   if (!race) {
     throw new ApiError(404, 'Race not found');
   }
 
-  if (race.registration_slots_initialized) {
-    return race;
+  if (race.get('registration_slots_initialized')) {
+    return toSerializableRace(race);
   }
 
   const now = new Date();
   const activeFilter = activeRegistrationFilter(raceId, now);
-  const activeCount = await Registration.countDocuments(activeFilter);
-  const initialized = await Race.findOneAndUpdate(
-    { _id: raceId, registration_slots_initialized: { $ne: true } },
+  const activeCount = await Registration.count({ where: activeFilter });
+
+  const [affected] = await Race.update(
     {
-      $set: {
-        registration_slot_count: activeCount,
-        registration_slots_initialized: true
-      }
+      registration_slot_count: activeCount,
+      registration_slots_initialized: true
     },
-    { returnDocument: 'after', runValidators: true }
+    {
+      where: { id: raceId, registration_slots_initialized: { [Op.ne]: true } }
+    }
   );
 
-  if (initialized) {
-    await Registration.updateMany(activeFilter, {
-      $set: {
+  if (affected > 0) {
+    await Registration.update(
+      {
         slot_reserved: true,
-        slot_reserved_at: now
+        slot_reserved_at: now,
+        slot_released_at: null
       },
-      $unset: { slot_released_at: 1 }
-    });
-    return initialized;
+      { where: activeFilter }
+    );
+    const updated = await Race.findByPk(raceId);
+    return toSerializableRace(updated);
   }
 
-  return Race.findById(raceId);
+  const raceFinal = await Race.findByPk(raceId);
+  return toSerializableRace(raceFinal);
 }
 
 async function releaseExpiredReservations(raceId) {
+  const { Race, Registration } = getModels();
   const now = new Date();
-  const expired = await Registration.updateMany(
+  const [releasedCount] = await Registration.update(
     {
-      race_id: raceId,
-      slot_reserved: true,
-      status: REGISTRATION_STATUS.PENDING,
-      payment_status: 'pending',
-      payment_expires_at: { $lte: now }
+      slot_reserved: false,
+      slot_released_at: now,
+      payment_status: 'failed',
+      status: REGISTRATION_STATUS.REJECTED,
+      admin_note: 'Payment reservation expired'
     },
     {
-      $set: {
-        slot_reserved: false,
-        slot_released_at: now,
-        payment_status: 'failed',
-        status: REGISTRATION_STATUS.REJECTED,
-        admin_note: 'Payment reservation expired'
+      where: {
+        race_id: raceId,
+        slot_reserved: true,
+        status: REGISTRATION_STATUS.PENDING,
+        payment_status: 'pending',
+        payment_expires_at: { [Op.lte]: now }
       }
     }
   );
-  const releasedCount = Number(expired.modifiedCount || expired.nModified || 0);
 
   if (releasedCount > 0) {
-    await Race.updateOne(
-      { _id: raceId },
-      [{ $set: { registration_slot_count: { $max: [0, { $subtract: ['$registration_slot_count', releasedCount] }] } } }]
+    const sequelize = getSequelize();
+    await sequelize.query(
+      `UPDATE races
+       SET registration_slot_count = GREATEST(0, registration_slot_count - :released)
+       WHERE id = :raceId`,
+      { replacements: { released: releasedCount, raceId } }
     );
   }
 
@@ -93,71 +110,56 @@ async function reserveRaceSlot(raceId) {
   await initializeRaceSlots(raceId);
   await releaseExpiredReservations(raceId);
 
+  const { Race } = getModels();
   const now = new Date();
-  const race = await Race.findOneAndUpdate(
-    {
-      _id: raceId,
-      status: 'scheduled',
-      registration_locked: { $ne: true },
-      $and: [
-        {
-          $or: [
-            { registration_lock_at: null },
-            { registration_lock_at: { $gt: now } }
-          ]
-        },
-        {
-          $expr: {
-            $or: [
-              { $lte: [{ $ifNull: ['$max_participants', 0] }, 0] },
-              {
-                $lt: [
-                  { $ifNull: ['$registration_slot_count', 0] },
-                  '$max_participants'
-                ]
-              }
-            ]
-          }
-        }
-      ]
-    },
-    { $inc: { registration_slot_count: 1 } },
-    { returnDocument: 'after', runValidators: true }
+  const sequelize = getSequelize();
+
+  const [race] = await sequelize.query(
+    `UPDATE races
+     SET registration_slot_count = registration_slot_count + 1
+     WHERE id = :raceId
+       AND status = 'scheduled'
+       AND (registration_locked IS NULL OR registration_locked = FALSE)
+       AND (registration_lock_at IS NULL OR registration_lock_at > :now)
+       AND (max_participants IS NULL OR max_participants <= 0 OR COALESCE(registration_slot_count, 0) < max_participants)
+     RETURNING *`,
+    { replacements: { raceId, now } }
   );
 
-  if (!race) {
+  if (!race || race.length === 0) {
     throw new ApiError(409, 'Race registration is closed or all available places are reserved');
   }
 
-  return race;
+  return race[0];
 }
 
 async function releaseRaceSlot(raceId) {
-  await Race.updateOne(
-    { _id: raceId, registration_slot_count: { $gt: 0 } },
-    { $inc: { registration_slot_count: -1 } }
+  const { Race } = getModels();
+  await Race.update(
+    { registration_slot_count: literal('GREATEST(0, registration_slot_count - 1)') },
+    { where: { id: raceId, registration_slot_count: { [Op.gt]: 0 } } }
   );
 }
 
 async function releaseRegistrationSlot(registrationId, reason) {
+  const { Registration } = getModels();
   const now = new Date();
-  const registration = await Registration.findOneAndUpdate(
-    { _id: registrationId, slot_reserved: true },
-    {
-      $set: {
-        slot_reserved: false,
-        slot_released_at: now,
-        ...(reason ? { admin_note: reason } : {})
-      }
-    },
-    { returnDocument: 'after', runValidators: true }
-  );
+  const updateData = {
+    slot_reserved: false,
+    slot_released_at: now
+  };
+  if (reason) updateData.admin_note = reason;
 
-  if (registration) {
-    await releaseRaceSlot(registration.race_id);
+  const [affected] = await Registration.update(updateData, {
+    where: { id: registrationId, slot_reserved: true }
+  });
+
+  if (affected > 0) {
+    const registration = await Registration.findByPk(registrationId);
+    if (registration) await releaseRaceSlot(registration.race_id);
+    return registration && (registration.toJSON ? registration.toJSON() : registration);
   }
-
-  return registration;
+  return null;
 }
 
 module.exports = {

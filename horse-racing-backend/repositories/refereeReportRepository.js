@@ -1,38 +1,45 @@
-const { RefereeReport } = require('../models');
+const { loadSequelizeModels } = require('../models/sequelize/index.js');
 
-function basePopulate(query) {
-  return query
-    .populate('race_id')
-    .populate({
-      path: 'referee_id',
-      populate: {
-        path: 'user_id',
-        select: 'full_name email'
-      }
-    });
+function getModels() { return loadSequelizeModels().models; }
+
+function baseInclude() {
+  const { Race, RaceReferee, User } = getModels();
+  return [
+    { model: Race, as: 'race' },
+    {
+      model: RaceReferee,
+      as: 'referee',
+      include: [{ model: User, as: 'user', attributes: ['full_name', 'email'] }]
+    }
+  ];
 }
 
 async function create(data) {
+  const { RefereeReport } = getModels();
   return RefereeReport.create(data);
 }
 
-async function find(filter) {
-  return basePopulate(RefereeReport.find(filter || {}).sort({ created_at: -1 }));
+async function find(filter = {}) {
+  const { RefereeReport } = getModels();
+  return RefereeReport.findAll({ where: filter, include: baseInclude(), order: [['created_at', 'DESC']] });
 }
 
 async function findById(id) {
-  return basePopulate(RefereeReport.findById(id));
+  const { RefereeReport } = getModels();
+  return RefereeReport.findByPk(id, { include: baseInclude() });
 }
 
-async function findOne(filter) {
-  return basePopulate(RefereeReport.findOne(filter || {}).sort({ created_at: -1 }));
+async function findOne(filter = {}) {
+  const { RefereeReport } = getModels();
+  return RefereeReport.findOne({ where: filter, include: baseInclude(), order: [['created_at', 'DESC']] });
 }
 
 async function updateById(id, data) {
-  return RefereeReport.findByIdAndUpdate(id, data, {
-    returnDocument: 'after',
-    runValidators: true
-  });
+  const { RefereeReport } = getModels();
+  const instance = await RefereeReport.findByPk(id);
+  if (!instance) return null;
+  await instance.update(data);
+  return instance;
 }
 
 module.exports = {

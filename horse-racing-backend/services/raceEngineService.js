@@ -1,5 +1,4 @@
 const crypto = require("crypto");
-const mongoose = require("mongoose");
 
 const ApiError = require("../utils/ApiError");
 const {
@@ -9,13 +8,7 @@ const {
   RACE_RESULT_STATUS,
   REGISTRATION_STATUS,
 } = require("../constants/statuses");
-const {
-  HorseCheck,
-  JockeyAssignment,
-  Race,
-  RaceResult,
-  Registration,
-} = require("../models");
+const { loadSequelizeModels } = require("../models/sequelize/index.js");
 const raceEngineRunRepository = require("../repositories/raceEngineRunRepository");
 const raceRepository = require("../repositories/raceRepository");
 const raceRunRepository = require("../repositories/raceRunRepository");
@@ -29,6 +22,14 @@ const ENGINE_RUN_STATUS = {
   FAILED: "failed",
 };
 const COMPLETED_RACE_STATUSES = ["completed", "finished"];
+
+function getModels() {
+  return loadSequelizeModels().models;
+}
+
+function getSequelize() {
+  return loadSequelizeModels().sequelize;
+}
 
 function getRaceId(race) {
   return race && (race._id || race.id);
@@ -123,7 +124,7 @@ function createSeededRandom(seed) {
   };
 }
 
-function getObjectId(value) {
+function getDocumentId(value) {
   return value && (value._id || value);
 }
 
@@ -179,14 +180,8 @@ function addLatestHorseCheck(latestByHorse, horseCheck) {
   }
 }
 
-async function getRaceOrThrow(raceId, session) {
-  const query = raceRepository.findById(raceId);
-
-  if (session && query.session) {
-    query.session(session);
-  }
-
-  const race = await query;
+async function getRaceOrThrow(raceId) {
+  const race = await raceRepository.findById(raceId);
 
   if (!race) {
     throw new ApiError(404, "Race not found");
@@ -196,76 +191,85 @@ async function getRaceOrThrow(raceId, session) {
 }
 
 async function lockRace(raceId) {
-  const session = await mongoose.startSession();
+  // Sequelize managed transaction (replaces the legacy session.withTransaction).
+  const sequelize = getSequelize();
+  let response;
 
-  try {
-    let response;
+  await sequelize.transaction(async () => {
+    const race = await raceRepository.findById(raceId);
 
-    await session.withTransaction(async function () {
-      const race = await Race.findById(raceId).session(session);
+    if (!race) {
+      throw new ApiError(404, "Race not found");
+    }
 
-      if (!race) {
-        throw new ApiError(404, "Race not found");
-      }
+    const registrationLockAt = getEffectiveRegistrationLockAt(race);
 
-      const registrationLockAt = getEffectiveRegistrationLockAt(race);
+    if (!registrationLockAt) {
+      throw new ApiError(400, "race_date is required to lock registrations");
+    }
 
-      if (!registrationLockAt) {
-        throw new ApiError(400, "race_date is required to lock registrations");
-      }
+    if (!DEMO_BYPASS_TIME_VALIDATIONS && new Date(registrationLockAt).getTime() > Date.now()) {
+      throw new ApiError(400, "Registration lock time has not been reached");
+    }
 
-      if (!DEMO_BYPASS_TIME_VALIDATIONS && new Date(registrationLockAt).getTime() > Date.now()) {
-        throw new ApiError(400, "Registration lock time has not been reached");
-      }
-
-      if (race.registration_locked) {
-        response = {
-          race: race,
-          locked: false,
-        };
-        return;
-      }
-
-      race.registration_locked = true;
-      race.registration_lock_at = registrationLockAt;
-      await race.save({ session: session });
-
+    if (race.registration_locked) {
       response = {
         race: race,
-        locked: true,
+        locked: false,
       };
+      return;
+    }
+
+    await raceRepository.updateById(raceId, {
+      $set: {
+        registration_locked: true,
+        registration_lock_at: registrationLockAt
+      }
     });
 
-    return response;
-  } finally {
-    await session.endSession();
-  }
+    const updated = await raceRepository.findById(raceId);
+
+    response = {
+      race: updated,
+      locked: true,
+    };
+  });
+
+  return response;
 }
 
-async function collectParticipantStatuses(raceId, options) {
-  const session = options && options.session;
-  const race = await getRaceOrThrow(raceId, session);
-  const registrations = await Registration.find({
-    race_id: raceId,
-    status: REGISTRATION_STATUS.APPROVED,
-  })
-    .populate({
-      path: "horse_id",
-      populate: {
-        path: "owner_id",
-        populate: {
-          path: "user_id",
-        },
-      },
-    })
-    .session(session || null);
+async function collectParticipantStatuses(raceId, _options) {
+  // Note: `_options.session` was a per-query legacy session parameter; Sequelize handles
+  // transactions at the unit-of-work boundary, so we accept and ignore it.
+  const models = getModels();
+  const { Op } = require('sequelize');
+  const { Registration, JockeyAssignment, HorseCheck, Horse, HorseOwner, User, Jockey } = models;
+
+  const race = await getRaceOrThrow(raceId);
+
+  const registrations = await Registration.findAll({
+    where: {
+      race_id: raceId,
+      status: REGISTRATION_STATUS.APPROVED
+    },
+    include: [
+      {
+        model: Horse,
+        as: 'horse',
+        include: [
+          {
+            model: HorseOwner,
+            as: 'owner',
+            include: [{ model: User, as: 'user' }]
+          }
+        ]
+      }
+    ],
+    order: [['created_at', 'ASC']]
+  });
+
   const horseIds = registrations
-    .map(function (registration) {
-      return (
-        registration.horse_id &&
-        (registration.horse_id._id || registration.horse_id)
-      );
-    })
+    .map((registration) => registration.horse_id)
     .filter(Boolean);
 
   if (!horseIds.length) {
@@ -275,70 +279,57 @@ async function collectParticipantStatuses(raceId, options) {
     };
   }
 
-  const assignmentQuery = JockeyAssignment.find({
-    race_id: raceId,
-    horse_id: {
-      $in: horseIds,
+  const assignments = await JockeyAssignment.findAll({
+    where: {
+      race_id: raceId,
+      horse_id: { [Op.in]: horseIds },
+      assignment_type: 'primary',
+      status: ASSIGNMENT_STATUS.ACCEPTED
     },
-    assignment_type: "primary",
-    status: ASSIGNMENT_STATUS.ACCEPTED,
-  })
-    .sort({ invited_at: -1 })
-    .populate({
-      path: "jockey_id",
-      populate: {
-        path: "user_id",
-      },
-    });
-  const horseCheckQuery = HorseCheck.find({
-    race_id: raceId,
-    horse_id: {
-      $in: horseIds,
+    order: [['invited_at', 'DESC']],
+    include: [
+      {
+        model: Jockey,
+        as: 'jockey',
+        include: [{ model: User, as: 'user' }]
+      }
+    ]
+  });
+
+  const horseChecks = await HorseCheck.findAll({
+    where: {
+      race_id: raceId,
+      horse_id: { [Op.in]: horseIds }
     },
-  }).sort({ checked_at: -1 });
-
-  if (session) {
-    assignmentQuery.session(session);
-    horseCheckQuery.session(session);
-  }
-
-  const assignments = await assignmentQuery;
-  const horseChecks = await horseCheckQuery;
+    order: [['checked_at', 'DESC']]
+  });
 
   const assignmentByHorse = new Map();
   const latestPreCheckByHorse = new Map();
   const latestPostCheckByHorse = new Map();
 
-  assignments.forEach(function (assignment) {
-    const horseId = assignment.horse_id.toString();
-
+  assignments.forEach((assignment) => {
+    const horseId = assignment.horse_id && assignment.horse_id.toString();
     if (!assignmentByHorse.has(horseId)) {
       assignmentByHorse.set(horseId, assignment);
     }
   });
 
-  horseChecks.forEach(function (horseCheck) {
+  horseChecks.forEach((horseCheck) => {
     if (horseCheck.phase === HORSE_CHECK_PHASE.PRE_RACE) {
       addLatestHorseCheck(latestPreCheckByHorse, horseCheck);
     }
-
     if (horseCheck.phase === HORSE_CHECK_PHASE.POST_RACE) {
       addLatestHorseCheck(latestPostCheckByHorse, horseCheck);
     }
   });
 
-  const participants = registrations.map(function (registration) {
-    const horse = registration.horse_id;
-    const horseId = horse && (horse._id || horse);
-    const assignment = horseId
-      ? assignmentByHorse.get(horseId.toString())
-      : null;
-    const preRaceCheck = horseId
-      ? latestPreCheckByHorse.get(horseId.toString())
-      : null;
-    const postRaceCheck = horseId
-      ? latestPostCheckByHorse.get(horseId.toString())
-      : null;
+  const participants = registrations.map((registration) => {
+    const horse = registration.horse;
+    const horseId = horse && (horse._id || horse.id || horse);
+    const assignment = horseId ? assignmentByHorse.get(horseId.toString()) : null;
+    const preRaceCheck = horseId ? latestPreCheckByHorse.get(horseId.toString()) : null;
+    const postRaceCheck = horseId ? latestPostCheckByHorse.get(horseId.toString()) : null;
     const blockers = [];
 
     if (!assignment || assignment.status !== ASSIGNMENT_STATUS.ACCEPTED) {
@@ -347,9 +338,9 @@ async function collectParticipantStatuses(raceId, options) {
 
     if (
       assignment &&
-      assignment.jockey_id &&
-      assignment.jockey_id.suspended_until &&
-      new Date(assignment.jockey_id.suspended_until).getTime() > Date.now()
+      assignment.jockey &&
+      assignment.jockey.suspended_until &&
+      new Date(assignment.jockey.suspended_until).getTime() > Date.now()
     ) {
       blockers.push("jockey_suspension_active");
     }
@@ -365,7 +356,7 @@ async function collectParticipantStatuses(raceId, options) {
     return {
       registration: registration,
       horse: horse,
-      jockey: assignment ? assignment.jockey_id : null,
+      jockey: assignment ? assignment.jockey : null,
       assignment: assignment,
       pre_race_check: preRaceCheck || null,
       post_race_check: postRaceCheck || null,
@@ -391,9 +382,9 @@ function buildRaceOrder(raceId, participants) {
 
     return {
       participant: participant,
-      horse_id: getObjectId(participant.horse),
-      jockey_id: getObjectId(participant.jockey),
-      assignment_id: getObjectId(participant.assignment),
+      horse_id: getDocumentId(participant.horse),
+      jockey_id: getDocumentId(participant.jockey),
+      assignment_id: getDocumentId(participant.assignment),
       position: position,
       finish_time: finishTime,
       score: score
@@ -426,9 +417,9 @@ function buildRaceRunPayload(raceId, userId, participants, raceOrder) {
     seed: process.env.RACE_ENGINE_RANDOM_SEED || null,
     participants: participants.map(function(participant, index) {
       return {
-        horse_id: getObjectId(participant.horse),
-        jockey_id: getObjectId(participant.jockey),
-        assignment_id: getObjectId(participant.assignment),
+        horse_id: getDocumentId(participant.horse),
+        jockey_id: getDocumentId(participant.jockey),
+        assignment_id: getDocumentId(participant.assignment),
         lane: getLane(participant, index + 1),
         seed_position: index + 1
       };
@@ -445,8 +436,8 @@ function buildRaceRunPayload(raceId, userId, participants, raceOrder) {
   };
 }
 
-async function collectParticipants(raceId, options) {
-  const participantData = await collectParticipantStatuses(raceId, options);
+async function collectParticipants(raceId, _options) {
+  const participantData = await collectParticipantStatuses(raceId, _options);
   const participants = participantData.participants.reduce(function(items, participant) {
     if (!participant.eligible) {
       return items;
@@ -514,7 +505,7 @@ async function prepareRun(raceId) {
   };
 }
 
-async function startRun(raceId, existingRun, session) {
+async function startRun(raceId, existingRun, _session) {
   const runData = {
     race_id: raceId,
     engine_run_id: existingRun
@@ -527,19 +518,15 @@ async function startRun(raceId, existingRun, session) {
   };
 
   if (existingRun) {
-    return raceEngineRunRepository.updateById(existingRun._id, runData, {
-      session: session,
-    });
+    return raceEngineRunRepository.updateById(existingRun._id, runData);
   }
 
   try {
-    return await raceEngineRunRepository.create(runData, { session: session });
+    return await raceEngineRunRepository.create(runData);
   } catch (error) {
-    if (error && error.code === 11000) {
-      const concurrentRun = await raceEngineRunRepository.findOne(
-        { race_id: raceId },
-        { session: session },
-      );
+    // Sequelize unique-constraint error code
+    if (error && (error.name === 'SequelizeUniqueConstraintError' || error.code === '23505')) {
+      const concurrentRun = await raceEngineRunRepository.findOne({ race_id: raceId });
 
       if (
         getRunAction(concurrentRun) === "skip_completed" ||
@@ -551,20 +538,18 @@ async function startRun(raceId, existingRun, session) {
         );
       }
     }
-
     throw error;
   }
 }
 
-async function completeRun(run, session) {
+async function completeRun(run, _session) {
   return raceEngineRunRepository.updateById(
     run._id,
     {
       status: ENGINE_RUN_STATUS.COMPLETED,
       completed_at: new Date(),
       error: undefined,
-    },
-    { session: session },
+    }
   );
 }
 
@@ -588,7 +573,7 @@ async function generateDraftResults(raceId) {
     };
   }
 
-  const session = await mongoose.startSession();
+  const sequelize = getSequelize();
   let activeRun;
 
   try {
@@ -596,8 +581,11 @@ async function generateDraftResults(raceId) {
 
     let response;
 
-    await session.withTransaction(async function () {
-      const race = await Race.findById(raceId).session(session);
+    await sequelize.transaction(async () => {
+      const models = getModels();
+      const { RaceResult, Race } = models;
+
+      const race = await raceRepository.findById(raceId);
 
       if (!race) {
         throw new ApiError(404, "Race not found");
@@ -630,16 +618,17 @@ async function generateDraftResults(raceId) {
         throw new ApiError(400, "Registration lock time has not been reached");
       }
 
-      const existingResultCount = await RaceResult.countDocuments({
-        race_id: raceId,
-      }).session(session);
+      const existingResultCount = await RaceResult.count({ where: { race_id: raceId } });
 
       if (existingResultCount > 0) {
-        race.registration_locked = true;
-        race.registration_lock_at = registrationLockAt;
-        await race.save({ session: session });
+        await raceRepository.updateById(raceId, {
+          $set: {
+            registration_locked: true,
+            registration_lock_at: registrationLockAt
+          }
+        });
 
-        const completedRun = await completeRun(activeRun, session);
+        const completedRun = await completeRun(activeRun);
 
         response = {
           skipped: true,
@@ -650,15 +639,13 @@ async function generateDraftResults(raceId) {
         return;
       }
 
-      const participantData = await collectParticipants(raceId, {
-        session: session,
-      });
+      const participantData = await collectParticipants(raceId);
 
       if (!participantData.participants.length) {
         throw new ApiError(400, "Race has no eligible participants");
       }
 
-      const raceRun = await getProvisionalRaceRun(raceId, { session: session });
+      const raceRun = await getProvisionalRaceRun(raceId);
       const raceOrderFromRun = buildOrderFromRaceRun(
         participantData.participants,
         raceRun
@@ -684,33 +671,31 @@ async function generateDraftResults(raceId) {
           final_position: position,
           final_finish_time: finishTime,
           final_score: score,
-          applied_violation_ids: [],
           status: RACE_RESULT_STATUS.DRAFT,
-          recorded_by: race.referee_id._id || race.referee_id,
+          recorded_by: race.referee_id && (race.referee_id._id || race.referee_id),
           recorded_at: new Date(),
         };
       });
 
       if (results.length) {
-        await RaceResult.insertMany(results, {
-          ordered: true,
-          session: session,
-        });
+        await RaceResult.bulkCreate(results);
       }
 
       if (raceRun && raceRun._id) {
         await raceRunRepository.updateById(
           raceRun._id,
-          { status: 'used' },
-          { session: session }
+          { status: 'used' }
         );
       }
 
-      race.registration_locked = true;
-      race.registration_lock_at = registrationLockAt;
-      await race.save({ session: session });
+      await raceRepository.updateById(raceId, {
+        $set: {
+          registration_locked: true,
+          registration_lock_at: registrationLockAt
+        }
+      });
 
-      const completedRun = await completeRun(activeRun, session);
+      const completedRun = await completeRun(activeRun);
 
       response = {
         skipped: false,
@@ -726,47 +711,41 @@ async function generateDraftResults(raceId) {
     }
 
     throw error;
-  } finally {
-    await session.endSession();
   }
 }
 
 async function ensureRaceRegistrationIsUnlocked(raceId) {
   const race = await getRaceOrThrow(raceId);
-
   assertRegistrationOpen(race);
-
   return race;
 }
 
 async function findRacesReadyForLock(now) {
+  const models = getModels();
+  const { Op } = require('sequelize');
+  const { Race } = models;
   const currentTime = now || new Date();
   const raceDateCutoff = new Date(currentTime.getTime() + LOCK_OFFSET_MS);
 
-  return Race.find({
-    registration_locked: false,
-    $or: [
-      {
-        registration_lock_at: {
-          $lte: currentTime,
-        },
-      },
-      {
-        registration_lock_at: {
-          $exists: false,
-        },
-        race_date: {
-          $lte: raceDateCutoff,
-        },
-      },
-      {
-        registration_lock_at: null,
-        race_date: {
-          $lte: raceDateCutoff,
-        },
-      },
-    ],
+  // Sequelize equivalent of the legacy `$or` with `$lte`/`$exists`:
+  // - registration_lock_at <= currentTime
+  // - OR (registration_lock_at IS NULL AND race_date <= raceDateCutoff)
+  const rows = await Race.findAll({
+    where: {
+      registration_locked: false,
+      [Op.or]: [
+        { registration_lock_at: { [Op.lte]: currentTime } },
+        {
+          [Op.and]: [
+            { registration_lock_at: null },
+            { race_date: { [Op.lte]: raceDateCutoff } }
+          ]
+        }
+      ]
+    }
   });
+
+  return rows.map(r => r.toJSON ? r.toJSON() : r);
 }
 
 async function processDueRace(race) {
@@ -774,13 +753,18 @@ async function processDueRace(race) {
   return lockRace(getRaceId(race));
 }
 
-async function getProvisionalRaceRun(raceId, options) {
-  return raceRunRepository.findOne({
-    race_id: raceId,
-    status: {
-      $ne: 'cancelled'
-    }
-  }, options);
+async function getProvisionalRaceRun(raceId, _options) {
+  const models = getModels();
+  const { Op } = require('sequelize');
+  const { RaceRun } = models;
+
+  return RaceRun.findOne({
+    where: {
+      race_id: raceId,
+      status: { [Op.ne]: 'cancelled' }
+    },
+    raw: true
+  });
 }
 
 async function generateProvisionalRaceRun(raceId, userId, participantData) {
@@ -810,7 +794,7 @@ async function generateProvisionalRaceRun(raceId, userId, participantData) {
       created: true
     };
   } catch (error) {
-    if (error && error.code === 11000) {
+    if (error && (error.name === 'SequelizeUniqueConstraintError' || error.code === '23505')) {
       return {
         race_run: await getProvisionalRaceRun(raceId),
         created: false
@@ -821,8 +805,8 @@ async function generateProvisionalRaceRun(raceId, userId, participantData) {
   }
 }
 
-async function cancelProvisionalRaceRun(raceRunId, options) {
-  return raceRunRepository.updateById(raceRunId, { status: 'cancelled' }, options);
+async function cancelProvisionalRaceRun(raceRunId, _options) {
+  return raceRunRepository.updateById(raceRunId, { status: 'cancelled' });
 }
 
 function buildOrderFromRaceRun(participants, raceRun) {
@@ -832,7 +816,7 @@ function buildOrderFromRaceRun(participants, raceRun) {
 
   return raceRun.finish_order.reduce(function(items, orderItem) {
     const participant = participants.find(function(candidate) {
-      return sameId(getObjectId(candidate.horse), getObjectId(orderItem.horse_id));
+      return sameId(getDocumentId(candidate.horse), getDocumentId(orderItem.horse_id));
     });
 
     if (!participant) {
@@ -841,9 +825,9 @@ function buildOrderFromRaceRun(participants, raceRun) {
 
     items.push({
       participant: participant,
-      horse_id: getObjectId(participant.horse),
-      jockey_id: getObjectId(participant.jockey),
-      assignment_id: getObjectId(participant.assignment),
+      horse_id: getDocumentId(participant.horse),
+      jockey_id: getDocumentId(participant.jockey),
+      assignment_id: getDocumentId(participant.assignment),
       position: orderItem.position,
       finish_time: orderItem.finish_time,
       score: orderItem.score || getScore(orderItem.position)

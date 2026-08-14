@@ -1,45 +1,47 @@
-const { Bet } = require('../models');
+const { loadSequelizeModels } = require('../models/sequelize/index.js');
 
-function basePopulate(query) {
-  return query
-    .populate('spectator_id', 'full_name email')
-    .populate({
-      path: 'race_id',
-      populate: [
-        { path: 'tournament_id' },
-        { path: 'round_id' }
-      ]
-    })
-    .populate('predicted_horse_id')
-    .populate('odds_market_id')
-    .populate('settled_result_id');
-}
+function getModels() { return loadSequelizeModels().models; }
 
 async function create(data) {
+  const { Bet } = getModels();
   return Bet.create(data);
 }
 
-async function find(filter) {
-  return basePopulate(Bet.find(filter || {}).sort({ submitted_at: -1 }));
+async function find(filter = {}) {
+  const { Bet, Race, Horse, Tournament, Round, User, UserRole: _UR, RaceOddsMarket, RaceResult } = getModels();
+  return Bet.findAll({
+    where: filter,
+    include: [
+      { model: User, as: 'spectator', attributes: ['full_name', 'email'] },
+      { model: Race, as: 'race', include: [{ model: Tournament, as: 'tournament' }, { model: Round, as: 'round' }] },
+      { model: Horse, as: 'predicted_horse' },
+      { model: RaceOddsMarket, as: 'odds_market' },
+      { model: RaceResult, as: 'settled_result' }
+    ],
+    order: [['submitted_at', 'DESC']]
+  });
 }
 
 async function findById(id) {
-  return basePopulate(Bet.findById(id));
+  return find({ id }).then(rows => rows[0] || null);
 }
 
 async function findPendingByRaceId(raceId) {
-  return Bet.find({ race_id: raceId, status: 'pending' }).sort({ submitted_at: 1 });
+  const { Bet } = getModels();
+  return Bet.findAll({ where: { race_id: raceId, status: 'pending' }, order: [['submitted_at', 'ASC']] });
 }
 
 async function updateById(id, data) {
-  return basePopulate(Bet.findByIdAndUpdate(id, data, {
-    returnDocument: 'after',
-    runValidators: true
-  }));
+  const { Bet } = getModels();
+  const instance = await Bet.findByPk(id);
+  if (!instance) return null;
+  await instance.update(data);
+  return instance;
 }
 
-async function count(filter) {
-  return Bet.countDocuments(filter || {});
+async function count(filter = {}) {
+  const { Bet } = getModels();
+  return Bet.count({ where: filter });
 }
 
 module.exports = {

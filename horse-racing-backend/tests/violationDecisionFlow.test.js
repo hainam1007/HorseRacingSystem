@@ -20,6 +20,13 @@ const violationRepository = require('../repositories/violationRepository');
 const horseCheckService = require('../services/horseCheckService');
 const violationService = require('../services/violationService');
 const { validateConfirmViolation } = require('../validators/violationValidator');
+const { newObjectId } = require('../utils/objectId');
+
+const VIOLATION_ID = newObjectId();
+const RACE_ID = newObjectId();
+const REFEREE_ID = newObjectId();
+const REFEREE_USER_ID = newObjectId();
+const HORSE_ID = newObjectId();
 
 async function withPatches(patches, callback) {
   const originals = patches.map(function(patch) {
@@ -46,9 +53,9 @@ function makeViolation(overrides) {
   );
 
   return Object.assign({
-    _id: 'violation-1',
-    race_id: 'race-1',
-    referee_id: 'referee-1',
+    _id: VIOLATION_ID,
+    race_id: RACE_ID,
+    referee_id: REFEREE_ID,
     violation_type: VIOLATION_TYPE.LANE_VIOLATION,
     severity: VIOLATION_SEVERITY.MAJOR,
     status: VIOLATION_STATUS.RECORDED,
@@ -86,13 +93,13 @@ async function confirmAsReferee(violation, payload) {
       target: profileRepository,
       key: 'findRaceRefereeByUserId',
       value: async function() {
-        return { _id: 'referee-1' };
+        return { _id: REFEREE_ID };
       }
     }
   ], function() {
     return violationService.confirmViolation({
       roles: [ROLE_NAMES.RACE_REFEREE],
-      user: { _id: 'referee-user-1' }
+      user: { _id: REFEREE_USER_ID }
     }, violation._id, payload);
   });
 
@@ -128,13 +135,13 @@ async function dismissAsReferee(violation, payload) {
       target: profileRepository,
       key: 'findRaceRefereeByUserId',
       value: async function() {
-        return { _id: 'referee-1' };
+        return { _id: REFEREE_ID };
       }
     }
   ], function() {
     return violationService.dismissViolation({
       roles: [ROLE_NAMES.RACE_REFEREE],
-      user: { _id: 'referee-user-1' }
+      user: { _id: REFEREE_USER_ID }
     }, violation._id, payload);
   });
 
@@ -148,7 +155,7 @@ test('creation snapshots policy and ignores auto confirmation', async function()
       target: raceRepository,
       key: 'findById',
       value: async function() {
-        return { _id: 'race-1', referee_id: 'referee-1' };
+        return { _id: RACE_ID, referee_id: REFEREE_ID };
       }
     },
     {
@@ -162,7 +169,7 @@ test('creation snapshots policy and ignores auto confirmation', async function()
       target: profileRepository,
       key: 'findRaceRefereeByUserId',
       value: async function() {
-        return { _id: 'referee-1' };
+        return { _id: REFEREE_ID };
       }
     },
     {
@@ -176,9 +183,9 @@ test('creation snapshots policy and ignores auto confirmation', async function()
   ], function() {
     return violationService.createViolation({
       roles: [ROLE_NAMES.RACE_REFEREE],
-      user: { _id: 'referee-user-1' }
+      user: { _id: REFEREE_USER_ID }
     }, {
-      race_id: 'race-1',
+      race_id: RACE_ID,
       violation_type: VIOLATION_TYPE.LANE_VIOLATION,
       severity: VIOLATION_SEVERITY.MAJOR,
       status: VIOLATION_STATUS.RECORDED,
@@ -201,21 +208,21 @@ test('during-race horse check never auto-confirms its linked violation', async f
       target: raceRepository,
       key: 'findById',
       value: async function() {
-        return { _id: 'race-1', referee_id: 'referee-1' };
+        return { _id: RACE_ID, referee_id: REFEREE_ID };
       }
     },
     {
       target: Horse,
-      key: 'findById',
+      key: 'findByPk',
       value: async function() {
-        return { _id: 'horse-1' };
+        return { _id: HORSE_ID };
       }
     },
     {
       target: profileRepository,
       key: 'findRaceRefereeByUserId',
       value: async function() {
-        return { _id: 'referee-1' };
+        return { _id: REFEREE_ID };
       }
     },
     {
@@ -254,16 +261,16 @@ test('during-race horse check never auto-confirms its linked violation', async f
       key: 'create',
       value: async function(data) {
         violationData = data;
-        return Object.assign({ _id: 'violation-1' }, data);
+        return Object.assign({ _id: VIOLATION_ID }, data);
       }
     }
   ], function() {
     return horseCheckService.createHorseCheck({
       roles: [ROLE_NAMES.RACE_REFEREE],
-      user: { _id: 'referee-user-1' }
+      user: { _id: REFEREE_USER_ID }
     }, {
-      race_id: 'race-1',
-      horse_id: 'horse-1',
+      race_id: RACE_ID,
+      horse_id: HORSE_ID,
       phase: HORSE_CHECK_PHASE.DURING_RACE,
       status: HORSE_CHECK_STATUS.INCIDENT_RECORDED,
       event_type: VIOLATION_TYPE.LANE_VIOLATION,
@@ -429,7 +436,7 @@ test('admin can approve an unresolved referee proposal with its recorded reason'
     },
     deviates_from_policy: true,
     deviation_reason: 'Repeated lane violations require a stronger sanction',
-    proposed_by: 'referee-user-1',
+    proposed_by: REFEREE_USER_ID,
     proposed_at: new Date()
   });
   let updateData;

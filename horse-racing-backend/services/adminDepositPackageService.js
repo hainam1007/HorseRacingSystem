@@ -136,7 +136,7 @@ async function createPackage(payload) {
 }
 
 /**
- * Update an existing deposit package by its MongoDB _id.
+ * Update an existing deposit package by its primary key.
  *
  * Rules:
  *   - package_id cannot be changed (silently ignored if supplied).
@@ -144,8 +144,8 @@ async function createPackage(payload) {
  *   - Numeric fields are re-validated if supplied.
  *   - Existing PENDING / SUCCESS orders are NOT affected — they carry a snapshot.
  *
- * @param {string|ObjectId} id      - MongoDB _id of the package
- * @param {object}          payload - Fields to update
+ * @param {string} id      - Primary key of the package
+ * @param {object} payload - Fields to update
  * @returns {Promise<{ package: DepositPackage }>}
  */
 async function updatePackage(id, payload) {
@@ -238,7 +238,7 @@ async function updatePackage(id, payload) {
  *   - The response includes a has_successful_orders flag so admins know whether
  *     historical revenue data is attached to this package.
  *
- * @param {string|ObjectId} id - MongoDB _id of the package
+ * @param {string} id - Primary key of the package
  * @returns {Promise<{ package: DepositPackage, has_successful_orders: boolean, message: string }>}
  */
 async function deletePackage(id) {

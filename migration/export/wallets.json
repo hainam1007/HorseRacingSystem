@@ -1,0 +1,44 @@
+[
+  {
+    "_id": "6a6ad6f6b9b0bd29ca7b982b",
+    "user_id": "6a6ad6e3b9b0bd29ca7b9699",
+    "token_balance": 980,
+    "created_at": "2026-07-30T04:45:42.643Z",
+    "updated_at": "2026-08-13T10:53:29.525Z"
+  },
+  {
+    "_id": "6a6ad6f6b9b0bd29ca7b982c",
+    "user_id": "6a6ad6e3b9b0bd29ca7b969b",
+    "token_balance": 1874.21,
+    "created_at": "2026-07-30T04:45:42.703Z",
+    "updated_at": "2026-07-30T06:00:20.901Z"
+  },
+  {
+    "_id": "6a6ad6f6b9b0bd29ca7b982d",
+    "user_id": "6a6ad6e3b9b0bd29ca7b969d",
+    "token_balance": 370,
+    "created_at": "2026-07-30T04:45:42.764Z",
+    "updated_at": "2026-07-30T04:45:42.764Z"
+  },
+  {
+    "_id": "6a6ad6f6b9b0bd29ca7b982e",
+    "user_id": "6a6ad6e4b9b0bd29ca7b969f",
+    "token_balance": 340,
+    "created_at": "2026-07-30T04:45:42.824Z",
+    "updated_at": "2026-07-30T04:45:42.824Z"
+  },
+  {
+    "_id": "6a6ad6f6b9b0bd29ca7b982f",
+    "user_id": "6a6ad6e4b9b0bd29ca7b96a1",
+    "token_balance": 310,
+    "created_at": "2026-07-30T04:45:42.883Z",
+    "updated_at": "2026-07-30T04:45:42.883Z"
+  },
+  {
+    "_id": "6a6ad849a1b64dd0c4ba8691",
+    "user_id": "6a6ad82c7fc3aad02f5a10f0",
+    "created_at": "2026-07-30T04:51:21.904Z",
+    "token_balance": 0,
+    "updated_at": "2026-07-30T04:53:10.912Z"
+  }
+]

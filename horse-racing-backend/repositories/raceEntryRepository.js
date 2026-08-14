@@ -1,52 +1,71 @@
-const { JockeyAssignment, Registration } = require('../models');
+const { Op } = require('sequelize');
+const { loadSequelizeModels } = require('../models/sequelize/index.js');
 
-function populateEntries(query) {
-  return query
-    .populate('race_id')
-    .populate('horse_id')
-    .populate({
-      path: 'owner_id',
-      populate: { path: 'user_id', select: 'full_name email' }
-    })
-    .populate('entry_finalized_by', 'full_name email');
+function getModels() { return loadSequelizeModels().models; }
+
+function regInclude() {
+  const { Race, Horse, HorseOwner, User } = getModels();
+  return [
+    { model: Race, as: 'race' },
+    { model: Horse, as: 'horse' },
+    { model: HorseOwner, as: 'owner', include: [{ model: User, as: 'user', attributes: ['full_name', 'email'] }] },
+    { model: User, as: 'entry_finalized_by_user', attributes: ['full_name', 'email'] }
+  ];
 }
 
-async function findByRaceId(raceId, filter) {
-  return populateEntries(
-    Registration.find(Object.assign({ race_id: raceId }, filter || {}))
-      .sort({ registered_at: 1, _id: 1 })
-  );
+async function findByRaceId(raceId, filter = {}) {
+  const { Registration } = getModels();
+  return Registration.findAll({
+    where: { race_id: raceId, ...filter },
+    include: regInclude(),
+    order: [['registered_at', 'ASC'], ['id', 'ASC']]
+  });
 }
 
 async function findById(id) {
-  return populateEntries(Registration.findById(id));
+  const { Registration } = getModels();
+  return Registration.findByPk(id, { include: regInclude() });
 }
 
 async function findAcceptedPrimaryAssignments(raceId, horseIds) {
-  return JockeyAssignment.find({
-    race_id: raceId,
-    horse_id: { $in: horseIds },
-    assignment_type: 'primary',
-    status: 'accepted'
-  }).populate({
-    path: 'jockey_id',
-    populate: { path: 'user_id', select: 'full_name email' }
+  const { JockeyAssignment, Jockey, User } = getModels();
+  return JockeyAssignment.findAll({
+    where: {
+      race_id: raceId,
+      horse_id: { [Op.in]: horseIds },
+      assignment_type: 'primary',
+      status: 'accepted'
+    },
+    include: [{ model: Jockey, as: 'jockey', include: [{ model: User, as: 'user', attributes: ['full_name', 'email'] }] }]
   });
 }
 
 async function bulkWrite(operations) {
-  return Registration.bulkWrite(operations);
+  const { Registration } = getModels();
+  // Apply each operation sequentially; callers still operate at the
+  // Repository abstraction level.
+  for (const op of operations) {
+    if (op.updateOne && op.updateOne.filter && op.updateOne.update) {
+      await Registration.update(op.updateOne.update, { where: op.updateOne.filter });
+    } else if (op.updateMany && op.updateMany.filter && op.updateMany.update) {
+      await Registration.update(op.updateMany.update, { where: op.updateMany.filter });
+    }
+  }
 }
 
 async function updateById(id, update) {
-  return populateEntries(Registration.findByIdAndUpdate(id, update, {
-    returnDocument: 'after',
-    runValidators: true
-  }));
+  const { Registration } = getModels();
+  const instance = await Registration.findByPk(id);
+  if (!instance) return null;
+  await instance.update(update);
+  return Registration.findByPk(id, { include: regInclude() });
 }
 
 async function findDuplicate(raceId, registrationId, field, value) {
-  return Registration.findOne({ race_id: raceId, _id: { $ne: registrationId }, [field]: value });
+  const { Registration } = getModels();
+  return Registration.findOne({
+    where: { race_id: raceId, id: { [Op.ne]: registrationId }, [field]: value }
+  });
 }
 
 module.exports = {

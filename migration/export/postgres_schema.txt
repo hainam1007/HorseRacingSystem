@@ -1,0 +1,693 @@
+﻿               table_name                |          column_name           |        data_type         | is_nullable |                  column_default                   
+-----------------------------------------+--------------------------------+--------------------------+-------------+---------------------------------------------------
+ bets                                    | id                             | uuid                     | NO          | gen_random_uuid()
+ bets                                    | spectator_id                   | uuid                     | NO          | 
+ bets                                    | race_id                        | uuid                     | NO          | 
+ bets                                    | predicted_horse_id             | uuid                     | NO          | 
+ bets                                    | stake_amount                   | integer                  | NO          | 
+ bets                                    | odds_market_id                 | uuid                     | YES         | 
+ bets                                    | odds_snapshot                  | jsonb                    | NO          | '{}'::jsonb
+ bets                                    | potential_payout               | numeric                  | NO          | 
+ bets                                    | payout_amount                  | numeric                  | NO          | 0
+ bets                                    | status                         | text                     | NO          | 'pending'::text
+ bets                                    | settled_result_id              | uuid                     | YES         | 
+ bets                                    | settled_by                     | uuid                     | YES         | 
+ bets                                    | settled_at                     | timestamp with time zone | YES         | 
+ bets                                    | submitted_at                   | timestamp with time zone | NO          | now()
+ bets                                    | checked_at                     | timestamp with time zone | YES         | 
+ bets                                    | created_at                     | timestamp with time zone | NO          | now()
+ bets                                    | updated_at                     | timestamp with time zone | NO          | now()
+ bets                                    | deleted_at                     | timestamp with time zone | YES         | 
+ deposit_packages                        | id                             | uuid                     | NO          | gen_random_uuid()
+ deposit_packages                        | package_id                     | text                     | NO          | 
+ deposit_packages                        | label                          | text                     | NO          | 
+ deposit_packages                        | vnd_price                      | integer                  | NO          | 
+ deposit_packages                        | token_received                 | integer                  | NO          | 
+ deposit_packages                        | bonus_token                    | integer                  | NO          | 0
+ deposit_packages                        | is_active                      | boolean                  | NO          | true
+ deposit_packages                        | created_at                     | timestamp with time zone | NO          | now()
+ deposit_packages                        | updated_at                     | timestamp with time zone | NO          | now()
+ deposit_packages                        | deleted_at                     | timestamp with time zone | YES         | 
+ deposit_requests                        | id                             | uuid                     | NO          | gen_random_uuid()
+ deposit_requests                        | order_id                       | text                     | NO          | 
+ deposit_requests                        | user_id                        | uuid                     | NO          | 
+ deposit_requests                        | package_id                     | text                     | NO          | 
+ deposit_requests                        | total_vnd                      | numeric                  | NO          | 
+ deposit_requests                        | total_token                    | integer                  | NO          | 
+ deposit_requests                        | payment_method                 | text                     | NO          | 
+ deposit_requests                        | status                         | text                     | NO          | 'pending'::text
+ deposit_requests                        | gateway_reference_id           | text                     | YES         | 
+ deposit_requests                        | note                           | text                     | YES         | 
+ deposit_requests                        | created_at                     | timestamp with time zone | NO          | now()
+ deposit_requests                        | updated_at                     | timestamp with time zone | NO          | now()
+ deposit_requests                        | deleted_at                     | timestamp with time zone | YES         | 
+ horse_check_issues                      | id                             | uuid                     | NO          | gen_random_uuid()
+ horse_check_issues                      | horse_check_id                 | uuid                     | NO          | 
+ horse_check_issues                      | code                           | text                     | YES         | 
+ horse_check_issues                      | severity                       | text                     | YES         | 
+ horse_check_issues                      | note                           | text                     | YES         | 
+ horse_check_issues                      | created_at                     | timestamp with time zone | NO          | now()
+ horse_checks                            | id                             | uuid                     | NO          | gen_random_uuid()
+ horse_checks                            | race_id                        | uuid                     | NO          | 
+ horse_checks                            | horse_id                       | uuid                     | NO          | 
+ horse_checks                            | jockey_id                      | uuid                     | YES         | 
+ horse_checks                            | referee_id                     | uuid                     | NO          | 
+ horse_checks                            | phase                          | text                     | NO          | 'pre_race'::text
+ horse_checks                            | status                         | text                     | NO          | 'passed'::text
+ horse_checks                            | checklist                      | jsonb                    | NO          | '{}'::jsonb
+ horse_checks                            | event_type                     | text                     | YES         | 
+ horse_checks                            | severity                       | text                     | YES         | 
+ horse_checks                            | time_marker                    | text                     | YES         | 
+ horse_checks                            | description                    | text                     | YES         | 
+ horse_checks                            | evidence_urls                  | ARRAY                    | NO          | ARRAY[]::text[]
+ horse_checks                            | requires_violation             | boolean                  | NO          | false
+ horse_checks                            | auto_confirm_violation         | boolean                  | NO          | false
+ horse_checks                            | linked_violation_id            | uuid                     | YES         | 
+ horse_checks                            | health_status                  | text                     | YES         | 
+ horse_checks                            | weight                         | integer                  | YES         | 
+ horse_checks                            | check_note                     | text                     | YES         | 
+ horse_checks                            | is_eligible                    | boolean                  | NO          | true
+ horse_checks                            | checked_at                     | timestamp with time zone | NO          | now()
+ horse_checks                            | created_at                     | timestamp with time zone | NO          | now()
+ horse_checks                            | updated_at                     | timestamp with time zone | NO          | now()
+ horse_checks                            | deleted_at                     | timestamp with time zone | YES         | 
+ horse_owners                            | id                             | uuid                     | NO          | gen_random_uuid()
+ horse_owners                            | user_id                        | uuid                     | NO          | 
+ horse_owners                            | stable_name                    | text                     | YES         | 
+ horse_owners                            | address                        | text                     | YES         | 
+ horse_owners                            | license_number                 | text                     | YES         | 
+ horse_owners                            | status                         | text                     | NO          | 'active'::text
+ horse_owners                            | created_at                     | timestamp with time zone | NO          | now()
+ horse_owners                            | updated_at                     | timestamp with time zone | NO          | now()
+ horse_owners                            | deleted_at                     | timestamp with time zone | YES         | 
+ horse_rating_history                    | id                             | uuid                     | NO          | gen_random_uuid()
+ horse_rating_history                    | horse_id                       | uuid                     | NO          | 
+ horse_rating_history                    | race_id                        | uuid                     | YES         | 
+ horse_rating_history                    | previous_rating                | integer                  | NO          | 
+ horse_rating_history                    | rating_delta                   | integer                  | NO          | 
+ horse_rating_history                    | new_rating                     | integer                  | NO          | 
+ horse_rating_history                    | expected_score                 | numeric                  | YES         | 
+ horse_rating_history                    | actual_score                   | numeric                  | YES         | 
+ horse_rating_history                    | raw_position                   | integer                  | YES         | 
+ horse_rating_history                    | participant_count              | integer                  | YES         | 
+ horse_rating_history                    | calculation_version            | text                     | NO          | 'pairwise_elo_v1'::text
+ horse_rating_history                    | source                         | text                     | NO          | 
+ horse_rating_history                    | reason                         | text                     | YES         | 
+ horse_rating_history                    | calculated_by                  | uuid                     | YES         | 
+ horse_rating_history                    | calculated_at                  | timestamp with time zone | NO          | now()
+ horse_rating_history                    | created_at                     | timestamp with time zone | NO          | now()
+ horse_rating_history                    | deleted_at                     | timestamp with time zone | YES         | 
+ horses                                  | id                             | uuid                     | NO          | gen_random_uuid()
+ horses                                  | owner_id                       | uuid                     | NO          | 
+ horses                                  | name                           | text                     | NO          | 
+ horses                                  | breed                          | text                     | YES         | 
+ horses                                  | gender                         | text                     | YES         | 
+ horses                                  | date_of_birth                  | timestamp with time zone | YES         | 
+ horses                                  | color                          | text                     | YES         | 
+ horses                                  | weight                         | integer                  | YES         | 
+ horses                                  | current_rating                 | integer                  | NO          | 50
+ horses                                  | rating_updated_at              | timestamp with time zone | YES         | 
+ horses                                  | rating_updated_by              | uuid                     | YES         | 
+ horses                                  | default_gears                  | ARRAY                    | NO          | ARRAY[]::text[]
+ horses                                  | health_status                  | text                     | YES         | 
+ horses                                  | registration_number            | text                     | NO          | 
+ horses                                  | image_url                      | text                     | YES         | 
+ horses                                  | image_public_id                | text                     | YES         | 
+ horses                                  | status                         | text                     | NO          | 'active'::text
+ horses                                  | created_at                     | timestamp with time zone | NO          | now()
+ horses                                  | updated_at                     | timestamp with time zone | NO          | now()
+ horses                                  | deleted_at                     | timestamp with time zone | YES         | 
+ jockey_assignment_cancellation_requests | id                             | uuid                     | NO          | gen_random_uuid()
+ jockey_assignment_cancellation_requests | assignment_id                  | uuid                     | NO          | 
+ jockey_assignment_cancellation_requests | status                         | text                     | YES         | 
+ jockey_assignment_cancellation_requests | initiated_by_party             | text                     | YES         | 
+ jockey_assignment_cancellation_requests | initiated_by                   | uuid                     | YES         | 
+ jockey_assignment_cancellation_requests | reason                         | text                     | YES         | 
+ jockey_assignment_cancellation_requests | requested_at                   | timestamp with time zone | YES         | 
+ jockey_assignment_cancellation_requests | responded_by_party             | text                     | YES         | 
+ jockey_assignment_cancellation_requests | responded_by                   | uuid                     | YES         | 
+ jockey_assignment_cancellation_requests | response_message               | text                     | YES         | 
+ jockey_assignment_cancellation_requests | responded_at                   | timestamp with time zone | YES         | 
+ jockey_assignment_cancellation_requests | created_at                     | timestamp with time zone | NO          | now()
+ jockey_assignment_cancellation_requests | updated_at                     | timestamp with time zone | NO          | now()
+ jockey_assignment_contracts             | id                             | uuid                     | NO          | gen_random_uuid()
+ jockey_assignment_contracts             | assignment_id                  | uuid                     | NO          | 
+ jockey_assignment_contracts             | contract_number                | text                     | YES         | 
+ jockey_assignment_contracts             | title                          | text                     | YES         | 
+ jockey_assignment_contracts             | file_url                       | text                     | YES         | 
+ jockey_assignment_contracts             | file_public_id                 | text                     | YES         | 
+ jockey_assignment_contracts             | file_type                      | text                     | YES         | 
+ jockey_assignment_contracts             | file_name                      | text                     | YES         | 
+ jockey_assignment_contracts             | signed_at                      | timestamp with time zone | YES         | 
+ jockey_assignment_contracts             | uploaded_at                    | timestamp with time zone | YES         | 
+ jockey_assignment_contracts             | confirmed_at                   | timestamp with time zone | YES         | 
+ jockey_assignment_contracts             | rejected_at                    | timestamp with time zone | YES         | 
+ jockey_assignment_contracts             | response_message               | text                     | YES         | 
+ jockey_assignment_contracts             | note                           | text                     | YES         | 
+ jockey_assignment_contracts             | created_at                     | timestamp with time zone | NO          | now()
+ jockey_assignment_contracts             | updated_at                     | timestamp with time zone | NO          | now()
+ jockey_assignment_meetings              | id                             | uuid                     | NO          | gen_random_uuid()
+ jockey_assignment_meetings              | assignment_id                  | uuid                     | NO          | 
+ jockey_assignment_meetings              | title                          | text                     | YES         | 
+ jockey_assignment_meetings              | meeting_url                    | text                     | YES         | 
+ jockey_assignment_meetings              | meeting_time                   | timestamp with time zone | YES         | 
+ jockey_assignment_meetings              | location_name                  | text                     | YES         | 
+ jockey_assignment_meetings              | address                        | text                     | YES         | 
+ jockey_assignment_meetings              | city                           | text                     | YES         | 
+ jockey_assignment_meetings              | district                       | text                     | YES         | 
+ jockey_assignment_meetings              | ward                           | text                     | YES         | 
+ jockey_assignment_meetings              | map_url                        | text                     | YES         | 
+ jockey_assignment_meetings              | contact_name                   | text                     | YES         | 
+ jockey_assignment_meetings              | contact_phone                  | text                     | YES         | 
+ jockey_assignment_meetings              | note                           | text                     | YES         | 
+ jockey_assignment_meetings              | accepted_at                    | timestamp with time zone | YES         | 
+ jockey_assignment_meetings              | rejected_at                    | timestamp with time zone | YES         | 
+ jockey_assignment_meetings              | response_message               | text                     | YES         | 
+ jockey_assignment_meetings              | created_at                     | timestamp with time zone | NO          | now()
+ jockey_assignment_meetings              | updated_at                     | timestamp with time zone | NO          | now()
+ jockey_assignment_promotions            | id                             | uuid                     | NO          | gen_random_uuid()
+ jockey_assignment_promotions            | assignment_id                  | uuid                     | NO          | 
+ jockey_assignment_promotions            | promoted_at                    | timestamp with time zone | YES         | 
+ jockey_assignment_promotions            | promoted_by                    | uuid                     | YES         | 
+ jockey_assignment_promotions            | reason                         | text                     | YES         | 
+ jockey_assignment_promotions            | previous_primary_assignment_id | uuid                     | YES         | 
+ jockey_assignment_promotions            | created_at                     | timestamp with time zone | NO          | now()
+ jockey_assignment_promotions            | updated_at                     | timestamp with time zone | NO          | now()
+ jockey_assignment_standby_contracts     | id                             | uuid                     | NO          | gen_random_uuid()
+ jockey_assignment_standby_contracts     | assignment_id                  | uuid                     | NO          | 
+ jockey_assignment_standby_contracts     | contract_number                | text                     | YES         | 
+ jockey_assignment_standby_contracts     | title                          | text                     | YES         | 
+ jockey_assignment_standby_contracts     | file_url                       | text                     | YES         | 
+ jockey_assignment_standby_contracts     | file_public_id                 | text                     | YES         | 
+ jockey_assignment_standby_contracts     | file_type                      | text                     | YES         | 
+ jockey_assignment_standby_contracts     | file_name                      | text                     | YES         | 
+ jockey_assignment_standby_contracts     | signed_at                      | timestamp with time zone | YES         | 
+ jockey_assignment_standby_contracts     | uploaded_at                    | timestamp with time zone | YES         | 
+ jockey_assignment_standby_contracts     | confirmed_at                   | timestamp with time zone | YES         | 
+ jockey_assignment_standby_contracts     | rejected_at                    | timestamp with time zone | YES         | 
+ jockey_assignment_standby_contracts     | response_message               | text                     | YES         | 
+ jockey_assignment_standby_contracts     | note                           | text                     | YES         | 
+ jockey_assignment_standby_contracts     | created_at                     | timestamp with time zone | NO          | now()
+ jockey_assignment_standby_contracts     | updated_at                     | timestamp with time zone | NO          | now()
+ jockey_assignment_standby_terms         | id                             | uuid                     | NO          | gen_random_uuid()
+ jockey_assignment_standby_terms         | assignment_id                  | uuid                     | NO          | 
+ jockey_assignment_standby_terms         | agreed_terms                   | text                     | YES         | 
+ jockey_assignment_standby_terms         | meeting_note                   | text                     | YES         | 
+ jockey_assignment_standby_terms         | agreed_at                      | timestamp with time zone | YES         | 
+ jockey_assignment_standby_terms         | sent_at                        | timestamp with time zone | YES         | 
+ jockey_assignment_standby_terms         | confirmed_at                   | timestamp with time zone | YES         | 
+ jockey_assignment_standby_terms         | rejected_at                    | timestamp with time zone | YES         | 
+ jockey_assignment_standby_terms         | response_message               | text                     | YES         | 
+ jockey_assignment_standby_terms         | updated_by                     | uuid                     | YES         | 
+ jockey_assignment_standby_terms         | created_at                     | timestamp with time zone | NO          | now()
+ jockey_assignment_standby_terms         | updated_at                     | timestamp with time zone | NO          | now()
+ jockey_assignment_terms                 | id                             | uuid                     | NO          | gen_random_uuid()
+ jockey_assignment_terms                 | assignment_id                  | uuid                     | NO          | 
+ jockey_assignment_terms                 | agreed_terms                   | text                     | YES         | 
+ jockey_assignment_terms                 | meeting_note                   | text                     | YES         | 
+ jockey_assignment_terms                 | agreed_at                      | timestamp with time zone | YES         | 
+ jockey_assignment_terms                 | sent_at                        | timestamp with time zone | YES         | 
+ jockey_assignment_terms                 | confirmed_at                   | timestamp with time zone | YES         | 
+ jockey_assignment_terms                 | rejected_at                    | timestamp with time zone | YES         | 
+ jockey_assignment_terms                 | response_message               | text                     | YES         | 
+ jockey_assignment_terms                 | updated_by                     | uuid                     | YES         | 
+ jockey_assignment_terms                 | created_at                     | timestamp with time zone | NO          | now()
+ jockey_assignment_terms                 | updated_at                     | timestamp with time zone | NO          | now()
+ jockey_assignment_withdrawals           | id                             | uuid                     | NO          | gen_random_uuid()
+ jockey_assignment_withdrawals           | assignment_id                  | uuid                     | NO          | 
+ jockey_assignment_withdrawals           | initiated_by_party             | text                     | YES         | 
+ jockey_assignment_withdrawals           | initiated_by                   | uuid                     | YES         | 
+ jockey_assignment_withdrawals           | reason                         | text                     | YES         | 
+ jockey_assignment_withdrawals           | withdrawn_at                   | timestamp with time zone | YES         | 
+ jockey_assignment_withdrawals           | created_at                     | timestamp with time zone | NO          | now()
+ jockey_assignment_withdrawals           | updated_at                     | timestamp with time zone | NO          | now()
+ jockey_assignments                      | id                             | uuid                     | NO          | gen_random_uuid()
+ jockey_assignments                      | race_id                        | uuid                     | NO          | 
+ jockey_assignments                      | horse_id                       | uuid                     | NO          | 
+ jockey_assignments                      | owner_id                       | uuid                     | NO          | 
+ jockey_assignments                      | jockey_id                      | uuid                     | NO          | 
+ jockey_assignments                      | assignment_type                | text                     | NO          | 'primary'::text
+ jockey_assignments                      | backup_priority                | integer                  | YES         | 
+ jockey_assignments                      | backup_for_assignment_id       | uuid                     | YES         | 
+ jockey_assignments                      | status                         | text                     | NO          | 'meeting_invited'::text
+ jockey_assignments                      | invitation_message             | text                     | YES         | 
+ jockey_assignments                      | response_message               | text                     | YES         | 
+ jockey_assignments                      | invited_at                     | timestamp with time zone | NO          | now()
+ jockey_assignments                      | responded_at                   | timestamp with time zone | YES         | 
+ jockey_assignments                      | created_at                     | timestamp with time zone | NO          | now()
+ jockey_assignments                      | updated_at                     | timestamp with time zone | NO          | now()
+ jockey_assignments                      | deleted_at                     | timestamp with time zone | YES         | 
+ jockeys                                 | id                             | uuid                     | NO          | gen_random_uuid()
+ jockeys                                 | user_id                        | uuid                     | NO          | 
+ jockeys                                 | height                         | integer                  | YES         | 
+ jockeys                                 | weight                         | integer                  | YES         | 
+ jockeys                                 | weight_kg                      | numeric                  | YES         | 
+ jockeys                                 | experience_years               | integer                  | NO          | 0
+ jockeys                                 | license_number                 | text                     | YES         | 
+ jockeys                                 | total_races                    | integer                  | NO          | 0
+ jockeys                                 | total_wins                     | integer                  | NO          | 0
+ jockeys                                 | suspended_until                | timestamp with time zone | YES         | 
+ jockeys                                 | outstanding_fine_amount        | numeric                  | NO          | 0
+ jockeys                                 | disciplinary_status            | text                     | NO          | 'clear'::text
+ jockeys                                 | status                         | text                     | NO          | 'active'::text
+ jockeys                                 | created_at                     | timestamp with time zone | NO          | now()
+ jockeys                                 | updated_at                     | timestamp with time zone | NO          | now()
+ jockeys                                 | deleted_at                     | timestamp with time zone | YES         | 
+ notifications                           | id                             | uuid                     | NO          | gen_random_uuid()
+ notifications                           | user_id                        | uuid                     | NO          | 
+ notifications                           | title                          | text                     | NO          | 
+ notifications                           | content                        | text                     | NO          | 
+ notifications                           | type                           | text                     | YES         | 
+ notifications                           | is_read                        | boolean                  | NO          | false
+ notifications                           | created_at                     | timestamp with time zone | NO          | now()
+ notifications                           | updated_at                     | timestamp with time zone | NO          | now()
+ notifications                           | deleted_at                     | timestamp with time zone | YES         | 
+ prize_awards                            | id                             | uuid                     | NO          | gen_random_uuid()
+ prize_awards                            | prize_id                       | uuid                     | NO          | 
+ prize_awards                            | race_result_id                 | uuid                     | NO          | 
+ prize_awards                            | horse_id                       | uuid                     | NO          | 
+ prize_awards                            | owner_id                       | uuid                     | NO          | 
+ prize_awards                            | jockey_id                      | uuid                     | YES         | 
+ prize_awards                            | position                       | integer                  | YES         | 
+ prize_awards                            | amount                         | numeric                  | NO          | 0
+ prize_awards                            | gross_amount                   | numeric                  | NO          | 0
+ prize_awards                            | owner_amount                   | numeric                  | NO          | 0
+ prize_awards                            | jockey_amount                  | numeric                  | NO          | 0
+ prize_awards                            | currency                       | text                     | NO          | 'VND'::text
+ prize_awards                            | status                         | text                     | NO          | 'calculated'::text
+ prize_awards                            | awarded_at                     | timestamp with time zone | YES         | 
+ prize_awards                            | calculated_at                  | timestamp with time zone | YES         | 
+ prize_awards                            | approved_at                    | timestamp with time zone | YES         | 
+ prize_awards                            | approved_by                    | uuid                     | YES         | 
+ prize_awards                            | paid_at                        | timestamp with time zone | YES         | 
+ prize_awards                            | paid_by                        | uuid                     | YES         | 
+ prize_awards                            | created_at                     | timestamp with time zone | NO          | now()
+ prize_awards                            | updated_at                     | timestamp with time zone | NO          | now()
+ prize_awards                            | deleted_at                     | timestamp with time zone | YES         | 
+ prizes                                  | id                             | uuid                     | NO          | gen_random_uuid()
+ prizes                                  | tournament_id                  | uuid                     | NO          | 
+ prizes                                  | race_id                        | uuid                     | NO          | 
+ prizes                                  | prize_name                     | text                     | NO          | 
+ prizes                                  | position                       | integer                  | YES         | 
+ prizes                                  | amount                         | numeric                  | NO          | 0
+ prizes                                  | percent                        | numeric                  | NO          | 0
+ prizes                                  | currency                       | text                     | NO          | 'VND'::text
+ prizes                                  | description                    | text                     | YES         | 
+ prizes                                  | created_at                     | timestamp with time zone | NO          | now()
+ prizes                                  | updated_at                     | timestamp with time zone | NO          | now()
+ prizes                                  | deleted_at                     | timestamp with time zone | YES         | 
+ race_engine_runs                        | id                             | uuid                     | NO          | gen_random_uuid()
+ race_engine_runs                        | race_id                        | uuid                     | NO          | 
+ race_engine_runs                        | engine_run_id                  | text                     | NO          | 
+ race_engine_runs                        | status                         | text                     | NO          | 
+ race_engine_runs                        | started_at                     | timestamp with time zone | YES         | 
+ race_engine_runs                        | completed_at                   | timestamp with time zone | YES         | 
+ race_engine_runs                        | error                          | text                     | YES         | 
+ race_engine_runs                        | created_at                     | timestamp with time zone | NO          | now()
+ race_engine_runs                        | updated_at                     | timestamp with time zone | NO          | now()
+ race_engine_runs                        | deleted_at                     | timestamp with time zone | YES         | 
+ race_odds_market_odds                   | id                             | uuid                     | NO          | gen_random_uuid()
+ race_odds_market_odds                   | odds_market_id                 | uuid                     | NO          | 
+ race_odds_market_odds                   | horse_id                       | uuid                     | NO          | 
+ race_odds_market_odds                   | jockey_id                      | uuid                     | YES         | 
+ race_odds_market_odds                   | horse_no                       | integer                  | YES         | 
+ race_odds_market_odds                   | horse_name                     | text                     | YES         | 
+ race_odds_market_odds                   | jockey_name                    | text                     | YES         | 
+ race_odds_market_odds                   | win_probability                | numeric                  | NO          | 
+ race_odds_market_odds                   | fair_odds                      | numeric                  | NO          | 
+ race_odds_market_odds                   | game_odds                      | numeric                  | NO          | 
+ race_odds_market_odds                   | generated_game_odds            | numeric                  | YES         | 
+ race_odds_market_odds                   | probability_rank               | integer                  | NO          | 
+ race_odds_market_odds                   | fallbacks_used                 | ARRAY                    | NO          | ARRAY[]::text[]
+ race_odds_market_odds                   | created_at                     | timestamp with time zone | NO          | now()
+ race_odds_market_odds                   | updated_at                     | timestamp with time zone | NO          | now()
+ race_odds_markets                       | id                             | uuid                     | NO          | gen_random_uuid()
+ race_odds_markets                       | race_id                        | uuid                     | NO          | 
+ race_odds_markets                       | status                         | text                     | NO          | 'generated'::text
+ race_odds_markets                       | model_name                     | text                     | NO          | 'probability_engine_history_v1'::text
+ race_odds_markets                       | model_version                  | text                     | NO          | 'history_v1.0.0'::text
+ race_odds_markets                       | source                         | text                     | NO          | 'app_probability_engine_history_v1_runtime'::text
+ race_odds_markets                       | payout_factor                  | numeric                  | NO          | 0.85
+ race_odds_markets                       | model_input_version            | integer                  | NO          | 0
+ race_odds_markets                       | input_snapshot                 | jsonb                    | NO          | '{}'::jsonb
+ race_odds_markets                       | model_metrics                  | jsonb                    | NO          | '{}'::jsonb
+ race_odds_markets                       | input_diagnostics              | jsonb                    | NO          | '{}'::jsonb
+ race_odds_markets                       | generated_by                   | uuid                     | YES         | 
+ race_odds_markets                       | generated_at                   | timestamp with time zone | NO          | now()
+ race_odds_markets                       | manually_adjusted_by           | uuid                     | YES         | 
+ race_odds_markets                       | manually_adjusted_at           | timestamp with time zone | YES         | 
+ race_odds_markets                       | manual_adjustment_note         | text                     | YES         | 
+ race_odds_markets                       | created_at                     | timestamp with time zone | NO          | now()
+ race_odds_markets                       | updated_at                     | timestamp with time zone | NO          | now()
+ race_odds_markets                       | deleted_at                     | timestamp with time zone | YES         | 
+ race_prize_distribution_items           | id                             | uuid                     | NO          | gen_random_uuid()
+ race_prize_distribution_items           | race_id                        | uuid                     | NO          | 
+ race_prize_distribution_items           | position                       | integer                  | NO          | 
+ race_prize_distribution_items           | percent                        | numeric                  | YES         | 
+ race_prize_distribution_items           | amount                         | numeric                  | YES         | 
+ race_prize_distribution_items           | label                          | text                     | YES         | 
+ race_prize_distribution_items           | created_at                     | timestamp with time zone | NO          | now()
+ race_prize_distribution_items           | updated_at                     | timestamp with time zone | NO          | now()
+ race_prize_distribution_items           | deleted_at                     | timestamp with time zone | YES         | 
+ race_referees                           | id                             | uuid                     | NO          | gen_random_uuid()
+ race_referees                           | user_id                        | uuid                     | NO          | 
+ race_referees                           | license_number                 | text                     | YES         | 
+ race_referees                           | experience_years               | integer                  | NO          | 0
+ race_referees                           | status                         | text                     | NO          | 'active'::text
+ race_referees                           | created_at                     | timestamp with time zone | NO          | now()
+ race_referees                           | updated_at                     | timestamp with time zone | NO          | now()
+ race_referees                           | deleted_at                     | timestamp with time zone | YES         | 
+ race_result_applied_violations          | id                             | uuid                     | NO          | gen_random_uuid()
+ race_result_applied_violations          | race_result_id                 | uuid                     | NO          | 
+ race_result_applied_violations          | violation_id                   | uuid                     | NO          | 
+ race_result_applied_violations          | created_at                     | timestamp with time zone | NO          | now()
+ race_result_penalty_snapshot_violations | id                             | uuid                     | NO          | gen_random_uuid()
+ race_result_penalty_snapshot_violations | race_result_id                 | uuid                     | NO          | 
+ race_result_penalty_snapshot_violations | violation_id                   | uuid                     | NO          | 
+ race_result_penalty_snapshot_violations | created_at                     | timestamp with time zone | NO          | now()
+ race_results                            | id                             | uuid                     | NO          | gen_random_uuid()
+ race_results                            | race_id                        | uuid                     | NO          | 
+ race_results                            | horse_id                       | uuid                     | NO          | 
+ race_results                            | jockey_id                      | uuid                     | NO          | 
+ race_results                            | position                       | integer                  | YES         | 
+ race_results                            | finish_time                    | numeric                  | YES         | 
+ race_results                            | score                          | numeric                  | YES         | 
+ race_results                            | raw_position                   | integer                  | YES         | 
+ race_results                            | raw_finish_time                | numeric                  | YES         | 
+ race_results                            | raw_score                      | numeric                  | YES         | 
+ race_results                            | final_position                 | integer                  | YES         | 
+ race_results                            | final_finish_time              | numeric                  | YES         | 
+ race_results                            | final_score                    | numeric                  | YES         | 
+ race_results                            | penalties_applied_by           | uuid                     | YES         | 
+ race_results                            | penalties_applied_at           | timestamp with time zone | YES         | 
+ race_results                            | submitted_to_admin_by          | uuid                     | YES         | 
+ race_results                            | submitted_to_admin_at          | timestamp with time zone | YES         | 
+ race_results                            | status                         | text                     | NO          | 'draft'::text
+ race_results                            | note                           | text                     | YES         | 
+ race_results                            | correction_requested           | boolean                  | NO          | false
+ race_results                            | correction_note                | text                     | YES         | 
+ race_results                            | correction_requested_by        | uuid                     | YES         | 
+ race_results                            | correction_requested_at        | timestamp with time zone | YES         | 
+ race_results                            | correction_resolved_by         | uuid                     | YES         | 
+ race_results                            | correction_resolved_at         | timestamp with time zone | YES         | 
+ race_results                            | recorded_by                    | uuid                     | YES         | 
+ race_results                            | recorded_at                    | timestamp with time zone | YES         | 
+ race_results                            | confirmed_by                   | uuid                     | YES         | 
+ race_results                            | confirmed_at                   | timestamp with time zone | YES         | 
+ race_results                            | published_by                   | uuid                     | YES         | 
+ race_results                            | published_at                   | timestamp with time zone | YES         | 
+ race_results                            | created_at                     | timestamp with time zone | NO          | now()
+ race_results                            | updated_at                     | timestamp with time zone | NO          | now()
+ race_results                            | deleted_at                     | timestamp with time zone | YES         | 
+ race_run_finish_orders                  | id                             | uuid                     | NO          | gen_random_uuid()
+ race_run_finish_orders                  | race_run_id                    | uuid                     | NO          | 
+ race_run_finish_orders                  | horse_id                       | uuid                     | NO          | 
+ race_run_finish_orders                  | jockey_id                      | uuid                     | NO          | 
+ race_run_finish_orders                  | position                       | integer                  | NO          | 
+ race_run_finish_orders                  | finish_time                    | numeric                  | NO          | 
+ race_run_finish_orders                  | score                          | numeric                  | YES         | 
+ race_run_finish_orders                  | created_at                     | timestamp with time zone | NO          | now()
+ race_run_participants                   | id                             | uuid                     | NO          | gen_random_uuid()
+ race_run_participants                   | race_run_id                    | uuid                     | NO          | 
+ race_run_participants                   | horse_id                       | uuid                     | NO          | 
+ race_run_participants                   | jockey_id                      | uuid                     | NO          | 
+ race_run_participants                   | assignment_id                  | uuid                     | YES         | 
+ race_run_participants                   | lane                           | integer                  | YES         | 
+ race_run_participants                   | seed_position                  | integer                  | YES         | 
+ race_run_participants                   | created_at                     | timestamp with time zone | NO          | now()
+ race_runs                               | id                             | uuid                     | NO          | gen_random_uuid()
+ race_runs                               | race_id                        | uuid                     | NO          | 
+ race_runs                               | status                         | text                     | NO          | 'generated'::text
+ race_runs                               | generated_by                   | uuid                     | YES         | 
+ race_runs                               | generated_at                   | timestamp with time zone | NO          | now()
+ race_runs                               | seed                           | text                     | YES         | 
+ race_runs                               | created_at                     | timestamp with time zone | NO          | now()
+ race_runs                               | updated_at                     | timestamp with time zone | NO          | now()
+ race_runs                               | deleted_at                     | timestamp with time zone | YES         | 
+ races                                   | id                             | uuid                     | NO          | gen_random_uuid()
+ races                                   | tournament_id                  | uuid                     | NO          | 
+ races                                   | round_id                       | uuid                     | NO          | 
+ races                                   | name                           | text                     | NO          | 
+ races                                   | image_url                      | text                     | YES         | 
+ races                                   | image_public_id                | text                     | YES         | 
+ races                                   | race_no                        | integer                  | NO          | 1
+ races                                   | race_date                      | timestamp with time zone | YES         | 
+ races                                   | distance                       | integer                  | YES         | 
+ races                                   | max_participants               | integer                  | YES         | 
+ races                                   | location                       | text                     | YES         | 
+ races                                   | venue_code                     | text                     | YES         | 
+ races                                   | course                         | text                     | NO          | 'B+2'::text
+ races                                   | race_class                     | text                     | NO          | '5'::text
+ races                                   | going                          | text                     | NO          | 'Good'::text
+ races                                   | surface                        | text                     | NO          | 'Turf'::text
+ races                                   | referee_id                     | uuid                     | YES         | 
+ races                                   | registration_lock_at           | timestamp with time zone | YES         | 
+ races                                   | registration_locked            | boolean                  | NO          | false
+ races                                   | registration_slot_count        | integer                  | NO          | 0
+ races                                   | registration_slots_initialized | boolean                  | NO          | false
+ races                                   | entries_finalized_at           | timestamp with time zone | YES         | 
+ races                                   | entries_finalized_by           | uuid                     | YES         | 
+ races                                   | model_input_version            | integer                  | NO          | 0
+ races                                   | status                         | text                     | NO          | 'scheduled'::text
+ races                                   | starting_at                    | timestamp with time zone | YES         | 
+ races                                   | started_at                     | timestamp with time zone | YES         | 
+ races                                   | assignment_revision            | integer                  | NO          | 0
+ races                                   | betting_status                 | text                     | NO          | 'unavailable'::text
+ races                                   | betting_closes_at              | timestamp with time zone | YES         | 
+ races                                   | betting_market                 | jsonb                    | NO          | '{}'::jsonb
+ races                                   | entry_fee                      | numeric                  | NO          | 0
+ races                                   | entry_fee_currency             | text                     | NO          | 'VND'::text
+ races                                   | prize_pool                     | numeric                  | NO          | 0
+ races                                   | prize_currency                 | text                     | NO          | 'VND'::text
+ races                                   | created_at                     | timestamp with time zone | NO          | now()
+ races                                   | updated_at                     | timestamp with time zone | NO          | now()
+ races                                   | deleted_at                     | timestamp with time zone | YES         | 
+ redemption_histories                    | id                             | uuid                     | NO          | gen_random_uuid()
+ redemption_histories                    | user_id                        | uuid                     | NO          | 
+ redemption_histories                    | item_id                        | uuid                     | NO          | 
+ redemption_histories                    | token_spent                    | integer                  | NO          | 
+ redemption_histories                    | status                         | text                     | NO          | 'pending'::text
+ redemption_histories                    | transaction_id                 | uuid                     | YES         | 
+ redemption_histories                    | delivery_info                  | jsonb                    | YES         | 
+ redemption_histories                    | created_at                     | timestamp with time zone | NO          | now()
+ redemption_histories                    | updated_at                     | timestamp with time zone | NO          | now()
+ redemption_histories                    | deleted_at                     | timestamp with time zone | YES         | 
+ referee_reports                         | id                             | uuid                     | NO          | gen_random_uuid()
+ referee_reports                         | race_id                        | uuid                     | NO          | 
+ referee_reports                         | referee_id                     | uuid                     | NO          | 
+ referee_reports                         | report_title                   | text                     | NO          | 
+ referee_reports                         | report_content                 | text                     | YES         | 
+ referee_reports                         | race_condition                 | text                     | YES         | 
+ referee_reports                         | weather                        | text                     | YES         | 
+ referee_reports                         | track_condition                | text                     | YES         | 
+ referee_reports                         | conclusion                     | text                     | YES         | 
+ referee_reports                         | status                         | text                     | NO          | 'draft'::text
+ referee_reports                         | created_at                     | timestamp with time zone | NO          | now()
+ referee_reports                         | submitted_at                   | timestamp with time zone | YES         | 
+ referee_reports                         | updated_at                     | timestamp with time zone | NO          | now()
+ referee_reports                         | deleted_at                     | timestamp with time zone | YES         | 
+ registration_cancellation_tickets       | id                             | uuid                     | NO          | gen_random_uuid()
+ registration_cancellation_tickets       | registration_id                | uuid                     | NO          | 
+ registration_cancellation_tickets       | tournament_id                  | uuid                     | NO          | 
+ registration_cancellation_tickets       | race_id                        | uuid                     | NO          | 
+ registration_cancellation_tickets       | owner_id                       | uuid                     | NO          | 
+ registration_cancellation_tickets       | horse_id                       | uuid                     | NO          | 
+ registration_cancellation_tickets       | reason                         | text                     | NO          | 
+ registration_cancellation_tickets       | status                         | text                     | NO          | 'pending'::text
+ registration_cancellation_tickets       | refund_status                  | text                     | NO          | 'not_required'::text
+ registration_cancellation_tickets       | refund_amount_vnd              | numeric                  | NO          | 0
+ registration_cancellation_tickets       | requested_at                   | timestamp with time zone | NO          | now()
+ registration_cancellation_tickets       | reviewed_by                    | uuid                     | YES         | 
+ registration_cancellation_tickets       | reviewed_at                    | timestamp with time zone | YES         | 
+ registration_cancellation_tickets       | admin_note                     | text                     | YES         | 
+ registration_cancellation_tickets       | refund_reference               | text                     | YES         | 
+ registration_cancellation_tickets       | refund_sent_by                 | uuid                     | YES         | 
+ registration_cancellation_tickets       | refund_sent_at                 | timestamp with time zone | YES         | 
+ registration_cancellation_tickets       | owner_confirmed_at             | timestamp with time zone | YES         | 
+ registration_cancellation_tickets       | owner_confirmation_note        | text                     | YES         | 
+ registration_cancellation_tickets       | created_at                     | timestamp with time zone | NO          | now()
+ registration_cancellation_tickets       | updated_at                     | timestamp with time zone | NO          | now()
+ registration_cancellation_tickets       | deleted_at                     | timestamp with time zone | YES         | 
+ registrations                           | id                             | uuid                     | NO          | gen_random_uuid()
+ registrations                           | tournament_id                  | uuid                     | NO          | 
+ registrations                           | race_id                        | uuid                     | NO          | 
+ registrations                           | horse_id                       | uuid                     | NO          | 
+ registrations                           | owner_id                       | uuid                     | NO          | 
+ registrations                           | horse_no                       | integer                  | YES         | 
+ registrations                           | draw                           | integer                  | YES         | 
+ registrations                           | rating_snapshot                | integer                  | YES         | 
+ registrations                           | gears                          | ARRAY                    | NO          | ARRAY[]::text[]
+ registrations                           | declared_weight_kg             | numeric                  | NO          | 54.5
+ registrations                           | entry_finalized_at             | timestamp with time zone | YES         | 
+ registrations                           | entry_finalized_by             | uuid                     | YES         | 
+ registrations                           | status                         | text                     | NO          | 'pending'::text
+ registrations                           | note                           | text                     | YES         | 
+ registrations                           | admin_note                     | text                     | YES         | 
+ registrations                           | entry_fee_vnd                  | numeric                  | NO          | 0
+ registrations                           | entry_fee_token                | integer                  | NO          | 0
+ registrations                           | payment_status                 | text                     | NO          | 'not_required'::text
+ registrations                           | payment_method                 | text                     | YES         | 
+ registrations                           | payment_order_id               | text                     | YES         | 
+ registrations                           | payment_expires_at             | timestamp with time zone | YES         | 
+ registrations                           | gateway_reference_id           | text                     | YES         | 
+ registrations                           | payment_transaction_id         | uuid                     | YES         | 
+ registrations                           | payment_paid_at                | timestamp with time zone | YES         | 
+ registrations                           | payment_refunded_at            | timestamp with time zone | YES         | 
+ registrations                           | slot_reserved                  | boolean                  | NO          | false
+ registrations                           | slot_reserved_at               | timestamp with time zone | YES         | 
+ registrations                           | slot_released_at               | timestamp with time zone | YES         | 
+ registrations                           | registered_at                  | timestamp with time zone | NO          | now()
+ registrations                           | approved_by                    | uuid                     | YES         | 
+ registrations                           | approved_at                    | timestamp with time zone | YES         | 
+ registrations                           | created_at                     | timestamp with time zone | NO          | now()
+ registrations                           | updated_at                     | timestamp with time zone | NO          | now()
+ registrations                           | deleted_at                     | timestamp with time zone | YES         | 
+ reward_items                            | id                             | uuid                     | NO          | gen_random_uuid()
+ reward_items                            | name                           | text                     | NO          | 
+ reward_items                            | description                    | text                     | YES         | 
+ reward_items                            | token_price                    | integer                  | NO          | 
+ reward_items                            | stock                          | integer                  | NO          | 0
+ reward_items                            | is_active                      | boolean                  | NO          | true
+ reward_items                            | image_url                      | text                     | YES         | 
+ reward_items                            | created_by                     | uuid                     | YES         | 
+ reward_items                            | updated_by                     | uuid                     | YES         | 
+ reward_items                            | created_at                     | timestamp with time zone | NO          | now()
+ reward_items                            | updated_at                     | timestamp with time zone | NO          | now()
+ reward_items                            | deleted_at                     | timestamp with time zone | YES         | 
+ role_application_documents              | id                             | uuid                     | NO          | gen_random_uuid()
+ role_application_documents              | role_application_id            | uuid                     | NO          | 
+ role_application_documents              | type                           | text                     | YES         | 
+ role_application_documents              | url                            | text                     | YES         | 
+ role_application_documents              | public_id                      | text                     | YES         | 
+ role_application_documents              | note                           | text                     | YES         | 
+ role_application_documents              | created_at                     | timestamp with time zone | NO          | now()
+ role_applications                       | id                             | uuid                     | NO          | gen_random_uuid()
+ role_applications                       | user_id                        | uuid                     | NO          | 
+ role_applications                       | requested_role                 | text                     | NO          | 
+ role_applications                       | status                         | text                     | NO          | 'pending'::text
+ role_applications                       | application_data               | jsonb                    | NO          | '{}'::jsonb
+ role_applications                       | admin_note                     | text                     | YES         | 
+ role_applications                       | reviewed_by                    | uuid                     | YES         | 
+ role_applications                       | reviewed_at                    | timestamp with time zone | YES         | 
+ role_applications                       | created_at                     | timestamp with time zone | NO          | now()
+ role_applications                       | updated_at                     | timestamp with time zone | NO          | now()
+ role_applications                       | deleted_at                     | timestamp with time zone | YES         | 
+ roles                                   | id                             | uuid                     | NO          | gen_random_uuid()
+ roles                                   | role_name                      | text                     | NO          | 
+ roles                                   | description                    | text                     | YES         | 
+ roles                                   | created_at                     | timestamp with time zone | NO          | now()
+ roles                                   | updated_at                     | timestamp with time zone | NO          | now()
+ roles                                   | deleted_at                     | timestamp with time zone | YES         | 
+ rounds                                  | id                             | uuid                     | NO          | gen_random_uuid()
+ rounds                                  | tournament_id                  | uuid                     | NO          | 
+ rounds                                  | name                           | text                     | NO          | 
+ rounds                                  | round_order                    | integer                  | NO          | 
+ rounds                                  | description                    | text                     | YES         | 
+ rounds                                  | status                         | text                     | NO          | 'draft'::text
+ rounds                                  | created_at                     | timestamp with time zone | NO          | now()
+ rounds                                  | updated_at                     | timestamp with time zone | NO          | now()
+ rounds                                  | deleted_at                     | timestamp with time zone | YES         | 
+ tournaments                             | id                             | uuid                     | NO          | gen_random_uuid()
+ tournaments                             | name                           | text                     | NO          | 
+ tournaments                             | description                    | text                     | YES         | 
+ tournaments                             | location                       | text                     | YES         | 
+ tournaments                             | image_url                      | text                     | YES         | 
+ tournaments                             | image_public_id                | text                     | YES         | 
+ tournaments                             | start_date                     | timestamp with time zone | YES         | 
+ tournaments                             | end_date                       | timestamp with time zone | YES         | 
+ tournaments                             | status                         | text                     | NO          | 'draft'::text
+ tournaments                             | created_by                     | uuid                     | NO          | 
+ tournaments                             | created_at                     | timestamp with time zone | NO          | now()
+ tournaments                             | updated_at                     | timestamp with time zone | NO          | now()
+ tournaments                             | deleted_at                     | timestamp with time zone | YES         | 
+ transaction_histories                   | id                             | uuid                     | NO          | gen_random_uuid()
+ transaction_histories                   | user_id                        | uuid                     | NO          | 
+ transaction_histories                   | transaction_type               | text                     | NO          | 
+ transaction_histories                   | amount                         | numeric                  | NO          | 
+ transaction_histories                   | direction                      | text                     | NO          | 
+ transaction_histories                   | balance_before                 | numeric                  | NO          | 
+ transaction_histories                   | balance_after                  | numeric                  | NO          | 
+ transaction_histories                   | status                         | text                     | NO          | 'completed'::text
+ transaction_histories                   | reference_id                   | text                     | YES         | 
+ transaction_histories                   | note                           | text                     | YES         | 
+ transaction_histories                   | created_at                     | timestamp with time zone | NO          | now()
+ transaction_histories                   | updated_at                     | timestamp with time zone | NO          | now()
+ user_roles                              | id                             | uuid                     | NO          | gen_random_uuid()
+ user_roles                              | user_id                        | uuid                     | NO          | 
+ user_roles                              | role_id                        | uuid                     | NO          | 
+ user_roles                              | created_at                     | timestamp with time zone | NO          | now()
+ user_roles                              | deleted_at                     | timestamp with time zone | YES         | 
+ users                                   | id                             | uuid                     | NO          | gen_random_uuid()
+ users                                   | full_name                      | text                     | NO          | 
+ users                                   | email                          | text                     | NO          | 
+ users                                   | password                       | text                     | NO          | 
+ users                                   | phone_number                   | text                     | YES         | 
+ users                                   | date_of_birth                  | timestamp with time zone | YES         | 
+ users                                   | avatar_url                     | text                     | YES         | 
+ users                                   | avatar_public_id               | text                     | YES         | 
+ users                                   | status                         | text                     | NO          | 'active'::text
+ users                                   | email_verified                 | boolean                  | NO          | false
+ users                                   | email_verified_at              | timestamp with time zone | YES         | 
+ users                                   | email_verification_token       | text                     | YES         | 
+ users                                   | email_verification_expires_at  | timestamp with time zone | YES         | 
+ users                                   | password_reset_token           | text                     | YES         | 
+ users                                   | password_reset_expires_at      | timestamp with time zone | YES         | 
+ users                                   | password_changed_at            | timestamp with time zone | YES         | 
+ users                                   | created_at                     | timestamp with time zone | NO          | now()
+ users                                   | updated_at                     | timestamp with time zone | NO          | now()
+ users                                   | deleted_at                     | timestamp with time zone | YES         | 
+ violation_evidence_files                | id                             | uuid                     | NO          | gen_random_uuid()
+ violation_evidence_files                | violation_id                   | uuid                     | NO          | 
+ violation_evidence_files                | url                            | text                     | YES         | 
+ violation_evidence_files                | public_id                      | text                     | YES         | 
+ violation_evidence_files                | type                           | text                     | YES         | 
+ violation_evidence_files                | file_name                      | text                     | YES         | 
+ violation_evidence_files                | created_at                     | timestamp with time zone | NO          | now()
+ violation_penalties                     | id                             | uuid                     | NO          | gen_random_uuid()
+ violation_penalties                     | violation_id                   | uuid                     | NO          | 
+ violation_penalties                     | slot                           | text                     | NO          | 
+ violation_penalties                     | type                           | text                     | YES         | 
+ violation_penalties                     | score_deduction                | integer                  | NO          | 0
+ violation_penalties                     | position_delta                 | integer                  | NO          | 0
+ violation_penalties                     | time_penalty_seconds           | integer                  | NO          | 0
+ violation_penalties                     | suspension_days                | integer                  | NO          | 0
+ violation_penalties                     | fine_amount                    | numeric                  | NO          | 0
+ violation_penalties                     | disqualified                   | boolean                  | NO          | false
+ violation_penalties                     | note                           | text                     | YES         | 
+ violation_penalties                     | created_at                     | timestamp with time zone | NO          | now()
+ violation_penalties                     | updated_at                     | timestamp with time zone | NO          | now()
+ violations                              | id                             | uuid                     | NO          | gen_random_uuid()
+ violations                              | race_id                        | uuid                     | NO          | 
+ violations                              | horse_id                       | uuid                     | YES         | 
+ violations                              | jockey_id                      | uuid                     | YES         | 
+ violations                              | referee_id                     | uuid                     | NO          | 
+ violations                              | horse_check_id                 | uuid                     | YES         | 
+ violations                              | violation_type                 | text                     | NO          | 
+ violations                              | description                    | text                     | YES         | 
+ violations                              | severity                       | text                     | NO          | 'minor'::text
+ violations                              | time_marker                    | text                     | YES         | 
+ violations                              | evidence_urls                  | ARRAY                    | NO          | ARRAY[]::text[]
+ violations                              | decision                       | text                     | YES         | 
+ violations                              | deviates_from_policy           | boolean                  | NO          | false
+ violations                              | deviation_reason               | text                     | YES         | 
+ violations                              | decision_scope                 | text                     | YES         | 
+ violations                              | proposed_by                    | uuid                     | YES         | 
+ violations                              | proposed_at                    | timestamp with time zone | YES         | 
+ violations                              | status                         | text                     | NO          | 'recorded'::text
+ violations                              | decided_by                     | uuid                     | YES         | 
+ violations                              | decided_at                     | timestamp with time zone | YES         | 
+ violations                              | penalty_source                 | text                     | YES         | 
+ violations                              | policy_version                 | text                     | YES         | 
+ violations                              | discipline_applied_at          | timestamp with time zone | YES         | 
+ violations                              | discipline_applied_by          | uuid                     | YES         | 
+ violations                              | created_at                     | timestamp with time zone | NO          | now()
+ violations                              | updated_at                     | timestamp with time zone | NO          | now()
+ violations                              | deleted_at                     | timestamp with time zone | YES         | 
+ wallets                                 | id                             | uuid                     | NO          | gen_random_uuid()
+ wallets                                 | user_id                        | uuid                     | NO          | 
+ wallets                                 | token_balance                  | numeric                  | NO          | 0
+ wallets                                 | created_at                     | timestamp with time zone | NO          | now()
+ wallets                                 | updated_at                     | timestamp with time zone | NO          | now()
+ wallets                                 | deleted_at                     | timestamp with time zone | YES         | 
+(689 rows)
+

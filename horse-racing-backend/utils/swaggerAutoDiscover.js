@@ -40,14 +40,14 @@ const TAG_MAP = {
  *   - boolean  : body.field === true/false, typeof x === 'boolean'
  *   - integer  : Number(body.field) + isInteger, token_amount, bonus, stake_amount
  *   - number   : Number(body.field) + isFinite, vnd_price, price, amount
- *   - ObjectId : isObjectId(x), _id suffix, race_id / horse_id / user_id pattern
+ *   - string   : uuid-shaped id (e.g. race_id, horse_id, user_id),
  *   - array    : Array.isArray(body.field), documents, items, list
  *   - string   : default
  */
 function inferFieldType(fieldName, surroundingSource) {
   const n = fieldName.toLowerCase();
 
-  // Explicit string fields — must come before ObjectId check
+  // Explicit string fields — must come before the id check
   // These contain '_id' or look numeric but are actually string identifiers
   const explicitStrings = [
     'package_id', 'payment_method', 'method', 'type', 'status',
@@ -64,7 +64,7 @@ function inferFieldType(fieldName, surroundingSource) {
     /^is_|_active$|_public$|_verified$|^enabled$|^disabled$/.test(n)
   ) return 'boolean';
 
-  // ObjectId checks (only for pure _id suffix, not compound like package_id)
+  // UUID-shaped id checks (only for pure _id suffix, not compound like package_id)
   if (
     surroundingSource.includes(`isObjectId(body.${fieldName})`) ||
     surroundingSource.includes(`isObjectId(body['${fieldName}']`) ||
@@ -335,7 +335,7 @@ function extractPathParams(oaPath) {
     required: true,
     schema: { type: 'string' },
     description: m.slice(1, -1) === 'id'
-      ? 'MongoDB ObjectId (24-char hex)'
+      ? 'UUID primary key (36-char string)'
       : `Path parameter: ${m.slice(1, -1)}`,
   }));
 }

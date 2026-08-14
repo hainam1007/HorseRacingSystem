@@ -1,0 +1,37 @@
+# Repo-root .dockerignore used by docker compose / docker build at this path.
+# Patterns are matched against the build context root.
+
+# VCS / IDE
+.git
+.gitignore
+.gitattributes
+.vscode
+.idea
+*.swp
+*.swo
+
+# Tests / docs
+**/tests
+**/coverage
+**/*.test.js
+**/*.spec.js
+README.md
+**/README.md
+**/docs
+
+# Node artefacts — install fresh inside the image
+**/node_modules
+**/npm-debug.log
+**/yarn-error.log
+**/package-lock.json
+
+# Local env files (we pass real secrets via docker compose / --env-file)
+**/.env
+**/.env.*
+!**/.env.example
+!**/horse-racing-backend/.env.example
+
+# Local docker artefacts (not needed inside the image — Dockerfile/.dockerignore
+# themselves are excluded only when they aren't the one being built; we keep the
+# Dockerfile at horse-racing-backend/Dockerfile by excluding it explicitly here).
+**/.dockerignore

@@ -1,0 +1,77 @@
+[
+  {
+    "id": "2c33e56f-6a58-5203-811b-5c96da426cb7",
+    "horse_id": "2abfd28f-ec4a-5b20-ad84-e3c24f61eca9",
+    "gear_code": "B"
+  },
+  {
+    "id": "81f54b34-0b31-552d-b6f1-68248ab0ffe2",
+    "horse_id": "2abfd28f-ec4a-5b20-ad84-e3c24f61eca9",
+    "gear_code": "TT"
+  },
+  {
+    "id": "a7fda417-469e-5384-9c36-53f6ce58c114",
+    "horse_id": "f24d157b-7b1a-51a5-b4e1-5bcae8fd4e2a",
+    "gear_code": "V"
+  },
+  {
+    "id": "6efd5143-b661-50e5-a107-86f9c9fe1fef",
+    "horse_id": "06c1b636-94a7-5846-ba0d-37b35f0b5a86",
+    "gear_code": "B"
+  },
+  {
+    "id": "648c9716-c73e-5a21-b7de-cf93f23e6f2e",
+    "horse_id": "77773457-dafe-5c6e-ac86-0bb6052df27d",
+    "gear_code": "TT"
+  },
+  {
+    "id": "8f927366-e9f4-5ed7-b3d1-7c8edcdfeaf8",
+    "horse_id": "eaf77e79-edab-5037-a0b6-c7b7c5e14198",
+    "gear_code": "CP"
+  },
+  {
+    "id": "2148ab5d-4cb5-5b2f-8c24-b30f910e2286",
+    "horse_id": "6b094181-e78c-5f24-9c2a-f93e20b86446",
+    "gear_code": "V"
+  },
+  {
+    "id": "1541f315-00e2-52b1-83be-772f28495786",
+    "horse_id": "6b094181-e78c-5f24-9c2a-f93e20b86446",
+    "gear_code": "TT"
+  },
+  {
+    "id": "a98e9140-1e94-57a9-bc5a-41f1d45c480d",
+    "horse_id": "db624752-8ea2-5522-9b8c-c42e3bba4d29",
+    "gear_code": "B"
+  },
+  {
+    "id": "cfce9287-b23e-58f1-a240-b44aa5b4b03f",
+    "horse_id": "a1b7ecc3-c361-53ae-9d75-be542d1cbaf4",
+    "gear_code": "H"
+  },
+  {
+    "id": "031fbf3a-e85e-515d-8bfa-c394ca8951d0",
+    "horse_id": "4cc03d13-7c63-55bb-a055-2bec77380a8c",
+    "gear_code": "TT"
+  },
+  {
+    "id": "2be7c14c-1edf-58a1-8357-2a6da534c052",
+    "horse_id": "9055f70d-6b4d-5029-b095-27590dd97aae",
+    "gear_code": "V"
+  },
+  {
+    "id": "0f0a2de4-0b04-5228-bfc8-44985d97d9d7",
+    "horse_id": "4da4410a-b86a-5f3a-9fec-1b253fb4477a",
+    "gear_code": "B"
+  },
+  {
+    "id": "871c2db4-b032-5c95-a91b-b4e9400b9979",
+    "horse_id": "4da4410a-b86a-5f3a-9fec-1b253fb4477a",
+    "gear_code": "TT"
+  },
+  {
+    "id": "14f0d642-5608-5066-81a4-46b4c5e4ff59",
+    "horse_id": "8ffecdc7-02e5-5837-b012-cf3c216dd6b9",
+    "gear_code": "CP"
+  }
+]

@@ -1,4 +1,5 @@
 const ApiError = require('../utils/ApiError');
+const { Op } = require('sequelize');
 const {
   ASSIGNMENT_STATUS,
   ASSIGNMENT_TYPE,
@@ -7,15 +8,9 @@ const {
   REGISTRATION_STATUS
 } = require('../constants/statuses');
 const profileRepository = require('../repositories/profileRepository');
-const {
-  HorseCheck,
-  JockeyAssignment,
-  Race,
-  RaceResult,
-  RefereeReport,
-  Registration,
-  Violation
-} = require('../models');
+const { loadSequelizeModels } = require('../models/sequelize/index.js');
+
+function getModels() { return loadSequelizeModels().models; }
 
 function getDocumentId(value) {
   return value && (value._id || value.id || value);
@@ -131,21 +126,21 @@ async function getWorkspace(req) {
     throw new ApiError(404, 'Race referee profile not found');
   }
 
-  const races = await Race.find({ referee_id: referee._id })
-    .sort({ race_date: 1, created_at: -1 })
-    .populate('tournament_id')
-    .populate('round_id')
-    .populate({
-      path: 'referee_id',
-      populate: {
-        path: 'user_id',
-        select: 'full_name email'
+  const { Race, Registration, JockeyAssignment, HorseCheck, RaceResult, Violation, RefereeReport } = getModels();
+  const races = await Race.findAll({
+    where: { referee_id: referee._id },
+    order: [['race_date', 'ASC'], ['created_at', 'DESC']],
+    include: [
+      { model: getModels().Tournament, as: 'tournament' },
+      { model: getModels().Round, as: 'round' },
+      {
+        model: getModels().RaceReferee,
+        as: 'referee',
+        include: [{ model: getModels().User, as: 'user', attributes: ['full_name', 'email'] }]
       }
-    })
-    .lean();
-  const raceIds = races.map(function(race) {
-    return race._id;
+    ]
   });
+  const raceIds = races.map(function(race) { return race.id; });
 
   if (!raceIds.length) {
     return {
@@ -167,92 +162,113 @@ async function getWorkspace(req) {
     violations,
     refereeReports
   ] = await Promise.all([
-    Registration.find({
-      race_id: { $in: raceIds },
-      status: REGISTRATION_STATUS.APPROVED
-    })
-      .populate({
-        path: 'horse_id',
-        populate: {
-          path: 'owner_id',
-          populate: {
-            path: 'user_id',
-            select: 'full_name email'
-          }
+    Registration.findAll({
+      where: { race_id: { [Op.in]: raceIds }, status: REGISTRATION_STATUS.APPROVED },
+      include: [
+        {
+          model: getModels().Horse,
+          as: 'horse',
+          include: [{
+            model: getModels().HorseOwner,
+            as: 'owner',
+            include: [{ model: getModels().User, as: 'user', attributes: ['full_name', 'email'] }]
+          }]
+        },
+        {
+          model: getModels().HorseOwner,
+          as: 'owner',
+          include: [{ model: getModels().User, as: 'user', attributes: ['full_name', 'email'] }]
         }
-      })
-      .populate({
-        path: 'owner_id',
-        populate: {
-          path: 'user_id',
-          select: 'full_name email'
-        }
-      })
-      .sort({ registered_at: 1 })
-      .lean(),
-    JockeyAssignment.find({
-      race_id: { $in: raceIds },
-      assignment_type: ASSIGNMENT_TYPE.PRIMARY,
-      status: ASSIGNMENT_STATUS.ACCEPTED
+      ],
+      order: [['registered_at', 'ASC']]
+    }),
+    JockeyAssignment.findAll({
+      where: {
+        race_id: { [Op.in]: raceIds },
+        assignment_type: ASSIGNMENT_TYPE.PRIMARY,
+        status: ASSIGNMENT_STATUS.ACCEPTED
+      },
+      order: [['invited_at', 'DESC']],
+      include: [{
+        model: getModels().Jockey,
+        as: 'jockey',
+        include: [{ model: getModels().User, as: 'user', attributes: ['full_name', 'email'] }]
+      }]
+    }),
+    HorseCheck.findAll({
+      where: { race_id: { [Op.in]: raceIds }, referee_id: referee._id },
+      order: [['checked_at', 'DESC']]
+    }),
+    RaceResult.findAll({
+      where: { race_id: { [Op.in]: raceIds } },
+      order: [['published_at', 'DESC'], ['recorded_at', 'DESC']],
+      include: [
+        { model: getModels().Horse, as: 'horse' },
+        {
+          model: getModels().Jockey,
+          as: 'jockey',
+          include: [{ model: getModels().User, as: 'user', attributes: ['full_name', 'email'] }]
+        },
+        { model: getModels().RaceResultAppliedViolation, as: 'applied_violations' }
+      ]
+    }),
+    Violation.findAll({
+      where: { race_id: { [Op.in]: raceIds }, referee_id: referee._id },
+      order: [['created_at', 'DESC']],
+      include: [
+        { model: getModels().Horse, as: 'horse' },
+        {
+          model: getModels().Jockey,
+          as: 'jockey',
+          include: [{ model: getModels().User, as: 'user', attributes: ['full_name', 'email'] }]
+        },
+        { model: getModels().HorseCheck, as: 'horse_check' }
+      ]
+    }),
+    RefereeReport.findAll({
+      where: { race_id: { [Op.in]: raceIds }, referee_id: referee._id },
+      order: [['created_at', 'DESC']]
     })
-      .sort({ invited_at: -1 })
-      .populate({
-        path: 'jockey_id',
-        populate: {
-          path: 'user_id',
-          select: 'full_name email'
-        }
-      })
-      .lean(),
-    HorseCheck.find({
-      race_id: { $in: raceIds },
-      referee_id: referee._id
-    })
-      .sort({ checked_at: -1 })
-      .lean(),
-    RaceResult.find({ race_id: { $in: raceIds } })
-      .sort({ published_at: -1, recorded_at: -1 })
-      .populate('horse_id')
-      .populate({
-        path: 'jockey_id',
-        populate: {
-          path: 'user_id',
-          select: 'full_name email'
-        }
-      })
-      .populate('applied_violation_ids')
-      .lean(),
-    Violation.find({
-      race_id: { $in: raceIds },
-      referee_id: referee._id
-    })
-      .sort({ created_at: -1 })
-      .populate('horse_id')
-      .populate({
-        path: 'jockey_id',
-        populate: {
-          path: 'user_id',
-          select: 'full_name email'
-        }
-      })
-      .populate('horse_check_id')
-      .lean(),
-    RefereeReport.find({
-      race_id: { $in: raceIds },
-      referee_id: referee._id
-    })
-      .sort({ created_at: -1 })
-      .lean()
   ]);
-  const assignmentMap = buildAssignmentMap(assignments);
+
+  const raceRes = races.map(function(race) {
+    const plain = race.toJSON ? race.toJSON() : race;
+    return { ...plain, _id: plain.id };
+  });
+  const regRes = registrations.map(function(r) {
+    const plain = r.toJSON ? r.toJSON() : r;
+    return { ...plain, _id: plain.id };
+  });
+  const assignRes = assignments.map(function(a) {
+    const plain = a.toJSON ? a.toJSON() : a;
+    return { ...plain, _id: plain.id };
+  });
+  const checkRes = horseChecks.map(function(c) {
+    const plain = c.toJSON ? c.toJSON() : c;
+    return { ...plain, _id: plain.id };
+  });
+  const resultRes = raceResults.map(function(r) {
+    const plain = r.toJSON ? r.toJSON() : r;
+    return { ...plain, _id: plain.id };
+  });
+  const violationRes = violations.map(function(v) {
+    const plain = v.toJSON ? v.toJSON() : v;
+    return { ...plain, _id: plain.id };
+  });
+  const reportRes = refereeReports.map(function(r) {
+    const plain = r.toJSON ? r.toJSON() : r;
+    return { ...plain, _id: plain.id };
+  });
+
+  const assignmentMap = buildAssignmentMap(assignRes);
   const latestCheckMap = new Map();
   const participantsByRace = {};
 
-  horseChecks.forEach(function(horseCheck) {
+  checkRes.forEach(function(horseCheck) {
     addLatestHorseCheck(latestCheckMap, horseCheck);
   });
 
-  registrations.forEach(function(registration) {
+  regRes.forEach(function(registration) {
     const raceId = idString(registration.race_id);
 
     if (!participantsByRace[raceId]) {
@@ -264,12 +280,12 @@ async function getWorkspace(req) {
 
   return {
     referee: referee,
-    races: races,
+    races: raceRes,
     participants_by_race: participantsByRace,
-    results_by_race: groupByRace(raceResults),
-    violations_by_race: groupByRace(violations),
-    horse_checks_by_race: groupByRace(horseChecks),
-    reports_by_race: groupByRace(refereeReports)
+    results_by_race: groupByRace(resultRes),
+    violations_by_race: groupByRace(violationRes),
+    horse_checks_by_race: groupByRace(checkRes),
+    reports_by_race: groupByRace(reportRes)
   };
 }
 

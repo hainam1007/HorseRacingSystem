@@ -1,104 +1,83 @@
-const { Prize, PrizeAward } = require('../models');
+const { Op, literal } = require('sequelize');
+const { loadSequelizeModels } = require('../models/sequelize/index.js');
 
-function populateAward(query) {
-  return query
-    .populate({
-      path: 'prize_id',
-      populate: [
-        { path: 'race_id' },
-        { path: 'tournament_id' }
+function getModels() { return loadSequelizeModels().models; }
+
+function awardInclude() {
+  const { Prize, Race, Tournament, Round, RaceResult, RaceResultAppliedViolation, Horse, Jockey, HorseOwner, User } = getModels();
+  return [
+    {
+      model: Prize,
+      as: 'prize',
+      include: [{ model: Race, as: 'race' }, { model: Tournament, as: 'tournament' }]
+    },
+    {
+      model: RaceResult,
+      as: 'race_result',
+      include: [
+        { model: Race, as: 'race', include: [{ model: Tournament, as: 'tournament' }, { model: Round, as: 'round' }] },
+        { model: Horse, as: 'horse' },
+        { model: Jockey, as: 'jockey', include: [{ model: User, as: 'user', attributes: ['full_name', 'email'] }] },
+        { model: RaceResultAppliedViolation, as: 'applied_violations' }
       ]
-    })
-    .populate({
-      path: 'race_result_id',
-      populate: [
-        {
-          path: 'race_id',
-          populate: [
-            { path: 'tournament_id' },
-            { path: 'round_id' }
-          ]
-        },
-        { path: 'horse_id' },
-        {
-          path: 'jockey_id',
-          populate: { path: 'user_id', select: 'full_name email' }
-        },
-        { path: 'applied_violation_ids' }
-      ]
-    })
-    .populate('horse_id')
-    .populate({
-      path: 'owner_id',
-      populate: { path: 'user_id', select: 'full_name email' }
-    })
-    .populate({
-      path: 'jockey_id',
-      populate: { path: 'user_id', select: 'full_name email' }
-    })
-    .populate('approved_by', 'full_name email')
-    .populate('paid_by', 'full_name email');
+    },
+    { model: Horse, as: 'horse' },
+    { model: HorseOwner, as: 'owner', include: [{ model: User, as: 'user', attributes: ['full_name', 'email'] }] },
+    { model: Jockey, as: 'jockey', include: [{ model: User, as: 'user', attributes: ['full_name', 'email'] }] }
+  ];
 }
 
-async function findPrizes(filter) {
-  return Prize.find(filter || {}).sort({ position: 1, created_at: 1 });
+async function findPrizes(filter = {}) {
+  const { Prize } = getModels();
+  return Prize.findAll({ where: filter, order: [['position', 'ASC'], ['created_at', 'ASC']] });
 }
 
-async function findPrize(filter, session) {
-  const query = Prize.findOne(filter || {});
+async function findPrize(filter = {}) {
+  const { Prize } = getModels();
+  return Prize.findOne({ where: filter });
+}
 
-  if (session) {
-    query.session(session);
+async function upsertPrize(filter, data) {
+  const { Prize } = getModels();
+  let instance = await Prize.findOne({ where: filter });
+  if (instance) {
+    await instance.update(data);
+    return instance;
   }
-
-  return query;
+  return Prize.create({ ...filter, ...data });
 }
 
-async function upsertPrize(filter, data, session) {
-  return Prize.findOneAndUpdate(filter, data, {
-    new: true,
-    upsert: true,
-    runValidators: true,
-    session: session
-  });
-}
-
-async function findAwards(filter) {
-  return populateAward(PrizeAward.find(filter || {}).sort({ position: 1, created_at: 1 }));
+async function findAwards(filter = {}) {
+  const { PrizeAward } = getModels();
+  return PrizeAward.findAll({ where: filter, include: awardInclude(), order: [['position', 'ASC'], ['created_at', 'ASC']] });
 }
 
 async function findAwardById(id) {
-  return populateAward(PrizeAward.findById(id));
+  const { PrizeAward } = getModels();
+  return PrizeAward.findByPk(id, { include: awardInclude() });
 }
 
-async function findAward(filter, session) {
-  const query = PrizeAward.findOne(filter || {});
-
-  if (session) {
-    query.session(session);
-  }
-
-  return query;
+async function findAward(filter = {}) {
+  const { PrizeAward } = getModels();
+  return PrizeAward.findOne({ where: filter });
 }
 
-async function createAward(data, session) {
-  const award = new PrizeAward(data);
-
-  return award.save({ session: session });
+async function createAward(data) {
+  const { PrizeAward } = getModels();
+  return PrizeAward.create(data);
 }
 
-async function updateAwards(filter, data, session) {
-  return PrizeAward.updateMany(filter || {}, data, {
-    runValidators: true,
-    session: session
-  });
+async function updateAwards(filter, data) {
+  const { PrizeAward } = getModels();
+  return PrizeAward.update(data, { where: filter });
 }
 
 async function updateAwardById(id, data) {
-  return populateAward(PrizeAward.findByIdAndUpdate(id, data, {
-    returnDocument: 'after',
-    runValidators: true
-  }));
+  const { PrizeAward } = getModels();
+  const instance = await PrizeAward.findByPk(id);
+  if (!instance) return null;
+  await instance.update(data);
+  return PrizeAward.findByPk(id, { include: awardInclude() });
 }
 
 module.exports = {

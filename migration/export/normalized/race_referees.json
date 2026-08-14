@@ -1,0 +1,16 @@
+[
+  {
+    "id": "a478d69a-1ab5-5d27-8c18-1e909ed4d612",
+    "user_id": "b90984ff-8d05-5682-a127-db747cbc82c8",
+    "license_number": "REF-VN-2026-001",
+    "experience_years": 10,
+    "status": "active"
+  },
+  {
+    "id": "40bfac44-4e6f-5fae-ae76-f002a5c294ce",
+    "user_id": "a8c22c68-ced9-5c67-8b7c-cc3861e83c0d",
+    "license_number": "REF-VN-2026-002",
+    "experience_years": 7,
+    "status": "active"
+  }
+]

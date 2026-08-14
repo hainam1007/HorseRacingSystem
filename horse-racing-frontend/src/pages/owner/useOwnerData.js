@@ -210,8 +210,31 @@ export function useOwnerRegistrations() {
     setError("");
 
     try {
-      const data = await ownerApi.getRegistrations();
-      setRegistrations((data.registrations || []).map(toOwnerRegistration));
+      const [registrationResponse, horsesResponse, tournamentsResponse] = await Promise.all([
+        ownerApi.getRegistrations().catch(() => ({ registrations: [] })),
+        ownerApi.getHorses().catch(() => ({ horses: [] })),
+        ownerApi.getTournaments().catch(() => ({ tournaments: [] })),
+      ]);
+
+      const horsesById = new Map(
+        (horsesResponse.horses || []).map((horse) => [String(horse._id || horse.id), horse])
+      );
+      const tournamentsById = new Map(
+        (tournamentsResponse.tournaments || []).map((tournament) => [String(tournament._id || tournament.id), tournament])
+      );
+
+      // Note: We intentionally skip `getTournamentRaces()` here because that
+      // endpoint currently returns 400 for some tournaments (sequelized UUID
+      // PK mismatch). The `/api/registrations` payload already populates each
+      // registration's `race` / `tournament` / `horse` includes, so we build
+      // `racesById` from those embedded objects instead.
+      const racesById = new Map();
+
+      setRegistrations(
+        (registrationResponse.registrations || []).map((registration, index) =>
+          toOwnerRegistration(registration, index, { horsesById, racesById, tournamentsById })
+        )
+      );
     } catch (apiError) {
       setError(apiError.message || "Unable to load registrations.");
       setRegistrations([]);

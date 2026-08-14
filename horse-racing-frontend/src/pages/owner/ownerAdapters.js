@@ -133,7 +133,12 @@ export function toHorsePayload(form) {
 
 function getName(value, fallback = "Unknown") {
   if (!value) return fallback;
-  if (typeof value === "string") return value;
+  if (typeof value === "string") {
+    if (isUuidLike(value) || isUuidLike(value.split("/").pop())) {
+      return fallback;
+    }
+    return value;
+  }
   return value.full_name || value.name || value.email || fallback;
 }
 
@@ -158,6 +163,12 @@ function getDisplayDate(value, fallback = "Date unavailable") {
   return date.toLocaleDateString("en-US", { month: "short", day: "2-digit", year: "numeric" });
 }
 
+function isUuidLike(value) {
+  if (!value) return false;
+  const text = String(value);
+  return /[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/i.test(text);
+}
+
 function getTimeLabel(value) {
   if (value === undefined || value === null || value === "") return "-";
   const numericValue = Number(value);
@@ -170,7 +181,9 @@ function getTimeLabel(value) {
 }
 
 export function toOwnerJockey(apiJockey, index = 0) {
-  const user = apiJockey.user_id || apiJockey.user || {};
+  const user = (typeof apiJockey.user === "object" && apiJockey.user)
+    ? apiJockey.user
+    : (typeof apiJockey.user_id === "object" && apiJockey.user_id ? apiJockey.user_id : {});
   const races = apiJockey.total_races || apiJockey.races || 0;
   const wins = apiJockey.total_wins || apiJockey.wins || 0;
   const availableForRace = apiJockey.available_for_race ?? apiJockey.availableForRace;
@@ -214,7 +227,9 @@ export function toOwnerTournament(apiTournament, index = 0) {
 }
 
 export function toOwnerRaceOption(apiRace, index = 0) {
-  const round = apiRace.round_id || apiRace.round || {};
+  const round = (typeof apiRace.round === "object" && apiRace.round)
+    ? apiRace.round
+    : (typeof apiRace.round_id === "object" && apiRace.round_id ? apiRace.round_id : {});
   const raceDate = apiRace.race_date ? new Date(apiRace.race_date) : null;
   const hasRaceDate = raceDate && !Number.isNaN(raceDate.getTime());
   const lockDate = apiRace.registration_lock_at ? new Date(apiRace.registration_lock_at) : null;
@@ -282,21 +297,69 @@ function getRegistrationStatus(status) {
   return "Pending";
 }
 
-export function toOwnerRegistration(apiRegistration, index = 0) {
-  const horse = apiRegistration.horse_id || apiRegistration.horse || {};
-  const race = apiRegistration.race_id || apiRegistration.race || {};
-  const tournament = apiRegistration.tournament_id || apiRegistration.tournament || race.tournament_id || {};
+function resolveEntity(value, lookupMap, fallbackKeys = ["name"]) {
+  if (!value) return null;
+
+  if (typeof value === "string") {
+    const fromMap = lookupMap?.get?.(String(value));
+    if (fromMap && typeof fromMap === "object") return fromMap;
+    return null;
+  }
+
+  if (typeof value === "object") {
+    const id = value._id || value.id;
+    if ((!value.name || value.name === "") && id && lookupMap) {
+      const fromMap = lookupMap.get(String(id));
+      if (fromMap) return { ...fromMap, ...value };
+    }
+    return value;
+  }
+
+  return null;
+}
+
+export function toOwnerRegistration(apiRegistration, index = 0, context = {}) {
+  const lookup = context || {};
+  const horsesById = lookup.horsesById;
+  const racesById = lookup.racesById;
+  const tournamentsById = lookup.tournamentsById;
+
+  const horseRaw = (typeof apiRegistration.horse === "object" && apiRegistration.horse)
+    ? apiRegistration.horse
+    : apiRegistration.horse_id;
+  const raceRaw = (typeof apiRegistration.race === "object" && apiRegistration.race)
+    ? apiRegistration.race
+    : apiRegistration.race_id;
+  const resolvedRace = resolveEntity(raceRaw, racesById) || {};
+  const tournamentRaw =
+    (typeof apiRegistration.tournament === "object" && apiRegistration.tournament)
+      ? apiRegistration.tournament
+      : (apiRegistration.tournament_id
+        || (resolvedRace && (resolvedRace.tournament_id || resolvedRace.tournament))
+        || null);
+
+  const horse = resolveEntity(horseRaw, horsesById) || {};
+  const race = resolvedRace;
+  const tournament = resolveEntity(tournamentRaw, tournamentsById) || (typeof resolvedRace.tournament === "object" ? resolvedRace.tournament : {}) || {};
+
+  const horseId = (typeof horseRaw === "string" ? horseRaw : horse._id || horse.id) || apiRegistration.horse_id;
+  const raceId = (typeof raceRaw === "string" ? raceRaw : race._id || race.id) || apiRegistration.race_id;
+  const tournamentId =
+    (typeof tournamentRaw === "string" ? tournamentRaw : tournament._id || tournament.id) || apiRegistration.tournament_id;
+
   const registeredAt = apiRegistration.registered_at || apiRegistration.created_at || apiRegistration.updated_at;
   const date = registeredAt && !Number.isNaN(new Date(registeredAt).getTime())
     ? new Date(registeredAt).toISOString().slice(0, 10)
     : "Pending date";
 
+  const horseName = horse.name && !isUuidLike(horse.name) ? horse.name : `Horse ${index + 1}`;
+
   return {
     id: apiRegistration._id || apiRegistration.id || `REG-${index + 1}`,
-    horseId: horse._id || horse.id || apiRegistration.horse_id,
-    raceId: race._id || race.id || apiRegistration.race_id,
-    tournamentId: tournament._id || tournament.id || apiRegistration.tournament_id,
-    horse: horse.name || `Horse ${index + 1}`,
+    horseId,
+    raceId,
+    tournamentId,
+    horse: horseName,
     race: race.name || "Race pending",
     tournament: tournament.name || "Tournament pending",
     submitted: date,
@@ -349,14 +412,37 @@ function nestedId(value) {
 }
 
 function assignmentJockeyName(assignment) {
-  const jockey = assignment?.jockey_id || assignment?.jockey;
-  if (!jockey || typeof jockey === "string") return "Assignment unavailable";
+  const jockey = (typeof assignment?.jockey === "object" && assignment?.jockey)
+    ? assignment.jockey
+    : (typeof assignment?.jockey_id === "object" && assignment?.jockey_id ? assignment.jockey_id : null);
+  if (!jockey) return "Assignment unavailable";
 
-  return jockey.name
+  const user = (typeof jockey.user === "object" && jockey.user)
+    ? jockey.user
+    : (typeof jockey.user_id === "object" && jockey.user_id ? jockey.user_id : {});
+  const name = user.full_name
+    || user.name
+    || user.email
     || jockey.full_name
-    || jockey.user_id?.full_name
-    || jockey.user_id?.email
+    || jockey.name
     || "Assignment unavailable";
+
+  const status = String(assignment?.status || "").toLowerCase();
+  if (!status || status === "accepted") return name;
+  if (status === "pending" || status === "meeting_invited") return `${name} (Pending)`;
+  if (status === "declined") return `${name} (Declined)`;
+  if (status === "cancelled" || status === "canceled") return `${name} (Cancelled)`;
+  if (status === "withdrawn") return `${name} (Withdrawn)`;
+  return `${name} (${status.replace(/_/g, " ")})`;
+}
+
+export function findPrimaryAssignmentForRegistration(assignments, registration) {
+  return (assignments || []).find((assignment) => {
+    const type = assignment.assignment_type || "primary";
+    return type === "primary"
+      && nestedId(assignment.race_id || assignment.race) === nestedId(registration.raceId)
+      && nestedId(assignment.horse_id || assignment.horse) === nestedId(registration.horseId);
+  });
 }
 
 export function findAcceptedPrimaryAssignment(assignments, registration) {
@@ -403,13 +489,35 @@ export function toOwnerScheduleEntry(registration, assignment = null) {
 }
 
 export function toOwnerPrizeAward(apiAward, index = 0) {
-  const result = apiAward?.race_result_id || apiAward?.race_result || {};
-  const prize = apiAward?.prize_id || apiAward?.prize || {};
-  const race = result.race_id || result.race || prize.race_id || prize.race || {};
-  const tournament = race.tournament_id || race.tournament || prize.tournament_id || prize.tournament || {};
-  const round = race.round_id || race.round || {};
-  const horse = apiAward?.horse_id || result.horse_id || result.horse || {};
-  const jockey = apiAward?.jockey_id || result.jockey_id || result.jockey || {};
+  const result = (typeof apiAward?.race_result === "object" && apiAward?.race_result)
+    ? apiAward.race_result
+    : (apiAward?.race_result_id || {});
+  const prize = (typeof apiAward?.prize === "object" && apiAward?.prize)
+    ? apiAward.prize
+    : (apiAward?.prize_id || {});
+  const race = (typeof result.race === "object" && result.race)
+    ? result.race
+    : (typeof result.race_id === "object" && result.race_id ? result.race_id
+      : (typeof prize.race === "object" && prize.race ? prize.race
+        : (typeof prize.race_id === "object" && prize.race_id ? prize.race_id : {})));
+  const tournament = (typeof race.tournament === "object" && race.tournament)
+    ? race.tournament
+    : (typeof race.tournament_id === "object" && race.tournament_id ? race.tournament_id
+      : (typeof prize.tournament === "object" && prize.tournament ? prize.tournament
+        : (typeof prize.tournament_id === "object" && prize.tournament_id ? prize.tournament_id : {})));
+  const round = (typeof race.round === "object" && race.round)
+    ? race.round
+    : (typeof race.round_id === "object" && race.round_id ? race.round_id : {});
+  const horse = (typeof apiAward?.horse === "object" && apiAward?.horse)
+    ? apiAward.horse
+    : (apiAward?.horse_id
+      || (typeof result.horse === "object" && result.horse ? result.horse
+        : (typeof result.horse_id === "object" && result.horse_id ? result.horse_id : {})));
+  const jockey = (typeof apiAward?.jockey === "object" && apiAward?.jockey)
+    ? apiAward.jockey
+    : (apiAward?.jockey_id
+      || (typeof result.jockey === "object" && result.jockey ? result.jockey
+        : (typeof result.jockey_id === "object" && result.jockey_id ? result.jockey_id : {})));
   const violations = Array.isArray(result.applied_violation_ids) ? result.applied_violation_ids : [];
   const finalPosition = result.final_position ?? result.position ?? apiAward?.position ?? null;
   const rawPosition = result.raw_position ?? result.position ?? apiAward?.position ?? null;
@@ -430,7 +538,7 @@ export function toOwnerPrizeAward(apiAward, index = 0) {
     tournamentName: tournament.name || "Tournament unavailable",
     roundName: getName(round, "Round unavailable"),
     horseName: horse.name || `Horse ${index + 1}`,
-    jockeyName: getName(jockey.user_id || jockey.user || jockey, "Jockey unavailable"),
+    jockeyName: getName(jockey && jockey.user ? jockey.user : (typeof jockey === "object" && jockey) || jockey, "Jockey unavailable"),
     awardStatus: titleCaseStatus(apiAward?.status || "calculated"),
     resultStatus: titleCaseStatus(result.status || "published"),
     date: getDisplayDate(race.race_date || result.created_at || apiAward?.awarded_at || apiAward?.calculated_at),

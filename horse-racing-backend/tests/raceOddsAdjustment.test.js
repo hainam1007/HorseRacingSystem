@@ -1,6 +1,6 @@
 const assert = require('node:assert/strict');
 const test = require('node:test');
-const mongoose = require('mongoose');
+const { newObjectId } = require('../utils/objectId');
 
 const betRepository = require('../repositories/betRepository');
 const raceOddsMarketRepository = require('../repositories/raceOddsMarketRepository');
@@ -27,7 +27,7 @@ function runValidator(body) {
 }
 
 test('manual odds validator rejects duplicates and unsafe odds', function() {
-  const horseId = new mongoose.Types.ObjectId().toString();
+  const horseId = newObjectId().toString();
   const result = runValidator({
     odds: [
       { horse_id: horseId, game_odds: 1 },
@@ -41,14 +41,14 @@ test('manual odds validator rejects duplicates and unsafe odds', function() {
 });
 
 test('admin adjusts final game odds while generated model values remain unchanged', async function() {
-  const raceId = new mongoose.Types.ObjectId();
-  const adminId = new mongoose.Types.ObjectId();
-  const horseIds = [new mongoose.Types.ObjectId(), new mongoose.Types.ObjectId()];
+  const raceId = newObjectId();
+  const adminId = newObjectId();
+  const horseIds = [newObjectId(), newObjectId()];
   const market = {
     status: 'generated',
     odds: horseIds.map(function(horseId, index) {
       return {
-        _id: new mongoose.Types.ObjectId(),
+        _id: newObjectId(),
         horse_id: horseId,
         horse_no: index + 1,
         horse_name: 'Runner ' + (index + 1),
@@ -95,8 +95,8 @@ test('manual odds adjustment is blocked after betting opens', async function() {
 
   await assert.rejects(
     raceOddsService.updateRaceOdds(
-      { user: { _id: new mongoose.Types.ObjectId() } },
-      new mongoose.Types.ObjectId(),
+      { user: { _id: newObjectId() } },
+      newObjectId(),
       { odds: [] }
     ),
     function(error) { return error.statusCode === 409; }

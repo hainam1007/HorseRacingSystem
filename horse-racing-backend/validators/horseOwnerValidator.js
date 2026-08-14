@@ -1,7 +1,7 @@
 const ApiError = require('../utils/ApiError');
 const { HORSE_GEAR_CODES } = require('../constants/raceModelInput');
 
-const OBJECT_ID_PATTERN = /^[0-9a-fA-F]{24}$/;
+const OBJECT_ID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 function getString(value) {
   if (typeof value !== 'string') {

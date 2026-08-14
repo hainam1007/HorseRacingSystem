@@ -2,7 +2,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const test = require('node:test');
-const mongoose = require('mongoose');
+const { newObjectId } = require('../utils/objectId');
 
 const betRepository = require('../repositories/betRepository');
 const raceOddsMarketRepository = require('../repositories/raceOddsMarketRepository');
@@ -48,8 +48,8 @@ test('potential payout uses stake multiplied by game odds rounded to cents', () 
 });
 
 test('winning bet requires same horse and official final position', () => {
-  const winningHorseId = new mongoose.Types.ObjectId();
-  const losingHorseId = new mongoose.Types.ObjectId();
+  const winningHorseId = newObjectId();
+  const losingHorseId = newObjectId();
   const officialResult = {
     horse_id: winningHorseId,
     final_position: 1
@@ -72,7 +72,7 @@ test('winning bet requires same horse and official final position', () => {
 });
 
 test('pre-race exclusion is refundable, but post-start exclusion is not', () => {
-  const horseId = new mongoose.Types.ObjectId();
+  const horseId = newObjectId();
   const bet = { predicted_horse_id: horseId };
   const startedAt = new Date('2026-07-25T10:00:00.000Z');
   const race = { started_at: startedAt };
@@ -101,10 +101,10 @@ test('pre-race exclusion is refundable, but post-start exclusion is not', () => 
 });
 
 test('failed bet creation refunds wallet and writes refund audit log', async () => {
-  const userId = new mongoose.Types.ObjectId();
-  const raceId = new mongoose.Types.ObjectId();
-  const horseId = new mongoose.Types.ObjectId();
-  const marketId = new mongoose.Types.ObjectId();
+  const userId = newObjectId();
+  const raceId = newObjectId();
+  const horseId = newObjectId();
+  const marketId = newObjectId();
   const logs = [];
   let refundAmount = 0;
 

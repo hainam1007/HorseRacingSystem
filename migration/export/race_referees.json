@@ -1,0 +1,16 @@
+[
+  {
+    "_id": "6a6ad6e3b9b0bd29ca7b9695",
+    "user_id": "6a6ad6e3b9b0bd29ca7b9693",
+    "license_number": "REF-VN-2026-001",
+    "experience_years": 10,
+    "status": "active"
+  },
+  {
+    "_id": "6a6ad6e3b9b0bd29ca7b9698",
+    "user_id": "6a6ad6e3b9b0bd29ca7b9696",
+    "license_number": "REF-VN-2026-002",
+    "experience_years": 7,
+    "status": "active"
+  }
+]

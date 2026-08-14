@@ -1,0 +1,21 @@
+[
+  {
+    "_id": "6a6ad88c7fc3aad02f5a10f3",
+    "user_id": "6a6ad82c7fc3aad02f5a10f0",
+    "requested_role": "horse_owner",
+    "status": "approved",
+    "application_data": {
+      "stable_name": "Da Lat Stable",
+      "address": "16 Dong Da, Xuan Huong, Da Lat",
+      "license_number": "00C-102",
+      "ownership_type": "individual",
+      "tax_id": "192"
+    },
+    "documents": [],
+    "created_at": "2026-07-30T04:52:28.798Z",
+    "updated_at": "2026-07-30T04:53:01.267Z",
+    "admin_note": "",
+    "reviewed_at": "2026-07-30T04:53:01.267Z",
+    "reviewed_by": "6a6ad6e1b9b0bd29ca7b9670"
+  }
+]

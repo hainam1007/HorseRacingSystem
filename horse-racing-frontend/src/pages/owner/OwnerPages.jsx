@@ -36,7 +36,7 @@ import {
 import LoadingSkeleton from "../../components/LoadingSkeleton.jsx";
 import { ownerApi } from "../../api/ownerApi";
 import { readFileAsDataUri } from "../../utils/fileData";
-import { canRequestRegistrationCancellation, findAcceptedPrimaryAssignment, toHorsePayload, toOwnerJockey, toOwnerProfilePayload, toOwnerRaceOption, toOwnerScheduleEntry } from "./ownerAdapters";
+import { canRequestRegistrationCancellation, findAcceptedPrimaryAssignment, findPrimaryAssignmentForRegistration, toHorsePayload, toOwnerJockey, toOwnerProfilePayload, toOwnerRaceOption, toOwnerScheduleEntry } from "./ownerAdapters";
 import { useOwnerCancellationTickets, useOwnerHorse, useOwnerHorseApprovalStatus, useOwnerHorses, useOwnerJockeyAssignments, useOwnerJockeys, useOwnerPrizeAwards, useOwnerProfile, useOwnerRegistrations, useOwnerTournaments } from "./useOwnerData";
 
 const statusClass = (status) => {
@@ -119,6 +119,7 @@ const getJockeyAvailabilityReason = (jockey) => {
 };
 
 const isMongoObjectId = (value) => /^[a-f\d]{24}$/i.test(String(value || ""));
+const isUuidLike = (value) => /^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i.test(String(value || ""));
 
 // Keep an owner's open invitation workspace in sync with jockey responses without
 // interrupting the form they may be completing. This also works when the jockey
@@ -127,7 +128,7 @@ const ASSIGNMENT_REFRESH_INTERVAL_MS = 5000;
 
 const compactRecordCode = (prefix, value) => {
   if (!value) return prefix;
-  if (isMongoObjectId(value)) return `${prefix}-${String(value).slice(-6).toUpperCase()}`;
+  if (isMongoObjectId(value) || isUuidLike(value)) return `${prefix}-${String(value).slice(-6).toUpperCase()}`;
   return value;
 };
 
@@ -3200,7 +3201,8 @@ function OwnerSchedule() {
   const ownerSchedule = registrations
     .map((registration) => toOwnerScheduleEntry(
       registration,
-      findAcceptedPrimaryAssignment(assignments, registration)
+      findPrimaryAssignmentForRegistration(assignments, registration)
+        ?? findAcceptedPrimaryAssignment(assignments, registration)
     ))
     .sort((first, second) => {
       const firstDate = first.date && first.date !== "Date unavailable" ? new Date(first.date).getTime() : Number.POSITIVE_INFINITY;
@@ -3289,7 +3291,7 @@ function OwnerSchedule() {
                   <strong>{race.clock}</strong>
                 </div>
                 <div className="owner-schedule-slot__race">
-                  <span className="owner-kicker">{race.round && race.round !== "Round unavailable" && !isMongoObjectId(race.round) ? race.round : "Race day"}</span>
+                  <span className="owner-kicker">{race.round && race.round !== "Round unavailable" && !isMongoObjectId(race.round) && !isUuidLike(race.round) ? race.round : "Race day"}</span>
                   <h3>{race.race}</h3>
                   <small><MapPin size={13} /> {race.venue}</small>
                 </div>
