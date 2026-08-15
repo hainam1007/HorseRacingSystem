@@ -196,19 +196,30 @@ const lockedRaceStatuses = [
 const normalizeAssignmentRecord = (item) => {
   if (!item) return item;
 
-  if (item.status === "pending") {
-    return { ...item, source_status: item.status, status: "meeting_invited" };
+  // The Sequelize API returns eager-loaded entities as `horse`, `jockey`, and
+  // `race` with an `id`. The owner workspace still reads the legacy Mongo
+  // shape (`*_id` and `_id`), so normalize both response formats here.
+  const normalized = {
+    ...item,
+    _id: item._id || item.id,
+    horse_id: item.horse || item.horse_id,
+    jockey_id: item.jockey || item.jockey_id,
+    race_id: item.race || item.race_id,
+  };
+
+  if (normalized.status === "pending") {
+    return { ...normalized, source_status: normalized.status, status: "meeting_invited" };
   }
-  if (item.status === "rejected") {
-    return { ...item, source_status: item.status, status: "meeting_rejected" };
+  if (normalized.status === "rejected") {
+    return { ...normalized, source_status: normalized.status, status: "meeting_rejected" };
   }
-  if (item.assignment_type === "backup" && item.status === "terms_pending_confirmation") {
-    return { ...item, source_status: item.status, status: "standby_terms_pending_confirmation" };
+  if (normalized.assignment_type === "backup" && normalized.status === "terms_pending_confirmation") {
+    return { ...normalized, source_status: normalized.status, status: "standby_terms_pending_confirmation" };
   }
-  if (item.assignment_type === "backup" && ["terms_agreed", "contract_uploaded", "accepted"].includes(item.status)) {
-    return { ...item, source_status: item.status, status: "standby_confirmed" };
+  if (normalized.assignment_type === "backup" && ["terms_agreed", "contract_uploaded", "accepted"].includes(normalized.status)) {
+    return { ...normalized, source_status: normalized.status, status: "standby_confirmed" };
   }
-  return item;
+  return normalized;
 };
 
 const isAssignmentRaceLocked = (item) => {
@@ -228,7 +239,14 @@ const withdrawableAssignmentStatuses = [
 const assignmentPartyName = (party, fallback) => {
   if (!party) return fallback;
   if (typeof party === "string") return fallback;
-  return party.name || party.user_id?.full_name || party.user_id?.email || fallback;
+  return party.name
+    || party.full_name
+    || party.user?.full_name
+    || party.user_id?.full_name
+    || party.email
+    || party.user?.email
+    || party.user_id?.email
+    || fallback;
 };
 
 const PageHeader = ({ eyebrow, title, copy, action }) => (
@@ -511,7 +529,13 @@ function OwnerHorseForm({ mode = "new" }) {
           payload.image_file_data = imageFileData;
         }
         const data = await ownerApi.createHorse(payload);
-        navigate(`/owner/horses/${data.horse._id}`, { replace: true });
+        // Sequelize returns `id`, while the legacy Mongo response used `_id`.
+        // Use either form so the detail page never receives an undefined ID.
+        const createdHorseId = data.horse?.id || data.horse?._id;
+        if (!createdHorseId) {
+          throw new Error("Horse was created but its ID was not returned by the server.");
+        }
+        navigate(`/owner/horses/${createdHorseId}`, { replace: true });
       }
     } catch (apiError) {
       setError(apiError.message || "Unable to save horse profile.");

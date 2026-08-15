@@ -94,7 +94,12 @@ function projectUpdate(update) {
     if (!update) return {};
     const set = update.$set || {};
     const unset = update.$unset || {};
-    const fields = { ...set };
+    // Most migrated services pass a plain update object, while a few legacy
+    // paths still use {$set, $unset}. Preserve both forms instead of silently
+    // dropping plain fields such as betting_status.
+    const fields = { ...update, ...set };
+    delete fields.$set;
+    delete fields.$unset;
     for (const k of Object.keys(unset)) fields[k] = null;
     return fields;
 }

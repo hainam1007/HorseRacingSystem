@@ -10,7 +10,10 @@ const NEUTRAL_FINISH_AVG = 8;
 const DEFAULT_DAYS_SINCE_LAST_RACE = 365;
 
 function documentId(value) {
-  return value && (value._id || value);
+  // The PostgreSQL/Sequelize models expose `id`, while the legacy Mongo
+  // adapters expose `_id`.  Returning the model instance here makes Op.in
+  // receive an invalid value (and causes odds generation to fail with 500).
+  return value && (value._id || value.id || value);
 }
 
 function idString(value) {

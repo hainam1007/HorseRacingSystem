@@ -211,16 +211,21 @@ function buildAssignmentWhere(filter) {
     const { Op } = require('sequelize');
     const where = {};
     Object.keys(filter).forEach((key) => {
-        if (key === 'status') {
-            const v = filter[key];
-            if (v && typeof v === 'object' && v.$in) {
-                where[key] = { [Op.in]: v.$in };
-            } else {
-                where[key] = v;
+        const value = filter[key];
+        const sequelizeKey = key === '_id' ? 'id' : key;
+
+        if (value && typeof value === 'object' && !Array.isArray(value)) {
+            if (value.$in !== undefined) {
+                where[sequelizeKey] = { [Op.in]: value.$in };
+                return;
             }
-        } else {
-            where[key] = filter[key];
+            if (value.$ne !== undefined) {
+                where[sequelizeKey] = { [Op.ne]: value.$ne };
+                return;
+            }
         }
+
+        where[sequelizeKey] = value;
     });
     return where;
 }

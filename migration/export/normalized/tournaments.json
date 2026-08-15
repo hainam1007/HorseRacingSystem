@@ -48,10 +48,10 @@
     "image_public_id": "horse-racing/tournaments/wz559yt1wcyv9nybpgt6",
     "start_date": "2026-08-11T00:00:00.000Z",
     "end_date": "2026-08-11T00:00:00.000Z",
-    "status": "active",
+    "status": "deleted",
     "created_by": "2a999561-9019-5bf2-b7d0-f4aa6d745285",
     "created_at": "2026-08-11T04:35:18.810Z",
-    "updated_at": "2026-08-11T04:44:14.085Z"
+    "updated_at": "2026-08-14T18:41:10.601Z"
   },
   {
     "id": "a76f8076-35ab-5ee0-882a-f29d16a711c1",
@@ -98,9 +98,23 @@
     "image_public_id": "horse-racing/tournaments/apnrkgp0kgmfycfzprmz",
     "start_date": "2026-08-13T00:00:00.000Z",
     "end_date": "2026-08-15T00:00:00.000Z",
-    "status": "active",
+    "status": "completed",
     "created_by": "2a999561-9019-5bf2-b7d0-f4aa6d745285",
     "created_at": "2026-08-13T04:15:15.772Z",
-    "updated_at": "2026-08-13T04:15:30.146Z"
+    "updated_at": "2026-08-14T13:06:22.897Z"
+  },
+  {
+    "id": "1deca7eb-f079-5318-9ce7-c155cd51480c",
+    "name": "sdfd",
+    "description": "",
+    "location": "HCs",
+    "image_url": "https://res.cloudinary.com/dmhvxebg9/image/upload/v1786712556/horse-racing/tournaments/ygbuit8i3df4enlkxdhz.png",
+    "image_public_id": "horse-racing/tournaments/ygbuit8i3df4enlkxdhz",
+    "start_date": "2026-08-14T00:00:00.000Z",
+    "end_date": "2026-08-22T00:00:00.000Z",
+    "status": "deleted",
+    "created_by": "2a999561-9019-5bf2-b7d0-f4aa6d745285",
+    "created_at": "2026-08-14T13:02:37.620Z",
+    "updated_at": "2026-08-14T13:02:47.822Z"
   }
 ]

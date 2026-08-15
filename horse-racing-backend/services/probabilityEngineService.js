@@ -33,6 +33,12 @@ function getTimeoutMs() {
   return Number.isFinite(value) && value > 0 ? value : 30000;
 }
 
+function wait(ms) {
+  return new Promise(function(resolve) {
+    setTimeout(resolve, ms);
+  });
+}
+
 async function ensureRuntimeExists(runtimeDirectory) {
   if (!fs.existsSync(path.join(runtimeDirectory, 'engine', 'probability_engine.py'))) {
     throw new ApiError(500, 'Probability engine runtime is not available');
@@ -112,17 +118,31 @@ async function predictRaceHttp(payload) {
     throw new ApiError(500, 'PROBABILITY_ENGINE_URL is required when PROBABILITY_ENGINE_MODE=http');
   }
 
-  try {
-    return unwrapPredictionResponse(await postJson(engineUrl, payload));
-  } catch (error) {
-    if (error instanceof ApiError) {
-      throw error;
+  let lastError;
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    try {
+      return unwrapPredictionResponse(await postJson(engineUrl, payload));
+    } catch (error) {
+      lastError = error;
+      const upstreamStatus = error && error.details && Number(error.details.status_code);
+      if (!(error instanceof ApiError) || ![502, 503].includes(upstreamStatus) || attempt === 2) {
+        break;
+      }
+      await wait(1500 * (attempt + 1));
     }
-
-    throw new ApiError(502, 'Probability engine HTTP prediction failed', {
-      message: String(error.message || error).slice(0, 2000)
-    });
   }
+
+  if (lastError instanceof ApiError) {
+    const upstreamStatus = lastError.details && Number(lastError.details.status_code);
+    if (upstreamStatus === 503) {
+      throw new ApiError(503, 'Probability engine is temporarily unavailable. Please retry in a moment.', lastError.details);
+    }
+    throw lastError;
+  }
+
+  throw new ApiError(502, 'Probability engine HTTP prediction failed', {
+    message: String(lastError && (lastError.message || lastError) || 'Unknown engine error').slice(0, 2000)
+  });
 }
 
 async function predictRaceLocal(payload) {

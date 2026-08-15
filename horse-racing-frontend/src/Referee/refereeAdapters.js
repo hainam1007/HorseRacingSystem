@@ -9,7 +9,11 @@ export function getId(value) {
 }
 
 function getUserName(value, fallback) {
-  const user = value?.user_id || value?.user;
+  // `user_id` is usually just a UUID while `user` is the eagerly loaded
+  // profile. Prefer the object so full_name is not masked by the ID.
+  const user = value?.user && typeof value.user === "object"
+    ? value.user
+    : (value?.user_id && typeof value.user_id === "object" ? value.user_id : null);
   return user?.full_name || value?.full_name || value?.name || fallback;
 }
 
@@ -55,10 +59,14 @@ function formatDateTime(value) {
 
 function adaptParticipant(item) {
   const registration = item.registration || item;
-  const horse = item.horse || registration.horse_id || {};
-  const owner = item.owner || registration.owner_id || horse.owner_id || {};
+  const horse = item.horse && typeof item.horse === "object" ? item.horse : (registration.horse && typeof registration.horse === "object" ? registration.horse : {});
+  const owner = item.owner && typeof item.owner === "object"
+    ? item.owner
+    : (registration.owner && typeof registration.owner === "object" ? registration.owner : (horse.owner && typeof horse.owner === "object" ? horse.owner : {}));
   const assignment = item.assignment || null;
-  const jockey = assignment?.jockey_id || {};
+  const jockey = item.jockey && typeof item.jockey === "object"
+    ? item.jockey
+    : (assignment?.jockey && typeof assignment.jockey === "object" ? assignment.jockey : {});
 
   return {
     registrationId: getId(registration),

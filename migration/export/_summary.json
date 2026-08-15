@@ -5,7 +5,7 @@
   },
   "races": {
     "count": 18,
-    "bytes": 32491
+    "bytes": 32487
   },
   "race_referees": {
     "count": 2,
@@ -76,12 +76,12 @@
     "bytes": 3140
   },
   "transaction_histories": {
-    "count": 50,
-    "bytes": 21742
+    "count": 52,
+    "bytes": 22623
   },
   "wallets": {
-    "count": 6,
-    "bytes": 1252
+    "count": 7,
+    "bytes": 1461
   },
   "prizes": {
     "count": 64,
@@ -96,8 +96,8 @@
     "bytes": 77804
   },
   "tournaments": {
-    "count": 8,
-    "bytes": 4309
+    "count": 9,
+    "bytes": 4883
   },
   "registration_cancellation_tickets": {
     "count": 0,
@@ -108,8 +108,8 @@
     "bytes": 598
   },
   "user_roles": {
-    "count": 21,
-    "bytes": 2795
+    "count": 22,
+    "bytes": 2928
   },
   "rounds": {
     "count": 11,
@@ -120,11 +120,11 @@
     "bytes": 601
   },
   "users": {
-    "count": 20,
-    "bytes": 12076
+    "count": 21,
+    "bytes": 12466
   },
   "deposit_requests": {
-    "count": 10,
-    "bytes": 4205
+    "count": 12,
+    "bytes": 5015
   }
 }

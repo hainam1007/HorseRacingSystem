@@ -1,5 +1,12 @@
 function errorHandler(err, req, res, next) {
-  if (!req.originalUrl.startsWith('/api')) {
+  // All JSON API namespaces must return JSON errors. The spectator live-state
+  // endpoint is mounted under /users (not /api), so letting it fall through
+  // to Express' HTML error page makes the frontend report only "Invalid API
+  // response" and hides the real backend exception.
+  const isJsonApiRequest = req.originalUrl.startsWith('/api')
+    || req.originalUrl.startsWith('/users');
+
+  if (!isJsonApiRequest) {
     return next(err);
   }
 

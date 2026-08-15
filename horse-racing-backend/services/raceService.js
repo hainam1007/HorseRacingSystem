@@ -39,7 +39,6 @@ const { ASSIGNMENT_STATUS, ODDS_MARKET_STATUS, REGISTRATION_STATUS } = require('
 
 const LOCK_OFFSET_MS = 3 * 60 * 60 * 1000;
 const RACE_START_STALE_MS = 2 * 60 * 1000;
-const DEMO_BYPASS_TIME_VALIDATIONS = String(process.env.DEMO_BYPASS_TIME_VALIDATIONS || '').toLowerCase() === 'true';
 
 function getModels() {
     return loadSequelizeModels().models;
@@ -556,10 +555,6 @@ async function startRace(req, id) {
 
     if (race.status !== 'scheduled' && !staleStart) {
         throw new ApiError(400, 'Only scheduled races or stale start attempts can be started');
-    }
-
-    if (!race.race_date || (!DEMO_BYPASS_TIME_VALIDATIONS && new Date(race.race_date).getTime() > Date.now())) {
-        throw new ApiError(400, 'Race cannot be started before race_date');
     }
 
     const startAttemptAt = new Date();

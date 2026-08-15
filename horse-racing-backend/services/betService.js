@@ -213,7 +213,9 @@ async function placeBet(req, payload) {
     });
 
     return {
-      bet: await betRepository.findById(bet._id),
+      // Sequelize models expose `id`; Mongo-style documents expose `_id`.
+      // Use either shape so the response lookup never queries with undefined.
+      bet: await betRepository.findById(bet.id || bet._id),
       wallet: deduction.wallet,
       transaction: transaction
     };

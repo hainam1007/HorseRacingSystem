@@ -9,7 +9,9 @@ function regInclude() {
     { model: Race, as: 'race' },
     { model: Horse, as: 'horse' },
     { model: HorseOwner, as: 'owner', include: [{ model: User, as: 'user', attributes: ['full_name', 'email'] }] },
-    { model: User, as: 'entry_finalized_by_user', attributes: ['full_name', 'email'] }
+    // Registration has two User associations (entry finalizer and approver),
+    // so Sequelize requires the exact association alias here.
+    { model: User, as: 'entry_finalizer', attributes: ['full_name', 'email'] }
   ];
 }
 

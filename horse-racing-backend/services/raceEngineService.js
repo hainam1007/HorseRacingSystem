@@ -125,7 +125,7 @@ function createSeededRandom(seed) {
 }
 
 function getDocumentId(value) {
-  return value && (value._id || value);
+  return value && (value._id || value.id || value);
 }
 
 function sameId(first, second) {
@@ -462,7 +462,7 @@ async function collectParticipants(raceId, _options) {
 }
 
 async function markStaleRunFailed(run) {
-  return raceEngineRunRepository.updateById(run._id, {
+  return raceEngineRunRepository.updateById(getDocumentId(run), {
     status: ENGINE_RUN_STATUS.FAILED,
     completed_at: new Date(),
     error: "Race Engine run timed out",
@@ -518,7 +518,7 @@ async function startRun(raceId, existingRun, _session) {
   };
 
   if (existingRun) {
-    return raceEngineRunRepository.updateById(existingRun._id, runData);
+    return raceEngineRunRepository.updateById(getDocumentId(existingRun), runData);
   }
 
   try {
@@ -544,7 +544,7 @@ async function startRun(raceId, existingRun, _session) {
 
 async function completeRun(run, _session) {
   return raceEngineRunRepository.updateById(
-    run._id,
+    getDocumentId(run),
     {
       status: ENGINE_RUN_STATUS.COMPLETED,
       completed_at: new Date(),
@@ -554,7 +554,7 @@ async function completeRun(run, _session) {
 }
 
 async function failRun(run, error) {
-  return raceEngineRunRepository.updateById(run._id, {
+  return raceEngineRunRepository.updateById(getDocumentId(run), {
     status: ENGINE_RUN_STATUS.FAILED,
     completed_at: new Date(),
     error: error.message,
@@ -612,10 +612,6 @@ async function generateDraftResults(raceId) {
           400,
           "race_date is required to generate race results",
         );
-      }
-
-      if (!DEMO_BYPASS_TIME_VALIDATIONS && new Date(registrationLockAt).getTime() > Date.now()) {
-        throw new ApiError(400, "Registration lock time has not been reached");
       }
 
       const existingResultCount = await RaceResult.count({ where: { race_id: raceId } });
@@ -681,9 +677,9 @@ async function generateDraftResults(raceId) {
         await RaceResult.bulkCreate(results);
       }
 
-      if (raceRun && raceRun._id) {
+      if (raceRun && getDocumentId(raceRun)) {
         await raceRunRepository.updateById(
-          raceRun._id,
+          getDocumentId(raceRun),
           { status: 'used' }
         );
       }
@@ -706,7 +702,7 @@ async function generateDraftResults(raceId) {
 
     return response;
   } catch (error) {
-    if (activeRun && activeRun._id) {
+    if (activeRun && getDocumentId(activeRun)) {
       await failRun(activeRun, error);
     }
 

@@ -75,7 +75,6 @@ async function generateRaceOdds(req, raceId) {
   });
 
   await raceRepository.updateById(raceId, {
-    betting_status: ODDS_MARKET_STATUS.GENERATED,
     betting_market: {
       status: ODDS_MARKET_STATUS.GENERATED,
       min_stake: 1,

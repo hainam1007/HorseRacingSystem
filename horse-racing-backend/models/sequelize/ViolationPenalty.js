@@ -2,7 +2,7 @@
 
 /**
  * Sequelize model — `violation_penalties` table.
- * Holds 3 penalty sub-docs (suggested/proposed/penalty) per violation via `kind`.
+ * Holds 3 penalty sub-docs (suggested/proposed/final) per violation via `slot`.
  */
 
 module.exports = (sequelize, DataTypes) => {
@@ -15,10 +15,10 @@ module.exports = (sequelize, DataTypes) => {
                 defaultValue: sequelize.literal('gen_random_uuid()')
             },
             violation_id: { type: DataTypes.UUID, allowNull: false },
-            kind: {
+            slot: {
                 type: DataTypes.STRING(16),
                 allowNull: false,
-                validate: { isIn: [['suggested', 'proposed', 'penalty']] }
+                validate: { isIn: [['suggested', 'proposed', 'final']] }
             },
             type: { type: DataTypes.STRING(32) },
             score_deduction: { type: DataTypes.DECIMAL(6, 2), defaultValue: 0 },
@@ -32,7 +32,7 @@ module.exports = (sequelize, DataTypes) => {
         {
             tableName: 'violation_penalties',
             indexes: [
-                { name: 'violation_penalties_uniq', unique: true, fields: ['violation_id', 'kind'], where: { deleted_at: null } }
+                { name: 'violation_penalties_violation_slot_uniq', unique: true, fields: ['violation_id', 'slot'] }
             ]
         }
     );

@@ -103,5 +103,10 @@
     "_id": "6a6ad8ad7fc3aad02f5a10f4",
     "user_id": "6a6ad82c7fc3aad02f5a10f0",
     "role_id": "6a6ad6e0b9b0bd29ca7b966c"
+  },
+  {
+    "_id": "6a7ea90d264b9be8aa3a6d19",
+    "user_id": "6a7ea90d264b9be8aa3a6d18",
+    "role_id": "6a6ad6e1b9b0bd29ca7b966f"
   }
 ]

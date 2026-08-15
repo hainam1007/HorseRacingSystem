@@ -3267,7 +3267,7 @@
 
 .owner-assignment-workflow__layout {
   display: grid;
-  grid-template-columns: minmax(350px, 0.34fr) minmax(0, 1fr);
+  grid-template-columns: minmax(280px, 320px) minmax(0, 1fr);
   gap: 16px;
   align-items: start;
 }
@@ -3299,6 +3299,7 @@
 .owner-assignment-workflow__list {
   display: grid;
   gap: 6px;
+  align-content: start;
   max-block-size: none;
   overflow-y: auto;
   overscroll-behavior: contain;

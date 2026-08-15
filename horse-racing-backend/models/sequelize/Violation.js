@@ -3,7 +3,7 @@
 /**
  * Sequelize model — `violations` table.
  * `evidence_files[]` and `evidence_urls[]` → child + array; 3 penalty sub-docs
- * (suggested/proposed/penalty) → single child table with `kind` column.
+ * (suggested/proposed/penalty) → single child table with `slot` column.
  */
 
 module.exports = (sequelize, DataTypes) => {

@@ -132,7 +132,9 @@ function sortNewestWithStatus(first, second, fields) {
 }
 
 function getBettingStatus(race) {
-  return String(race?.betting_status || race?.betting_market?.status || "unavailable").toLowerCase();
+  // The normalized race column only stores unavailable/open/closed/settled;
+  // generated is stored in the embedded betting market until betting opens.
+  return String(race?.betting_market?.status || race?.betting_status || "unavailable").toLowerCase();
 }
 
 function isRaceRegistrationOpen(race) {

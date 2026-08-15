@@ -76,6 +76,13 @@ const VALUE_REMAPS = {
     violation_penalties_slot: { penalty: 'final' }
 };
 
+// Mongo keeps soft-deleted records with `status: deleted`, while the
+// PostgreSQL schema uses table-specific lifecycle values.
+const STATUS_REMAPS = {
+    tournaments: { deleted: 'archived' },
+    races: { deleted: 'cancelled' }
+};
+
 const SCHEMA_CACHE = new Map();
 
 async function loadTableSchema(sequelize, table) {
@@ -157,6 +164,10 @@ function scrubRow(row, table, schema, renames, valueRemaps) {
 
         const dataType = schema.dataTypes.get(dbKey);
         let coerced = coerceForInsert(v, dataType);
+
+        if (dbKey === 'status' && STATUS_REMAPS[table]?.[coerced]) {
+            coerced = STATUS_REMAPS[table][coerced];
+        }
 
         if (valueRemaps) {
             const remap = valueRemaps[`${table}_${dbKey}`];

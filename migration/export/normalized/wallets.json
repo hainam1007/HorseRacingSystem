@@ -2,9 +2,9 @@
   {
     "id": "9b105449-882c-5c5f-a611-20b0ac81aa49",
     "user_id": "f13396fe-4a9e-5c49-8b23-dd4b99a341a6",
-    "token_balance": 980,
+    "token_balance": 1530,
     "created_at": "2026-07-30T04:45:42.643Z",
-    "updated_at": "2026-08-13T10:53:29.525Z"
+    "updated_at": "2026-08-14T14:21:18.932Z"
   },
   {
     "id": "58bd32de-7d8a-5e7e-a14f-e52a25382429",
@@ -40,5 +40,12 @@
     "created_at": "2026-07-30T04:51:21.904Z",
     "token_balance": 0,
     "updated_at": "2026-07-30T04:53:10.912Z"
+  },
+  {
+    "id": "0dc6a3d4-23d0-52fe-9a7f-b7eeaffe0a71",
+    "user_id": "d3f1cec7-dec3-544b-9619-74dc0dabe7fe",
+    "created_at": "2026-08-14T05:35:44.827Z",
+    "token_balance": 550,
+    "updated_at": "2026-08-14T05:46:46.724Z"
   }
 ]

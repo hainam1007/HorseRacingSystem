@@ -19,7 +19,7 @@
  *     dropped (Sequelize attaches the transaction at the unit-of-work boundary).
  *   - `violation.penalty.score_deduction` → `violation.penalty.score_deduction`
  *     (the embedded penalty sub-doc was lifted into a child row
- *     `violation_penalties(kind='penalty')`; we eager-load it via `include:`
+ *     `violation_penalties(slot='final')`; we eager-load it via `include:`
  *     and re-expose it on the parent row).
  *   - `result.applied_violation_ids[]` and `result.penalty_snapshot_violation_ids[]`
  *     were arrays of object references in the legacy schema; they are now child
@@ -63,7 +63,7 @@ function getSequelize() {
  * `violation._id`, etc.
  *
  * The embedded `penalty{}` sub-doc was lifted into a `violation_penalties`
- * child row (kind='penalty'). Eager-load it and expose as `violation.penalty`.
+ * child row (slot='final'). Eager-load it and expose as `violation.penalty`.
  *
  * Returns a plain object (toPlain) with `._id` alias set.
  */
@@ -80,7 +80,7 @@ async function loadViolationsWithPenalty(filter) {
 
     return rows.map((row) => {
         const plain = toPlain(row);
-        const penaltyRow = (plain.penalties || []).find((p) => p.kind === 'penalty') || null;
+        const penaltyRow = (plain.penalties || []).find((p) => p.slot === 'final') || null;
         plain.penalty = penaltyRow
             ? {
                 score_deduction: Number(penaltyRow.score_deduction || 0),
@@ -108,7 +108,7 @@ async function loadViolationByIdWithPenalty(id) {
 
     if (!row) return null;
     const plain = toPlain(row);
-    const penaltyRow = (plain.penalties || []).find((p) => p.kind === 'penalty') || null;
+    const penaltyRow = (plain.penalties || []).find((p) => p.slot === 'final') || null;
     plain.penalty = penaltyRow
         ? {
             score_deduction: Number(penaltyRow.score_deduction || 0),
@@ -280,10 +280,8 @@ async function getRaceReadiness(req, raceId) {
         .map(function(participant) {
             return getDocumentId(participant.horse).toString();
         });
-    const raceDatePassed = DEMO_BYPASS_TIME_VALIDATIONS || (Boolean(race.race_date) && new Date(race.race_date).getTime() <= Date.now());
     const raceCompleted = ['completed', 'finished'].includes((race.status || '').toLowerCase());
-    const ready = raceDatePassed &&
-        race.registration_locked === true &&
+    const ready = race.registration_locked === true &&
         raceCompleted &&
         eligibleParticipants.length > 0 &&
         Boolean(submittedReport) &&
@@ -304,7 +302,6 @@ async function getRaceReadiness(req, raceId) {
         race_id: race._id,
         race_status: race.status,
         registration_locked: race.registration_locked,
-        race_date_passed: raceDatePassed,
         eligible_participant_count: eligibleParticipants.length,
         submitted_report_id: submittedReport ? submittedReport._id : null,
         missing_report: !submittedReport,

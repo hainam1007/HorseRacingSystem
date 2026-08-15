@@ -142,7 +142,6 @@ function TournamentCard({ tournament }) {
             <Trophy size={14} />
             <span>Prize</span>
             <strong>{tournament.prize || "TBA"}</strong>
-            <small>Total race prizes</small>
           </div>
         </div>
 

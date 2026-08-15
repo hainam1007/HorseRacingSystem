@@ -22,7 +22,7 @@ function hasRole(req, role) {
 }
 
 function getDocumentId(value) {
-  return value && (value._id || value);
+  return value && (value._id || value.id || value);
 }
 
 function toNumber(value, fallback) {
@@ -264,7 +264,7 @@ async function calculateRacePrizeAwards(raceId, adminUserId, _options) {
     const split = splitPrizeAmount(prize.amount);
     const now = new Date();
     const award = await prizeRepository.createAward({
-      prize_id: prize._id,
+      prize_id: getDocumentId(prize),
       race_result_id: resultId,
       horse_id: getDocumentId(horse),
       owner_id: ownerId,
@@ -306,7 +306,7 @@ async function approveRaceAwards(adminUserId, raceId) {
     {
       prize_id: {
         $in: prizes.map(function(prize) {
-          return prize._id;
+          return getDocumentId(prize);
         })
       },
       status: PRIZE_AWARD_STATUS.CALCULATED
@@ -347,7 +347,7 @@ async function markAwardPaid(adminUserId, awardId) {
 async function listRaceAwards(req, raceId) {
   const prizes = await prizeRepository.findPrizes({ race_id: raceId });
   const prizeIds = prizes.map(function(prize) {
-    return prize._id;
+    return getDocumentId(prize);
   });
 
   if (!prizeIds.length) {

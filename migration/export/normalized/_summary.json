@@ -11,8 +11,8 @@
   },
   {
     "table": "deposit_requests",
-    "rows": 10,
-    "bytes": 4435
+    "rows": 12,
+    "bytes": 5291
   },
   {
     "table": "horse_checks",
@@ -117,7 +117,7 @@
   {
     "table": "races",
     "rows": 18,
-    "bytes": 24150
+    "bytes": 24146
   },
   {
     "table": "referee_reports",
@@ -151,23 +151,23 @@
   },
   {
     "table": "tournaments",
-    "rows": 8,
-    "bytes": 4503
+    "rows": 9,
+    "bytes": 5100
   },
   {
     "table": "transaction_histories",
-    "rows": 50,
-    "bytes": 22898
+    "rows": 52,
+    "bytes": 23829
   },
   {
     "table": "user_roles",
-    "rows": 21,
-    "bytes": 3530
+    "rows": 22,
+    "bytes": 3698
   },
   {
     "table": "users",
-    "rows": 20,
-    "bytes": 12296
+    "rows": 21,
+    "bytes": 12697
   },
   {
     "table": "violation_penalties",
@@ -181,7 +181,7 @@
   },
   {
     "table": "wallets",
-    "rows": 6,
-    "bytes": 1390
+    "rows": 7,
+    "bytes": 1622
   }
 ]

@@ -1,4 +1,5 @@
 const { loadSequelizeModels } = require('../models/sequelize/index.js');
+const { projectUpdate } = require('./sequelize/adapter');
 
 function getModels() { return loadSequelizeModels().models; }
 
@@ -11,7 +12,7 @@ function baseInclude() {
       include: [{ model: Tournament, as: 'tournament' }, { model: Round, as: 'round' }]
     },
     { model: Horse, as: 'horse' },
-    { model: Jockey, as: 'jockey' },
+    { model: Jockey, as: 'jockey', include: [{ model: User, as: 'user', attributes: ['full_name'] }] },
     { model: User, as: 'penalties_applied_by_user', attributes: ['full_name', 'email'] },
     { model: User, as: 'submitted_to_admin_by_user', attributes: ['full_name', 'email'] },
     { model: User, as: 'correction_requested_by_user', attributes: ['full_name', 'email'] },
@@ -51,13 +52,13 @@ async function updateById(id, data) {
   const { RaceResult } = getModels();
   const instance = await RaceResult.findByPk(id);
   if (!instance) return null;
-  await instance.update(data);
+  await instance.update(projectUpdate(data));
   return instance;
 }
 
 async function updateMany(filter, data) {
   const { RaceResult } = getModels();
-  return RaceResult.update(data, { where: filter });
+  return RaceResult.update(projectUpdate(data), { where: filter });
 }
 
 module.exports = {

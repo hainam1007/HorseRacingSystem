@@ -87,6 +87,9 @@ async function findAvailableJockeys() {
     const M = models();
     const rows = await M.Jockey.findAll({
         where: { status: 'active' },
+        include: [
+            { model: M.User, as: 'user', attributes: ['id', 'full_name', 'email'] }
+        ],
         order: [['total_wins', 'DESC'], ['total_races', 'DESC']]
     });
     return rows.map(toPlain);
@@ -94,7 +97,11 @@ async function findAvailableJockeys() {
 
 async function findJockeyById(jockeyId) {
     const M = models();
-    const row = await M.Jockey.findByPk(jockeyId);
+    const row = await M.Jockey.findByPk(jockeyId, {
+        include: [
+            { model: M.User, as: 'user', attributes: ['id', 'full_name', 'email'] }
+        ]
+    });
     return toPlain(row);
 }
 

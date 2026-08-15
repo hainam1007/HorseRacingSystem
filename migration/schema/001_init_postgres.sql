@@ -345,7 +345,7 @@ CREATE TABLE races (
     model_input_version                 INTEGER         NOT NULL DEFAULT 0
                                                         CHECK (model_input_version >= 0),
     status                              TEXT            NOT NULL DEFAULT 'scheduled'
-                                                        CHECK (status IN ('scheduled','entries_finalized','running','completed','cancelled','postponed')),
+                                                        CHECK (status IN ('scheduled','entries_finalized','starting','running','completed','cancelled','postponed')),
     starting_at                         TIMESTAMPTZ,
     started_at                          TIMESTAMPTZ,
     assignment_revision                 INTEGER         NOT NULL DEFAULT 0

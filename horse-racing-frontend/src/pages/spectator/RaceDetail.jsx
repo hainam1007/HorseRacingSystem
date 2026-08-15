@@ -19,7 +19,6 @@ import {
 import LoadingSkeleton from "../../components/LoadingSkeleton.jsx";
 import { useSpectatorTournamentDetail, useSpectatorRaceResultsSingle } from "./useSpectatorData.js";
 import { getHorseJockeyImage } from "./spectatorAdapters.js";
-import { mockContenders } from "./live-race/mockRaceFixtures.js";
 import RaceViewer2D from "./live-race/RaceViewer2D.jsx";
 import { useRaceViewerSession } from "./live-race/useRaceViewerSession.js";
 import { spectatorApi } from "../../api/spectatorApi.js";
@@ -100,7 +99,7 @@ function getId(value) {
 
 function getJockeyName(jockey) {
   if (!jockey || typeof jockey === "string") return "Unknown Jockey";
-  return jockey.user_id?.full_name || jockey.full_name || jockey.name || "Unknown Jockey";
+  return jockey.user?.full_name || jockey.user_id?.full_name || jockey.full_name || jockey.name || "Unknown Jockey";
 }
 
 function getLiveStateSignature(liveState) {
@@ -166,17 +165,16 @@ function mapRaceEngineContenders(engine) {
 
 function mapLiveParticipantContenders(participants = []) {
   return participants
-    .filter((participant) => !participant.pre_race_check || participant.eligible)
     .map((participant, index) => {
     const horse = participant.horse || participant.horse_id || {};
-    const jockey = participant.jockey || participant.jockey_id || {};
+      const jockey = participant.jockey || participant.jockey_id || {};
     const horseId = getId(participant.horse_id || horse);
 
     return {
       id: horseId,
       horse: horse?.name || "Unknown horse",
       jockey: participant.jockey_name || getJockeyName(jockey),
-      owner: participant.owner_name || participant.owner?.stable_name || "Horse Owner",
+      owner: participant.owner_name || participant.owner?.stable_name || participant.horse?.owner?.stable_name || "Horse Owner",
       lane: participant.lane != null ? Number(participant.lane) : index + 1,
       weight: horse?.weight ? `${horse.weight}kg` : "56kg",
       form: participant.eligible ? "Eligible" : "Pending check",
@@ -261,24 +259,6 @@ export default function RaceDetail() {
     contenders = [...raceEngineContenders];
   } else if (hasBackendParticipants) {
     contenders = [...liveParticipantContenders];
-  } else {
-    const usedLanes = new Set();
-    const usedIds = new Set();
-    let nextLane = 1;
-    for (const mock of mockContenders) {
-      if (contenders.length >= 8) break;
-      if (usedIds.has(mock.id)) continue;
-      while (usedLanes.has(nextLane)) {
-        nextLane++;
-      }
-      contenders.push({
-        ...mock,
-        lane: nextLane,
-        position: contenders.length + 1,
-      });
-      usedLanes.add(nextLane);
-      usedIds.add(mock.id);
-    }
   }
 
   contenders.sort((a, b) => a.lane - b.lane);

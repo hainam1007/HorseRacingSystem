@@ -3,15 +3,16 @@ const { loadSequelizeModels } = require('../models/sequelize/index.js');
 function getModels() { return loadSequelizeModels().models; }
 
 function baseInclude() {
-  const { Race, Tournament, Round, User } = getModels();
+  const { Race, Tournament, Round, User, RaceOddsMarketOdd } = getModels();
   return [
     {
       model: Race,
       as: 'race',
       include: [{ model: Tournament, as: 'tournament' }, { model: Round, as: 'round' }]
     },
-    { model: User, as: 'generated_by_user', attributes: ['full_name', 'email'] },
-    { model: User, as: 'manually_adjusted_by_user', attributes: ['full_name', 'email'] }
+    { model: User, as: 'generator', attributes: ['full_name', 'email'] },
+    { model: User, as: 'adjuster', attributes: ['full_name', 'email'] },
+    { model: RaceOddsMarketOdd, as: 'odds', order: [['probability_rank', 'ASC']] }
   ];
 }
 

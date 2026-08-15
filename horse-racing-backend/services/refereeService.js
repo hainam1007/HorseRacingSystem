@@ -78,7 +78,10 @@ function buildAssignmentMap(assignments) {
 
 function buildParticipant(registration, assignmentMap, latestCheckMap) {
   const raceId = idString(registration.race_id);
-  const horse = registration.horse_id;
+  // The associations are eagerly loaded above. Use them in the workspace
+  // payload; the *_id fields are only foreign-key values and do not contain
+  // the display data needed by the referee UI.
+  const horse = registration.horse || registration.horse_id;
   const horseId = idString(horse);
   const assignment = assignmentMap.get(raceId + ':' + horseId) || null;
   const preRaceCheck = latestCheckMap.get(raceId + ':' + horseId + ':' + HORSE_CHECK_PHASE.PRE_RACE) || null;
@@ -109,8 +112,8 @@ function buildParticipant(registration, assignmentMap, latestCheckMap) {
   return {
     registration: registration,
     horse: horse,
-    owner: registration.owner_id || (horse && horse.owner_id) || null,
-    jockey: assignment ? assignment.jockey_id : null,
+    owner: registration.owner || (horse && horse.owner) || registration.owner_id || (horse && horse.owner_id) || null,
+    jockey: assignment ? (assignment.jockey || assignment.jockey_id) : null,
     assignment: assignment,
     pre_race_check: preRaceCheck,
     post_race_check: postRaceCheck,

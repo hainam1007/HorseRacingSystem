@@ -698,5 +698,33 @@
     "note": "Top-up: 500,000 VND → 550 Token(s) [VNPAY]",
     "created_at": "2026-08-13T10:53:23.529Z",
     "updated_at": "2026-08-13T10:53:23.529Z"
+  },
+  {
+    "id": "ee02068c-064a-5f5f-b746-0ea9d0174a84",
+    "user_id": "f13396fe-4a9e-5c49-8b23-dd4b99a341a6",
+    "transaction_type": "deposit",
+    "amount": 550,
+    "direction": "credit",
+    "balance_before": 980,
+    "balance_after": 1530,
+    "status": "completed",
+    "reference_id": "deposit:15656215",
+    "note": "Top-up: 500,000 VND → 550 Token(s) [VNPAY]",
+    "created_at": "2026-08-14T04:06:57.533Z",
+    "updated_at": "2026-08-14T04:06:57.533Z"
+  },
+  {
+    "id": "97fa0ef0-3080-5c3c-8751-58f068a3b6d7",
+    "user_id": "d3f1cec7-dec3-544b-9619-74dc0dabe7fe",
+    "transaction_type": "deposit",
+    "amount": 550,
+    "direction": "credit",
+    "balance_before": 0,
+    "balance_after": 550,
+    "status": "completed",
+    "reference_id": "deposit:15656348",
+    "note": "Top-up: 500,000 VND → 550 Token(s) [VNPAY]",
+    "created_at": "2026-08-14T05:38:58.730Z",
+    "updated_at": "2026-08-14T05:38:58.730Z"
   }
 ]
