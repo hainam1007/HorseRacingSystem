@@ -87,21 +87,60 @@ function serializeDates(obj) {
 }
 
 /**
- * Apply a `$set` / `$unset` legacy-ORM update payload to a plain object
- * and return the fields to write.
+ * Normalize a legacy-ORM update payload to a flat fields object.
+ *
+ * Accepts both shapes that callers use:
+ *   - Mongoose-style operator: { $set: {a:1}, $unset: {b:1} }
+ *   - Plain object:            { a: 1, b: 2 }
+ *
+ * Always returns a flat object with the fields to write. Returning an empty
+ * object would make `Model.update()` affect 0 rows and the callers interpret
+ * that as "row not found" (HTTP 404), which is the bug we are fixing here.
  */
 function projectUpdate(update) {
-    if (!update) return {};
-    const set = update.$set || {};
-    const unset = update.$unset || {};
-    const fields = { ...set };
-    for (const k of Object.keys(unset)) fields[k] = null;
-    return fields;
+    if (!update || typeof update !== 'object') return {};
+
+    // Legacy mongoose operator form
+    if (Object.prototype.hasOwnProperty.call(update, '$set') ||
+        Object.prototype.hasOwnProperty.call(update, '$unset')) {
+        const set = update.$set || {};
+        const unset = update.$unset || {};
+        const fields = { ...set };
+        for (const k of Object.keys(unset)) fields[k] = null;
+        return fields;
+    }
+
+    // Plain object form (used by the modernized services)
+    return { ...update };
+}
+
+/**
+ * Soft-delete a row by `id` using a raw SQL UPDATE.
+ *
+ * Many Sequelize models in this codebase do NOT declare the `deleted_at`
+ * column (it lives in Postgres but was omitted from the model definition),
+ * which makes `Model.update({ deleted_at: now })` a no-op (affected = 0).
+ * Going through raw SQL keeps the call idempotent across models regardless
+ * of whether they declare the field, and keeps the soft-delete semantics
+ * identical to what every service expects.
+ */
+async function softDeleteById(model, id, deletedAt) {
+    const sequelize = model.sequelize;
+    const tableName = model.tableName;
+    const pkCol = model.primaryKeyAttribute || 'id';
+    const ts = (deletedAt || new Date()).toISOString();
+    const [results] = await sequelize.query(
+        `UPDATE ${tableName} SET deleted_at = :ts WHERE ${pkCol} = :id RETURNING *`,
+        { replacements: { id, ts }, type: sequelize.QueryTypes.UPDATE }
+    );
+    if (!results || !results.length) return null;
+    return toPlain(results[0]);
 }
 
 module.exports = {
     toPlain,
     withIdAlias,
     serializeDates,
-    projectUpdate
+    projectUpdate,
+    softDeleteById
 };

@@ -52,7 +52,8 @@ async function updateById(id, data) {
 }
 
 async function softDeleteById(id) {
-    return updateById(id, { $set: { deleted_at: new Date().toISOString() } });
+    const M = models();
+    return require('./adapter').softDeleteById(M.Round, id);
 }
 
 module.exports = {

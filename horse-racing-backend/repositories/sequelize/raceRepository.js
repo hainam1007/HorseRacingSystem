@@ -110,7 +110,8 @@ async function updateMany(filter, data) {
 }
 
 async function softDeleteById(id) {
-    return updateById(id, { $set: { deleted_at: new Date().toISOString() } });
+    const M = models();
+    return require('./adapter').softDeleteById(M.Race, id);
 }
 
 module.exports = {
