@@ -748,6 +748,52 @@ async function mutateAssignmentWhileRaceOpen(assignment, filter, update, conflic
     return updatedAssignment;
 }
 
+/**
+ * Variant of mutateAssignmentWhileRaceOpen that ALSO upserts the
+ * `jockey_assignment_terms` child row inside the same transaction.
+ *
+ * Used by `respondToTerms` because legacy code wrote the terms payload as an
+ * embedded sub-doc on the parent; in the normalised schema it lives on
+ * `jockey_assignment_terms` and must be persisted explicitly.
+ */
+async function mutateAssignmentAndTermsWhileRaceOpen(
+    assignment,
+    filter,
+    parentFields,
+    termsFields,
+    conflictMessage
+) {
+    const raceId = assignment.race_id;
+    const sequelize = getSequelize();
+    let updatedAssignment;
+
+    try {
+        await sequelize.transaction(async () => {
+            const openRace = await findRaceAndIncrementAssignmentRevision(raceId);
+
+            if (!openRace) {
+                throw new ApiError(409, 'A jockey assignment cannot be changed after the race has started');
+            }
+
+            updatedAssignment = await findAssignmentAndUpdate(filter, { $set: parentFields });
+
+            if (!updatedAssignment) {
+                throw new ApiError(409, conflictMessage);
+            }
+
+            const { JockeyAssignmentTerm } = getModels();
+            await JockeyAssignmentTerm.upsert(termsFields);
+        });
+    } catch (error) {
+        if (error && (error.code === '23505' || error.original?.code === '23505') && error.keyPattern && error.keyPattern.jockey_id) {
+            throw new ApiError(409, 'This jockey is already confirmed for another horse in the selected race');
+        }
+        throw error;
+    }
+
+    return updatedAssignment;
+}
+
 async function requestCancellation(req, id, payload) {
     const assignment = await findAssignmentById(id);
 
@@ -1029,17 +1075,25 @@ async function respondToTerms(userId, id, status, responseMessage) {
         terms.rejected_at = new Date();
     }
 
-    const updatedAssignment = await mutateAssignmentWhileRaceOpen(assignment, {
-        _id: id,
-        status: assignment.status
-    }, {
-        $set: {
+    const updatedAssignment = await mutateAssignmentAndTermsWhileRaceOpen(
+        assignment,
+        {
+            _id: id,
+            status: assignment.status
+        },
+        {
             status: nextStatus,
             response_message: responseMessage,
-            terms: terms,
             responded_at: new Date()
-        }
-    }, 'The assignment changed before your terms response was saved');
+        },
+        {
+            assignment_id: id,
+            response_message: responseMessage,
+            confirmed_at: nextStatus === confirmedStatus ? new Date() : null,
+            rejected_at: nextStatus === ASSIGNMENT_STATUS.TERMS_REJECTED ? new Date() : null
+        },
+        'The assignment changed before your terms response was saved'
+    );
 
     return {
         assignment: updatedAssignment
