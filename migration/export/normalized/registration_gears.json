@@ -1,0 +1,432 @@
+[
+  {
+    "id": "172b2c33-4cc1-56aa-aae0-a01aab25370f",
+    "registration_id": "4fc969f8-a4c8-5b92-9929-d33c26422dbd",
+    "gear_code": "V"
+  },
+  {
+    "id": "1af7ff80-b7f1-5d4f-882b-08006ef99626",
+    "registration_id": "15fe46b0-3d95-535e-96ab-9166da1e1e8d",
+    "gear_code": "B"
+  },
+  {
+    "id": "687de78b-69aa-52ef-b758-fbbd37ed9a40",
+    "registration_id": "3581e0e9-415a-5b2b-a58a-d88f9e27d885",
+    "gear_code": "TT"
+  },
+  {
+    "id": "881d3c83-a85a-559b-bed5-e51f8e385455",
+    "registration_id": "79c9cd34-5c73-5cff-9b7f-7a20ef93294a",
+    "gear_code": "CP"
+  },
+  {
+    "id": "11b46eb7-9418-5bee-8f76-f6f094caabe0",
+    "registration_id": "5b0fc687-b357-538b-a4a8-29b6e84294ff",
+    "gear_code": "V"
+  },
+  {
+    "id": "c7987df2-7f23-5954-8852-d1c9d8fb64b7",
+    "registration_id": "5b0fc687-b357-538b-a4a8-29b6e84294ff",
+    "gear_code": "TT"
+  },
+  {
+    "id": "cfbac948-d8f0-55a3-8427-ffbf34d59c04",
+    "registration_id": "9988fc9b-a184-55cf-bef5-34827e892eff",
+    "gear_code": "V"
+  },
+  {
+    "id": "5d1090b5-07dd-56f1-b482-8c398ddc9524",
+    "registration_id": "ecfbf85b-0af2-574a-bd06-1cb0a642f34f",
+    "gear_code": "B"
+  },
+  {
+    "id": "1544f4e4-bca4-5989-a9d3-164d26048171",
+    "registration_id": "7eef10f2-606f-59fd-a94e-6cf5c13d95cc",
+    "gear_code": "TT"
+  },
+  {
+    "id": "300562ed-bbbe-5356-bd2b-b0c2e2d3309e",
+    "registration_id": "30350582-a257-569c-9ebf-7d67c76be877",
+    "gear_code": "CP"
+  },
+  {
+    "id": "026c9383-0a6e-5e58-b2e1-512c866cedfb",
+    "registration_id": "189bee55-0813-5f1b-b1f3-3eecfcb1fb97",
+    "gear_code": "V"
+  },
+  {
+    "id": "198344e4-eae4-5190-b48a-d5961f88e2c2",
+    "registration_id": "189bee55-0813-5f1b-b1f3-3eecfcb1fb97",
+    "gear_code": "TT"
+  },
+  {
+    "id": "9791966f-db8f-52c6-8974-38ffbaa0bcd8",
+    "registration_id": "0474ce63-61ea-575a-b42b-2850f1096521",
+    "gear_code": "V"
+  },
+  {
+    "id": "7d2e71d4-3f0f-5751-a385-83ccb2f3b67c",
+    "registration_id": "c5a9425a-fc56-5e9f-9e25-e89c7cf8d0da",
+    "gear_code": "B"
+  },
+  {
+    "id": "2c757b1f-0907-5bb9-888d-bfd710c9d0d9",
+    "registration_id": "abf8ae57-11f9-59cd-a06f-c661c063081f",
+    "gear_code": "TT"
+  },
+  {
+    "id": "65bf9b7d-4eb5-520a-a96d-92774bde5b61",
+    "registration_id": "8e1e05ac-efc5-5779-b25c-51114cb3117a",
+    "gear_code": "CP"
+  },
+  {
+    "id": "5e21dfc3-f935-5f73-a522-ae9ddcde5100",
+    "registration_id": "ddc2a832-0454-52e5-82fe-0e4d7a20d64f",
+    "gear_code": "V"
+  },
+  {
+    "id": "5617a680-d51d-5559-923d-19327b55f539",
+    "registration_id": "ddc2a832-0454-52e5-82fe-0e4d7a20d64f",
+    "gear_code": "TT"
+  },
+  {
+    "id": "00f86cad-7941-5008-b14f-67c036d9b2d2",
+    "registration_id": "ae57bc3f-5f2c-5d0a-a23e-67030e8ed46a",
+    "gear_code": "V"
+  },
+  {
+    "id": "db896458-e443-5c6d-99f5-3a1850c5ad9a",
+    "registration_id": "2fca8e4c-a3f2-5471-b064-498c5c0a62c4",
+    "gear_code": "B"
+  },
+  {
+    "id": "408d6c0e-10f4-5ea0-9d8c-70df6dd05ad5",
+    "registration_id": "1e078654-626b-5c58-adc7-a986e9e7548c",
+    "gear_code": "TT"
+  },
+  {
+    "id": "d9a29ff1-f06c-511a-bd31-b9fcdbf609c1",
+    "registration_id": "1b104c68-7b5e-577b-a1a8-a72ccff2dc35",
+    "gear_code": "CP"
+  },
+  {
+    "id": "73e7fef2-ab49-5dd4-8ca5-13d09107fe6c",
+    "registration_id": "0c94cc68-84f0-55db-882c-4864bcbb3db8",
+    "gear_code": "V"
+  },
+  {
+    "id": "62c3caab-47fe-5577-9852-fcfafa1ff3f4",
+    "registration_id": "0c94cc68-84f0-55db-882c-4864bcbb3db8",
+    "gear_code": "TT"
+  },
+  {
+    "id": "3d4c6d5d-924d-533e-b5c9-e7afdb0a20c8",
+    "registration_id": "2ca4c125-5066-5ac8-a305-2c85f84b2c30",
+    "gear_code": "V"
+  },
+  {
+    "id": "c4df233a-c549-5f15-8013-a4936effe511",
+    "registration_id": "26c7fd07-9566-5cb8-8859-0b1760b7fb6a",
+    "gear_code": "B"
+  },
+  {
+    "id": "2c5083b2-2613-5086-ad90-372622872c3a",
+    "registration_id": "389d9b17-6cbc-504e-83b6-bd1ca255f76f",
+    "gear_code": "TT"
+  },
+  {
+    "id": "7dd3e9b2-363d-55d8-976b-ab33e373947b",
+    "registration_id": "81d2fb72-0015-5bd8-b41f-572fcf0a1de7",
+    "gear_code": "CP"
+  },
+  {
+    "id": "c9050cee-9bf5-555f-8d95-f9f44f20e510",
+    "registration_id": "815bd5b7-f033-55b4-876f-79903b222c5e",
+    "gear_code": "V"
+  },
+  {
+    "id": "145c5c7d-ee8d-558f-be70-5723cf6ad204",
+    "registration_id": "815bd5b7-f033-55b4-876f-79903b222c5e",
+    "gear_code": "TT"
+  },
+  {
+    "id": "ae621a77-be51-52ca-a7cb-cd9bef56bc0c",
+    "registration_id": "3b148adf-9590-569e-9093-6ec7e66438d0",
+    "gear_code": "V"
+  },
+  {
+    "id": "ce778063-79ab-58d0-a4e6-bed26ec23917",
+    "registration_id": "100d865a-a38e-58a4-a135-d303e566f865",
+    "gear_code": "B"
+  },
+  {
+    "id": "95878982-234f-54f3-9c8d-77ba804cc1d7",
+    "registration_id": "90a28a06-81d8-5891-bc82-abdb3790480c",
+    "gear_code": "TT"
+  },
+  {
+    "id": "6adf5a59-2a90-502d-ae9d-6022bec7ecf2",
+    "registration_id": "db11ac4e-f767-5895-bdec-b1069b46b2ff",
+    "gear_code": "CP"
+  },
+  {
+    "id": "37f6683a-8dd8-5422-938b-84ca745832af",
+    "registration_id": "8fc90de4-d319-52c6-ad81-9dc1cd3ceac7",
+    "gear_code": "V"
+  },
+  {
+    "id": "086d2ffa-697a-5869-9cea-2694d029e729",
+    "registration_id": "8fc90de4-d319-52c6-ad81-9dc1cd3ceac7",
+    "gear_code": "TT"
+  },
+  {
+    "id": "7b1f1b45-a528-5fa6-a049-23ff7d01bb9b",
+    "registration_id": "e783f6c2-0a63-501e-b883-e73c7aba75fe",
+    "gear_code": "V"
+  },
+  {
+    "id": "7429773a-2886-54d4-be5b-e3d79a5f29fa",
+    "registration_id": "86bf1b1f-4961-588e-804b-c9daa8dbfca1",
+    "gear_code": "B"
+  },
+  {
+    "id": "04bcaa2d-7154-53bd-a751-303810d9faf4",
+    "registration_id": "fb1da29e-8453-5203-ba4d-63fa35f7e2ef",
+    "gear_code": "TT"
+  },
+  {
+    "id": "dfcbbd83-3947-5049-9922-e87e3a4ae66b",
+    "registration_id": "485e4b83-a17c-5767-8b4b-3462229d82b2",
+    "gear_code": "CP"
+  },
+  {
+    "id": "bfd608cb-3d13-5eaf-b2cb-0e238f7f07bd",
+    "registration_id": "af0a4fcf-db13-5f68-b2bf-3a63ebf1c601",
+    "gear_code": "V"
+  },
+  {
+    "id": "4f42c551-9c8d-510a-9650-6b93f832e2ed",
+    "registration_id": "af0a4fcf-db13-5f68-b2bf-3a63ebf1c601",
+    "gear_code": "TT"
+  },
+  {
+    "id": "d91c91b2-9494-5928-923c-6bc7d0337e10",
+    "registration_id": "5111e44b-a9c5-5ed1-b08e-ecc6bd585f2d",
+    "gear_code": "V"
+  },
+  {
+    "id": "2b0275dd-2826-54a5-9965-a0882e5751b3",
+    "registration_id": "56caf13f-5a58-5d8d-a25d-12c4c99dfa4c",
+    "gear_code": "B"
+  },
+  {
+    "id": "620bf225-aedd-56f9-99a6-2408e1aabbed",
+    "registration_id": "efa7bbf1-9d10-5762-8359-f57b90475869",
+    "gear_code": "TT"
+  },
+  {
+    "id": "6a67932f-7a0f-54d9-a0d4-681086f9994a",
+    "registration_id": "126b6a9d-5766-52ad-85e7-ac40f1cbf7b1",
+    "gear_code": "CP"
+  },
+  {
+    "id": "2081d5c8-ec4d-5c35-b13b-640c2362a3f6",
+    "registration_id": "2a98615b-3f3e-5f09-8b1d-a646b8d5dc14",
+    "gear_code": "V"
+  },
+  {
+    "id": "3b11dc89-7c93-5b75-823d-9b1a2459c286",
+    "registration_id": "2a98615b-3f3e-5f09-8b1d-a646b8d5dc14",
+    "gear_code": "TT"
+  },
+  {
+    "id": "c5d69d0b-b0e7-5ca5-9ea9-d5101311f3fb",
+    "registration_id": "4470d4c2-b480-5411-869c-d8de2f88c3fd",
+    "gear_code": "V"
+  },
+  {
+    "id": "eea8c411-2c8f-5c7c-a0b9-751bc50a6f61",
+    "registration_id": "8d8d6a89-7caf-552d-a86b-971436c15bf5",
+    "gear_code": "B"
+  },
+  {
+    "id": "688a2266-52b3-5d40-b67b-77ab97d38c86",
+    "registration_id": "231826aa-9e2c-5402-a0a5-2608173110b0",
+    "gear_code": "TT"
+  },
+  {
+    "id": "5d35e176-1a47-55ad-859f-f761568f5aa6",
+    "registration_id": "3e6eab9e-a7ea-51a0-9936-d9f85840398f",
+    "gear_code": "CP"
+  },
+  {
+    "id": "a681aff3-e55b-5a11-9f33-3ab7e45a5f14",
+    "registration_id": "5e1c901c-271f-5ee1-a81f-cc1d8f5fd891",
+    "gear_code": "V"
+  },
+  {
+    "id": "16c15a25-8768-564a-b45f-2eaebb292939",
+    "registration_id": "5e1c901c-271f-5ee1-a81f-cc1d8f5fd891",
+    "gear_code": "TT"
+  },
+  {
+    "id": "f53774f0-00f1-54d7-b8a3-c554af9801c1",
+    "registration_id": "14dd2cf2-f265-5625-ab89-7751e6ea8d96",
+    "gear_code": "V"
+  },
+  {
+    "id": "3e6ca8e2-9b6e-5bdb-aafb-6519c9a35220",
+    "registration_id": "f855ae3b-1874-5b2e-be99-906590d04766",
+    "gear_code": "B"
+  },
+  {
+    "id": "a161ee96-e4b1-5934-a857-e7e76d496181",
+    "registration_id": "dbae47a5-d07f-54f3-af40-9bd3395de31f",
+    "gear_code": "TT"
+  },
+  {
+    "id": "21bbfcfc-1c84-50de-9be8-f5a4066e44fd",
+    "registration_id": "c6822167-4b1e-5590-a1ae-6ef933ebb997",
+    "gear_code": "CP"
+  },
+  {
+    "id": "9182d265-cbdd-5caf-a29d-661f1f35fedb",
+    "registration_id": "612964fe-9450-557b-ba49-36b5df1d4b42",
+    "gear_code": "V"
+  },
+  {
+    "id": "74c7b671-504f-52f6-9cfa-4324f04f60b9",
+    "registration_id": "612964fe-9450-557b-ba49-36b5df1d4b42",
+    "gear_code": "TT"
+  },
+  {
+    "id": "03a7a65c-5fb9-5727-9173-ebe092428c16",
+    "registration_id": "566675a8-15d9-5ac1-b387-091e67a578d1",
+    "gear_code": "V"
+  },
+  {
+    "id": "7ce4f733-24d6-5fcb-9702-c273f17dc281",
+    "registration_id": "b48923d5-667f-53ab-ae1c-9eafdccf243a",
+    "gear_code": "B"
+  },
+  {
+    "id": "8e937832-6a7c-506e-a5a4-4e613984d455",
+    "registration_id": "e90834e6-5f98-5b6c-9d6f-9809a173ba01",
+    "gear_code": "TT"
+  },
+  {
+    "id": "57169c48-cc59-5959-b38a-d950d2c857ea",
+    "registration_id": "d518e7db-8a9a-50ec-8538-2505f2e4124f",
+    "gear_code": "CP"
+  },
+  {
+    "id": "d9611ce2-910a-57a1-870a-10abb083ad65",
+    "registration_id": "3e82d125-9902-52e5-9945-f338a6e7dcef",
+    "gear_code": "V"
+  },
+  {
+    "id": "25d8eb5a-5708-5a43-8e99-a21fbbbeeb34",
+    "registration_id": "3e82d125-9902-52e5-9945-f338a6e7dcef",
+    "gear_code": "TT"
+  },
+  {
+    "id": "c635f11f-4e56-52f9-b9a3-9d172e837868",
+    "registration_id": "2fd0f1ce-2c8d-5ccd-85d9-6e42595dbdf7",
+    "gear_code": "V"
+  },
+  {
+    "id": "1231c72d-6a08-5842-b2f3-4ae7cd22454d",
+    "registration_id": "2fd0f1ce-2c8d-5ccd-85d9-6e42595dbdf7",
+    "gear_code": "TT"
+  },
+  {
+    "id": "f149b456-8c96-5899-95d1-31e89b7acc1f",
+    "registration_id": "69cc0431-4ad5-5148-9d19-e31ab45f1ec5",
+    "gear_code": "CP"
+  },
+  {
+    "id": "927dab6a-e9a4-5d9e-8058-09aa9f5dfb68",
+    "registration_id": "1bd72acf-0885-545d-a148-4f95eee27c00",
+    "gear_code": "TT"
+  },
+  {
+    "id": "8ba8389b-da40-5d0c-a04a-f8277d0baa0a",
+    "registration_id": "d67cd2dc-df72-5921-9ae4-32e98cc9fa93",
+    "gear_code": "B"
+  },
+  {
+    "id": "a9cdee1a-4990-5632-95e9-55e6590cdb6b",
+    "registration_id": "b326a709-4279-5e1e-b754-fe980b96bd08",
+    "gear_code": "V"
+  },
+  {
+    "id": "29aea701-10b3-52e2-a462-bc48ca05b1aa",
+    "registration_id": "87bd1238-ee58-5008-bdd3-38a0ae4390f5",
+    "gear_code": "V"
+  },
+  {
+    "id": "99a1ee8f-8992-59d8-959f-2477d2a75c14",
+    "registration_id": "87bd1238-ee58-5008-bdd3-38a0ae4390f5",
+    "gear_code": "CP"
+  },
+  {
+    "id": "3f78a62f-4dbe-5331-a512-4b69c50a54d3",
+    "registration_id": "849fa847-56c5-5911-9bf1-7a670544f38a",
+    "gear_code": "B"
+  },
+  {
+    "id": "ec21cd1a-3a3c-509f-9be6-66abeab9ce3b",
+    "registration_id": "849fa847-56c5-5911-9bf1-7a670544f38a",
+    "gear_code": "TT"
+  },
+  {
+    "id": "bbbae2f8-46ca-58c4-8364-602fe254bd49",
+    "registration_id": "89f368f2-459a-5550-9b9b-bcb5fc3c7428",
+    "gear_code": "B"
+  },
+  {
+    "id": "c84cd92d-fcdc-5228-b2ba-794f06814d14",
+    "registration_id": "89f368f2-459a-5550-9b9b-bcb5fc3c7428",
+    "gear_code": "TT"
+  },
+  {
+    "id": "a5470d40-6e12-5d25-af75-e57972816d76",
+    "registration_id": "6b31141d-bac6-5057-ad0e-a76d1851ba20",
+    "gear_code": "V"
+  },
+  {
+    "id": "88e23e6c-e047-5ee3-a36c-6d73a20efe7c",
+    "registration_id": "bd7923c0-3cea-59e4-a679-513bc7d5d74b",
+    "gear_code": "V"
+  },
+  {
+    "id": "e3a7830e-dcbb-553d-ab13-aac16dbb673c",
+    "registration_id": "c6dcd969-eb21-5a65-8783-205be010e33e",
+    "gear_code": "B"
+  },
+  {
+    "id": "c22c0568-6373-5264-98f1-11dc12886e6f",
+    "registration_id": "3b6efa3e-3249-5f7a-8ab0-a4b44b60922e",
+    "gear_code": "B"
+  },
+  {
+    "id": "8b70c63b-8040-5344-bb02-b1b2859ffbf9",
+    "registration_id": "3b6efa3e-3249-5f7a-8ab0-a4b44b60922e",
+    "gear_code": "TT"
+  },
+  {
+    "id": "2a0e31dd-15bf-5b5e-888c-92b57f1387a2",
+    "registration_id": "05b0bee9-69ff-5949-9cb3-b881532dd808",
+    "gear_code": "V"
+  },
+  {
+    "id": "4bb3075c-b55b-5bd4-a1ce-bd02f8fcfec3",
+    "registration_id": "ec2e6e4d-9f38-580f-838f-c798a7e6b61a",
+    "gear_code": "B"
+  },
+  {
+    "id": "70ca8dda-8021-5e9b-a077-ae291ee25fda",
+    "registration_id": "ec2e6e4d-9f38-580f-838f-c798a7e6b61a",
+    "gear_code": "TT"
+  }
+]

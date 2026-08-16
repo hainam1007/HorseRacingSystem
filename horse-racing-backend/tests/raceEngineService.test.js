@@ -75,12 +75,12 @@ test('latest pre-race HorseCheck wins eligibility selection', function() {
   assert.equal(latestByHorse.get(horseId).is_eligible, false);
 });
 
-test('draft result generation is wrapped in a MongoDB transaction', function() {
+test('draft result generation is wrapped in a Sequelize transaction', function() {
   const source = fs.readFileSync(path.join(__dirname, '..', 'services', 'raceEngineService.js'), 'utf8');
 
-  assert.match(source, /session\.withTransaction/);
-  assert.match(source, /RaceResult\.insertMany\(results,[\s\S]*ordered:\s*true,[\s\S]*session:\s*session[\s\S]*\)/);
-  assert.match(source, /completeRun\(activeRun,\s*session\)/);
+  assert.match(source, /sequelize\.transaction/);
+  assert.match(source, /RaceResult\.bulkCreate/);
+  assert.match(source, /completeRun\(activeRun\)/);
 });
 
 test('scheduler processing only locks registrations', function() {
@@ -107,7 +107,7 @@ test('draft results preserve raw and final values', function() {
 test('race result confirmation requires the referee penalty snapshot and submission', function() {
   const source = fs.readFileSync(path.join(__dirname, '..', 'services', 'raceResultService.js'), 'utf8');
 
-  assert.match(source, /async function confirmRaceResults[\s\S]*session\.withTransaction/);
+  assert.match(source, /async function confirmRaceResults[\s\S]*sequelize\.transaction/);
   assert.match(source, /penaltiesMatchCurrentSnapshot\(submittedResults, confirmedViolations\)/);
   assert.match(source, /Referee must apply confirmed penalties and submit final results before Admin confirmation/);
   assert.match(source, /All race violations must be confirmed or dismissed first/);

@@ -323,9 +323,11 @@ export function adaptTournamentDetail({ tournamentPayload, racesPayload }) {
 
 // ─── Race results adapters ────────────────────────────────────────────────────
 export function toSpectatorRaceResult(apiResult, index = 0) {
-  const horse = apiResult.horse_id || apiResult.horse || {};
-  const jockey = apiResult.jockey_id || apiResult.jockey || {};
-  const race = apiResult.race_id || apiResult.race || {};
+  // The API includes populated entities alongside their UUID foreign keys.
+  // Prefer the entity so public result cards never render an internal UUID.
+  const horse = apiResult.horse || apiResult.horse_id || {};
+  const jockey = apiResult.jockey || apiResult.jockey_id || {};
+  const race = apiResult.race || apiResult.race_id || {};
   const positionValue = apiResult.final_position ?? apiResult.position;
   const numericPosition = Number(positionValue);
   const position = Number.isInteger(numericPosition) && numericPosition > 0
@@ -341,7 +343,7 @@ export function toSpectatorRaceResult(apiResult, index = 0) {
     jockey:
       typeof jockey === "string"
         ? jockey
-        : jockey.user_id?.full_name || jockey.full_name || apiResult.jockey_name || "Unknown Jockey",
+        : jockey.user?.full_name || jockey.user_id?.full_name || jockey.full_name || apiResult.jockey_name || "Unknown Jockey",
     race: typeof race === "string" ? race : race.name || apiResult.race_name || "Race",
     lane: apiResult.lane || "-",
     weight: typeof horse === "object" ? horse.weight : null,

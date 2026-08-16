@@ -1,12 +1,15 @@
 const ApiError = require('../utils/ApiError');
 const { ROLE_NAMES } = require('../constants/roles');
+const { Op } = require('sequelize');
 const profileRepository = require('../repositories/profileRepository');
 const roleRepository = require('../repositories/roleRepository');
 const userRepository = require('../repositories/userRepository');
-const { HorseOwner, Jockey, RaceReferee, UserRole } = require('../models');
+const { loadSequelizeModels } = require('../models/sequelize/index.js');
+
+function getModels() { return loadSequelizeModels().models; }
 
 function sanitizeUser(user) {
-  const plainUser = typeof user.toObject === 'function' ? user.toObject() : user;
+  const plainUser = user && typeof user.toJSON === 'function' ? user.toJSON() : (user && typeof user.toObject === 'function' ? user.toObject() : user);
   const safeUser = Object.assign({}, plainUser);
 
   delete safeUser.password;
@@ -33,10 +36,7 @@ async function listUsers(query) {
   const filter = {};
 
   if (query.email) {
-    filter.email = {
-      $regex: query.email,
-      $options: 'i'
-    };
+    filter.email = { [Op.iLike]: `%${query.email}%` };
   }
 
   if (query.status) {
@@ -58,10 +58,14 @@ async function listUsers(query) {
       };
     }
 
-    const userRoles = await UserRole.find({ role_id: role._id }).select('user_id').lean();
+    const userRoles = await getModels().UserRole.findAll({
+      where: { role_id: role._id },
+      attributes: ['user_id'],
+      raw: true
+    });
 
-    filter._id = {
-      $in: userRoles.map(function(userRole) {
+    filter.id = {
+      [Op.in]: userRoles.map(function(userRole) {
         return userRole.user_id;
       })
     };
@@ -110,27 +114,18 @@ async function updateUserStatus(userId, payload) {
 
 async function ensureProfileForRole(userId, roleName) {
   if (roleName === ROLE_NAMES.HORSE_OWNER) {
-    const profile = await HorseOwner.findOne({ user_id: userId });
-
-    if (!profile) {
-      await HorseOwner.create({ user_id: userId });
-    }
+    const profile = await getModels().HorseOwner.findOne({ where: { user_id: userId } });
+    if (!profile) await getModels().HorseOwner.create({ user_id: userId });
   }
 
   if (roleName === ROLE_NAMES.JOCKEY) {
-    const profile = await Jockey.findOne({ user_id: userId });
-
-    if (!profile) {
-      await Jockey.create({ user_id: userId });
-    }
+    const profile = await getModels().Jockey.findOne({ where: { user_id: userId } });
+    if (!profile) await getModels().Jockey.create({ user_id: userId });
   }
 
   if (roleName === ROLE_NAMES.RACE_REFEREE) {
-    const profile = await RaceReferee.findOne({ user_id: userId });
-
-    if (!profile) {
-      await RaceReferee.create({ user_id: userId });
-    }
+    const profile = await getModels().RaceReferee.findOne({ where: { user_id: userId } });
+    if (!profile) await getModels().RaceReferee.create({ user_id: userId });
   }
 }
 
@@ -176,8 +171,8 @@ async function removeRole(userId, roleName) {
 
   const roles = await userRepository.getUserRoleDocsByUserId(user._id);
 
-  if (!roles.some(function(userRole) {
-    return userRole.role_id && userRole.role_id.role_name === roleName;
+  if (!roles.some(function(r) {
+    return r.role_name === roleName;
   })) {
     throw new ApiError(404, 'User role not found');
   }

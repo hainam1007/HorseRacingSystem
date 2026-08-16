@@ -1,0 +1,54 @@
+[
+  {
+    "id": "b562b9e3-7f85-5f7f-a46d-d7e7f2ebc975",
+    "violation_id": "3c887c57-3413-5717-b775-f29c8f4fc86b",
+    "kind": "suggested",
+    "type": "position_demotion",
+    "score_deduction": 0,
+    "position_delta": 2,
+    "time_penalty_seconds": 0,
+    "suspension_days": 0,
+    "fine_amount": 0,
+    "disqualified": false,
+    "note": "Demoted two positions for dangerous riding"
+  },
+  {
+    "id": "8a5d48c7-15c4-538a-a209-3ebc4405e33c",
+    "violation_id": "3c887c57-3413-5717-b775-f29c8f4fc86b",
+    "kind": "proposed",
+    "type": "position_demotion",
+    "score_deduction": 0,
+    "position_delta": 2,
+    "time_penalty_seconds": 0,
+    "suspension_days": 0,
+    "fine_amount": 0,
+    "disqualified": false,
+    "note": "Demoted two positions for dangerous riding"
+  },
+  {
+    "id": "c3263757-2409-5bcc-94c5-98753cd1e1df",
+    "violation_id": "3c887c57-3413-5717-b775-f29c8f4fc86b",
+    "kind": "penalty",
+    "type": "position_demotion",
+    "score_deduction": 0,
+    "position_delta": 2,
+    "time_penalty_seconds": 0,
+    "suspension_days": 0,
+    "fine_amount": 0,
+    "disqualified": false,
+    "note": "Demoted two positions for dangerous riding"
+  },
+  {
+    "id": "f58a574b-ff97-5a3b-8665-36b31852fe27",
+    "violation_id": "742c89b8-64e2-5e3b-9084-21e446235c5b",
+    "kind": "suggested",
+    "type": "position_demotion",
+    "score_deduction": 0,
+    "position_delta": 2,
+    "time_penalty_seconds": 0,
+    "suspension_days": 0,
+    "fine_amount": 0,
+    "disqualified": false,
+    "note": "Demoted two positions for dangerous riding"
+  }
+]

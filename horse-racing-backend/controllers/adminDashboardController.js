@@ -1,11 +1,12 @@
 const adminDashboardService = require('../services/adminDashboardService');
+const { sendSuccess } = require('../utils/apiResponse');
 
 class AdminDashboardController {
   
   async getDashboardSummary(req, res, next) {
     try {
       const summary = await adminDashboardService.getDashboardSummary(req.query.from, req.query.to);
-      res.json(summary);
+      return sendSuccess(res, 200, 'Dashboard summary retrieved successfully', summary);
     } catch (error) {
       next(error);
     }
@@ -15,7 +16,7 @@ class AdminDashboardController {
     try {
       const { from, to } = req.query;
       const summary = await adminDashboardService.getBettingSummary(from, to);
-      res.json(summary);
+      return sendSuccess(res, 200, 'Betting summary retrieved successfully', summary);
     } catch (error) {
       next(error);
     }
@@ -31,7 +32,7 @@ class AdminDashboardController {
         parseInt(page) || 1,
         parseInt(limit) || 20
       );
-      res.json(result);
+      return sendSuccess(res, 200, 'Deposit requests retrieved successfully', result);
     } catch (error) {
       next(error);
     }
@@ -41,7 +42,7 @@ class AdminDashboardController {
     try {
       const { from, to } = req.query;
       const summary = await adminDashboardService.getPrizeAwardsSummary(from, to);
-      res.json(summary);
+      return sendSuccess(res, 200, 'Prize awards summary retrieved successfully', summary);
     } catch (error) {
       next(error);
     }

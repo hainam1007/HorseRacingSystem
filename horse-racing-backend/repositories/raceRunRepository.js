@@ -1,68 +1,56 @@
-const { RaceRun } = require('../models');
+const { loadSequelizeModels } = require('../models/sequelize/index.js');
 
-function basePopulate(query) {
-  return query
-    .populate({
-      path: 'race_id',
-      populate: [
-        { path: 'tournament_id' },
-        { path: 'round_id' },
-        {
-          path: 'referee_id',
-          populate: {
-            path: 'user_id',
-            select: 'full_name email'
-          }
-        }
+function getModels() { return loadSequelizeModels().models; }
+
+function baseInclude() {
+  const { Race, Tournament, Round, RaceReferee, User, RaceRunParticipant, RaceRunFinishOrder, Horse, Jockey, HorseOwner } = getModels();
+  return [
+    {
+      model: Race,
+      as: 'race',
+      include: [
+        { model: Tournament, as: 'tournament' },
+        { model: Round, as: 'round' },
+        { model: RaceReferee, as: 'referee', include: [{ model: User, as: 'user', attributes: ['full_name', 'email'] }] }
       ]
-    })
-    .populate('participants.horse_id')
-    .populate({
-      path: 'participants.jockey_id',
-      populate: {
-        path: 'user_id',
-        select: 'full_name email'
-      }
-    })
-    .populate('participants.assignment_id')
-    .populate('finish_order.horse_id')
-    .populate({
-      path: 'finish_order.jockey_id',
-      populate: {
-        path: 'user_id',
-        select: 'full_name email'
-      }
-    })
-    .populate('generated_by', 'full_name email');
+    },
+    {
+      model: RaceRunParticipant,
+      as: 'participants',
+      include: [
+        { model: Horse, as: 'horse' },
+        { model: Jockey, as: 'jockey', include: [{ model: User, as: 'user', attributes: ['full_name', 'email'] }] },
+        { model: HorseOwner, as: 'owner' }
+      ]
+    },
+    {
+      model: RaceRunFinishOrder,
+      as: 'finish_order',
+      include: [
+        { model: Horse, as: 'horse' },
+        { model: Jockey, as: 'jockey', include: [{ model: User, as: 'user', attributes: ['full_name', 'email'] }] }
+      ]
+    },
+    { model: User, as: 'generated_by_user', attributes: ['full_name', 'email'] }
+  ];
 }
 
-async function create(data, options) {
-  const docs = await RaceRun.create([data], options || {});
-
-  return docs[0];
+async function create(data) {
+  const { RaceRun } = getModels();
+  return RaceRun.create(data);
 }
 
-async function findOne(filter, options) {
-  const query = basePopulate(RaceRun.findOne(filter || {}));
-
-  if (options && options.session) {
-    query.session(options.session);
-  }
-
-  return query;
+async function findOne(filter = {}) {
+  const { RaceRun } = getModels();
+  return RaceRun.findOne({ where: filter, include: baseInclude() });
 }
 
-async function updateById(id, data, options) {
-  const updateOptions = {
-    returnDocument: 'after',
-    runValidators: true
-  };
-
-  if (options && options.session) {
-    updateOptions.session = options.session;
-  }
-
-  return basePopulate(RaceRun.findByIdAndUpdate(id, data, updateOptions));
+async function updateById(id, data) {
+  const { RaceRun } = getModels();
+  const instance = await RaceRun.findByPk(id);
+  if (!instance) return null;
+  await instance.update(data);
+  return RaceRun.findByPk(id, { include: baseInclude() });
 }
 
 module.exports = {

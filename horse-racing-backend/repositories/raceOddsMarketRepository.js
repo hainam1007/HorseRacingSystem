@@ -1,62 +1,51 @@
-const { RaceOddsMarket } = require('../models');
+const { loadSequelizeModels } = require('../models/sequelize/index.js');
 
-function basePopulate(query) {
-  return query
-    .populate({
-      path: 'race_id',
-      populate: [
-        { path: 'tournament_id' },
-        { path: 'round_id' }
-      ]
-    })
-    .populate('odds.horse_id')
-    .populate({
-      path: 'odds.jockey_id',
-      populate: {
-        path: 'user_id',
-        select: 'full_name email'
-      }
-    })
-    .populate('generated_by', 'full_name email')
-    .populate('manually_adjusted_by', 'full_name email');
+function getModels() { return loadSequelizeModels().models; }
+
+function baseInclude() {
+  const { Race, Tournament, Round, User, RaceOddsMarketOdd } = getModels();
+  return [
+    {
+      model: Race,
+      as: 'race',
+      include: [{ model: Tournament, as: 'tournament' }, { model: Round, as: 'round' }]
+    },
+    { model: User, as: 'generator', attributes: ['full_name', 'email'] },
+    { model: User, as: 'adjuster', attributes: ['full_name', 'email'] },
+    { model: RaceOddsMarketOdd, as: 'odds', order: [['probability_rank', 'ASC']] }
+  ];
 }
 
 async function findByRaceId(raceId) {
-  return basePopulate(RaceOddsMarket.findOne({ race_id: raceId }));
+  const { RaceOddsMarket } = getModels();
+  return RaceOddsMarket.findOne({ where: { race_id: raceId }, include: baseInclude() });
 }
 
 async function upsertByRaceId(raceId, data) {
-  return basePopulate(RaceOddsMarket.findOneAndUpdate(
-    { race_id: raceId },
-    data,
-    {
-      returnDocument: 'after',
-      upsert: true,
-      runValidators: true
-    }
-  ));
+  const { RaceOddsMarket } = getModels();
+  let instance = await RaceOddsMarket.findOne({ where: { race_id: raceId } });
+  if (instance) {
+    await instance.update(data);
+  } else {
+    instance = await RaceOddsMarket.create({ ...data, race_id: raceId });
+  }
+  return RaceOddsMarket.findOne({ where: { race_id: raceId }, include: baseInclude() });
 }
 
 async function updateByRaceId(raceId, data) {
-  return basePopulate(RaceOddsMarket.findOneAndUpdate(
-    { race_id: raceId },
-    data,
-    {
-      returnDocument: 'after',
-      runValidators: true
-    }
-  ));
+  const { RaceOddsMarket } = getModels();
+  const instance = await RaceOddsMarket.findOne({ where: { race_id: raceId } });
+  if (!instance) return null;
+  await instance.update(data);
+  return RaceOddsMarket.findOne({ where: { race_id: raceId }, include: baseInclude() });
 }
 
 async function updateGeneratedByRaceId(raceId, data) {
-  return basePopulate(RaceOddsMarket.findOneAndUpdate(
-    { race_id: raceId, status: 'generated' },
-    data,
-    {
-      returnDocument: 'after',
-      runValidators: true
-    }
-  ));
+  const { RaceOddsMarket } = getModels();
+  const instance = await RaceOddsMarket.findOne({ where: { race_id: raceId, status: 'generated' } });
+  if (!instance) return null;
+  await instance.update(data);
+  return RaceOddsMarket.findOne({ where: { race_id: raceId }, include: baseInclude() });
 }
 
 module.exports = {

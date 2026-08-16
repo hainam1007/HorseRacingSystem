@@ -1,0 +1,27 @@
+[
+  {
+    "id": "69d41014-4d53-5b05-b87c-629b6111eac1",
+    "role_name": "admin",
+    "description": "System administrator"
+  },
+  {
+    "id": "54017cb0-0dc3-5f88-8e28-2e99810ed790",
+    "role_name": "horse_owner",
+    "description": "Horse owner and stable manager"
+  },
+  {
+    "id": "dc66f670-25b0-557d-a5b2-e021b112525b",
+    "role_name": "jockey",
+    "description": "Professional jockey"
+  },
+  {
+    "id": "2b335d3d-bfd5-50bf-85e9-029c6435b7af",
+    "role_name": "race_referee",
+    "description": "Race referee"
+  },
+  {
+    "id": "1b4a3f02-9894-5adc-82ef-c2160cec2258",
+    "role_name": "spectator",
+    "description": "Spectator account"
+  }
+]

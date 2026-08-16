@@ -1,41 +1,40 @@
-const { RegistrationCancellationTicket } = require('../models');
+const { loadSequelizeModels } = require('../models/sequelize/index.js');
 
-function populate(query) {
-  return query
-    .populate('registration_id')
-    .populate('tournament_id', 'name start_date end_date status')
-    .populate('race_id', 'name race_date status entry_fee entry_fee_currency')
-    .populate('horse_id', 'name registration_number image_url')
-    .populate({
-      path: 'owner_id',
-      populate: { path: 'user_id', select: 'full_name email phone_number' }
-    })
-    .populate('reviewed_by', 'full_name email')
-    .populate('refund_sent_by', 'full_name email');
+function getModels() { return loadSequelizeModels().models; }
+
+function baseInclude() {
+  const { Registration, Tournament, Race, Horse, User } = getModels();
+  return [
+    { model: Registration, as: 'registration' },
+    { model: Tournament, as: 'tournament', attributes: ['id', 'name', 'start_date', 'end_date', 'status'] },
+    { model: Race, as: 'race', attributes: ['id', 'name', 'race_date', 'status', 'entry_fee', 'entry_fee_currency'] },
+    { model: Horse, as: 'horse', attributes: ['id', 'name', 'registration_number', 'image_url'] },
+    { model: User, as: 'reviewer', attributes: ['id', 'full_name', 'email'] },
+    { model: User, as: 'refund_sender', attributes: ['id', 'full_name', 'email'] }
+  ];
 }
 
 async function create(data) {
+  const { RegistrationCancellationTicket } = getModels();
   return RegistrationCancellationTicket.create(data);
 }
 
-async function find(filter) {
-  return populate(
-    RegistrationCancellationTicket.find(filter || {}).sort({ created_at: -1 })
-  );
+async function find(filter = {}) {
+  const { RegistrationCancellationTicket } = getModels();
+  return RegistrationCancellationTicket.findAll({ where: filter, include: baseInclude(), order: [['created_at', 'DESC']] });
 }
 
-async function findById(id, session) {
-  return populate(
-    RegistrationCancellationTicket.findById(id).session(session || null)
-  );
+async function findById(id) {
+  const { RegistrationCancellationTicket } = getModels();
+  return RegistrationCancellationTicket.findByPk(id, { include: baseInclude() });
 }
 
-async function updateById(id, data, session) {
-  return RegistrationCancellationTicket.findByIdAndUpdate(id, data, {
-    returnDocument: 'after',
-    runValidators: true,
-    session: session || null
-  });
+async function updateById(id, data) {
+  const { RegistrationCancellationTicket } = getModels();
+  const instance = await RegistrationCancellationTicket.findByPk(id);
+  if (!instance) return null;
+  await instance.update(data);
+  return instance;
 }
 
 module.exports = {

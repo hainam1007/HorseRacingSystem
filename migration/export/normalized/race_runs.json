@@ -1,0 +1,122 @@
+[
+  {
+    "id": "e39ffec9-7ad2-50df-a8d3-f95fd28b87dd",
+    "race_id": "bb4f094f-a85e-58e6-a5db-3725e1724fe7",
+    "status": "used",
+    "generated_by": "2a999561-9019-5bf2-b7d0-f4aa6d745285",
+    "generated_at": "2026-07-03T02:00:00.000Z",
+    "seed": "clean-july-historical-1",
+    "created_at": "2026-07-30T04:45:26.129Z",
+    "updated_at": "2026-07-30T04:45:26.129Z"
+  },
+  {
+    "id": "a5f4da47-0326-59b7-a250-66db833b4fde",
+    "race_id": "2ddfccc9-b137-52e7-9238-e1266602f589",
+    "status": "used",
+    "generated_by": "2a999561-9019-5bf2-b7d0-f4aa6d745285",
+    "generated_at": "2026-07-05T08:00:00.000Z",
+    "seed": "clean-july-historical-2",
+    "created_at": "2026-07-30T04:45:28.273Z",
+    "updated_at": "2026-07-30T04:45:28.273Z"
+  },
+  {
+    "id": "f40a8eec-2740-51f7-8d2b-a075c482f95b",
+    "race_id": "93ff3d27-31a2-5e45-a9b3-06bab82f9daf",
+    "status": "used",
+    "generated_by": "2a999561-9019-5bf2-b7d0-f4aa6d745285",
+    "generated_at": "2026-07-07T02:00:00.000Z",
+    "seed": "clean-july-historical-3",
+    "created_at": "2026-07-30T04:45:30.416Z",
+    "updated_at": "2026-07-30T04:45:30.416Z"
+  },
+  {
+    "id": "d92dd0bc-7b7a-56df-9555-507c82d20952",
+    "race_id": "23756a7a-17a6-56f5-989a-3226cc1f30f7",
+    "status": "used",
+    "generated_by": "2a999561-9019-5bf2-b7d0-f4aa6d745285",
+    "generated_at": "2026-07-09T08:00:00.000Z",
+    "seed": "clean-july-historical-4",
+    "created_at": "2026-07-30T04:45:32.574Z",
+    "updated_at": "2026-07-30T04:45:32.574Z"
+  },
+  {
+    "id": "75b72432-95ad-5154-b178-28a9c201af50",
+    "race_id": "22de2553-1df9-5946-8e35-63b5d41f528f",
+    "status": "used",
+    "generated_by": "2a999561-9019-5bf2-b7d0-f4aa6d745285",
+    "generated_at": "2026-07-11T02:00:00.000Z",
+    "seed": "clean-july-historical-5",
+    "created_at": "2026-07-30T04:45:34.689Z",
+    "updated_at": "2026-07-30T04:45:34.689Z"
+  },
+  {
+    "id": "877802e9-8904-5af3-aaba-950a7f34d386",
+    "race_id": "08387fd4-a614-5cdd-a770-bfc9fa9ea69e",
+    "status": "used",
+    "generated_by": "2a999561-9019-5bf2-b7d0-f4aa6d745285",
+    "generated_at": "2026-07-13T08:00:00.000Z",
+    "seed": "clean-july-historical-6",
+    "created_at": "2026-07-30T04:45:36.827Z",
+    "updated_at": "2026-07-30T04:45:36.827Z"
+  },
+  {
+    "id": "280240d8-9091-5649-83e7-2cb13ceec9bf",
+    "race_id": "f8ea600d-1b70-5fc2-b961-74be4f49a097",
+    "status": "used",
+    "generated_by": "b90984ff-8d05-5682-a127-db747cbc82c8",
+    "generated_at": "2026-07-30T05:56:31.018Z",
+    "seed": null,
+    "created_at": "2026-07-30T05:56:31.021Z",
+    "updated_at": "2026-07-30T05:59:22.599Z"
+  },
+  {
+    "id": "8bce25b4-bfde-5d7b-94c5-87192f78efc2",
+    "race_id": "88aff93c-74d0-573e-a4fb-66dc2aa785f2",
+    "status": "generated",
+    "generated_by": "b90984ff-8d05-5682-a127-db747cbc82c8",
+    "generated_at": "2026-07-30T06:13:44.387Z",
+    "seed": null,
+    "created_at": "2026-07-30T06:13:44.396Z",
+    "updated_at": "2026-07-30T06:13:44.396Z"
+  },
+  {
+    "id": "c8ce85c9-6354-5328-968f-892f6e629e78",
+    "race_id": "92de665f-0113-5ddc-bb5f-41c93a953fde",
+    "status": "generated",
+    "generated_by": "b90984ff-8d05-5682-a127-db747cbc82c8",
+    "generated_at": "2026-07-30T07:02:32.830Z",
+    "seed": null,
+    "created_at": "2026-07-30T07:02:32.834Z",
+    "updated_at": "2026-07-30T07:02:32.834Z"
+  },
+  {
+    "id": "8e929f93-0900-57cb-9120-92e9bb6ff424",
+    "race_id": "3394deb1-5116-5a94-a7a4-2d87f147aeea",
+    "status": "used",
+    "generated_by": "b90984ff-8d05-5682-a127-db747cbc82c8",
+    "generated_at": "2026-08-10T14:23:24.129Z",
+    "seed": null,
+    "created_at": "2026-08-10T14:23:24.134Z",
+    "updated_at": "2026-08-10T14:24:44.546Z"
+  },
+  {
+    "id": "b0ea1399-f3ef-537a-b43a-8d7544499407",
+    "race_id": "d35605ea-afa2-58cc-8edd-137cff584362",
+    "status": "generated",
+    "generated_by": "b90984ff-8d05-5682-a127-db747cbc82c8",
+    "generated_at": "2026-08-11T09:57:40.847Z",
+    "seed": null,
+    "created_at": "2026-08-11T09:57:40.904Z",
+    "updated_at": "2026-08-11T09:57:40.904Z"
+  },
+  {
+    "id": "6580f638-25c8-540c-9a8e-4f27699a2198",
+    "race_id": "e279b503-2031-5c9a-80ac-b599aaa46fc3",
+    "status": "used",
+    "generated_by": "a8c22c68-ced9-5c67-8b7c-cc3861e83c0d",
+    "generated_at": "2026-08-13T06:21:47.878Z",
+    "seed": null,
+    "created_at": "2026-08-13T06:21:47.882Z",
+    "updated_at": "2026-08-13T06:25:45.116Z"
+  }
+]

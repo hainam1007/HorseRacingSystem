@@ -1,0 +1,1 @@
+{"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_"},{"v":{"$numberInt":"2"},"key":{"owner_id":{"$numberInt":"1"}},"name":"owner_id_1"},{"v":{"$numberInt":"2"},"key":{"registration_number":{"$numberInt":"1"}},"name":"registration_number_1","unique":true}],"uuid":"e04160b19b714aba974f2e86a739eaac","collectionName":"horses","type":"collection"}

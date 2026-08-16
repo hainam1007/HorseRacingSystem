@@ -104,7 +104,6 @@ function RaceResult() {
   const lockedResults = submittedToAdmin ||
     [RESULT_STATUSES.CONFIRMED, RESULT_STATUSES.PUBLISHED].includes(race.resultStatus);
   const readinessChecks = readiness ? [
-    ["Race date passed", readiness.race_date_passed],
     ["Registration locked", readiness.registration_locked],
     ["Race completed", ["completed", "finished"].includes(String(readiness.race_status).toLowerCase())],
     ["Eligible participants", readiness.eligible_participant_count > 0],

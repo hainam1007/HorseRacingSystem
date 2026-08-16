@@ -36,7 +36,7 @@ import {
 import LoadingSkeleton from "../../components/LoadingSkeleton.jsx";
 import { ownerApi } from "../../api/ownerApi";
 import { readFileAsDataUri } from "../../utils/fileData";
-import { canRequestRegistrationCancellation, findAcceptedPrimaryAssignment, toHorsePayload, toOwnerJockey, toOwnerProfilePayload, toOwnerRaceOption, toOwnerScheduleEntry } from "./ownerAdapters";
+import { canRequestRegistrationCancellation, findAcceptedPrimaryAssignment, findPrimaryAssignmentForRegistration, toHorsePayload, toOwnerJockey, toOwnerProfilePayload, toOwnerRaceOption, toOwnerScheduleEntry } from "./ownerAdapters";
 import { useOwnerCancellationTickets, useOwnerHorse, useOwnerHorseApprovalStatus, useOwnerHorses, useOwnerJockeyAssignments, useOwnerJockeys, useOwnerPrizeAwards, useOwnerProfile, useOwnerRegistrations, useOwnerTournaments } from "./useOwnerData";
 
 const statusClass = (status) => {
@@ -119,6 +119,7 @@ const getJockeyAvailabilityReason = (jockey) => {
 };
 
 const isMongoObjectId = (value) => /^[a-f\d]{24}$/i.test(String(value || ""));
+const isUuidLike = (value) => /^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i.test(String(value || ""));
 
 // Keep an owner's open invitation workspace in sync with jockey responses without
 // interrupting the form they may be completing. This also works when the jockey
@@ -127,7 +128,7 @@ const ASSIGNMENT_REFRESH_INTERVAL_MS = 5000;
 
 const compactRecordCode = (prefix, value) => {
   if (!value) return prefix;
-  if (isMongoObjectId(value)) return `${prefix}-${String(value).slice(-6).toUpperCase()}`;
+  if (isMongoObjectId(value) || isUuidLike(value)) return `${prefix}-${String(value).slice(-6).toUpperCase()}`;
   return value;
 };
 
@@ -195,19 +196,30 @@ const lockedRaceStatuses = [
 const normalizeAssignmentRecord = (item) => {
   if (!item) return item;
 
-  if (item.status === "pending") {
-    return { ...item, source_status: item.status, status: "meeting_invited" };
+  // The Sequelize API returns eager-loaded entities as `horse`, `jockey`, and
+  // `race` with an `id`. The owner workspace still reads the legacy Mongo
+  // shape (`*_id` and `_id`), so normalize both response formats here.
+  const normalized = {
+    ...item,
+    _id: item._id || item.id,
+    horse_id: item.horse || item.horse_id,
+    jockey_id: item.jockey || item.jockey_id,
+    race_id: item.race || item.race_id,
+  };
+
+  if (normalized.status === "pending") {
+    return { ...normalized, source_status: normalized.status, status: "meeting_invited" };
   }
-  if (item.status === "rejected") {
-    return { ...item, source_status: item.status, status: "meeting_rejected" };
+  if (normalized.status === "rejected") {
+    return { ...normalized, source_status: normalized.status, status: "meeting_rejected" };
   }
-  if (item.assignment_type === "backup" && item.status === "terms_pending_confirmation") {
-    return { ...item, source_status: item.status, status: "standby_terms_pending_confirmation" };
+  if (normalized.assignment_type === "backup" && normalized.status === "terms_pending_confirmation") {
+    return { ...normalized, source_status: normalized.status, status: "standby_terms_pending_confirmation" };
   }
-  if (item.assignment_type === "backup" && ["terms_agreed", "contract_uploaded", "accepted"].includes(item.status)) {
-    return { ...item, source_status: item.status, status: "standby_confirmed" };
+  if (normalized.assignment_type === "backup" && ["terms_agreed", "contract_uploaded", "accepted"].includes(normalized.status)) {
+    return { ...normalized, source_status: normalized.status, status: "standby_confirmed" };
   }
-  return item;
+  return normalized;
 };
 
 const isAssignmentRaceLocked = (item) => {
@@ -227,7 +239,14 @@ const withdrawableAssignmentStatuses = [
 const assignmentPartyName = (party, fallback) => {
   if (!party) return fallback;
   if (typeof party === "string") return fallback;
-  return party.name || party.user_id?.full_name || party.user_id?.email || fallback;
+  return party.name
+    || party.full_name
+    || party.user?.full_name
+    || party.user_id?.full_name
+    || party.email
+    || party.user?.email
+    || party.user_id?.email
+    || fallback;
 };
 
 const PageHeader = ({ eyebrow, title, copy, action }) => (
@@ -510,7 +529,13 @@ function OwnerHorseForm({ mode = "new" }) {
           payload.image_file_data = imageFileData;
         }
         const data = await ownerApi.createHorse(payload);
-        navigate(`/owner/horses/${data.horse._id}`, { replace: true });
+        // Sequelize returns `id`, while the legacy Mongo response used `_id`.
+        // Use either form so the detail page never receives an undefined ID.
+        const createdHorseId = data.horse?.id || data.horse?._id;
+        if (!createdHorseId) {
+          throw new Error("Horse was created but its ID was not returned by the server.");
+        }
+        navigate(`/owner/horses/${createdHorseId}`, { replace: true });
       }
     } catch (apiError) {
       setError(apiError.message || "Unable to save horse profile.");
@@ -3200,7 +3225,8 @@ function OwnerSchedule() {
   const ownerSchedule = registrations
     .map((registration) => toOwnerScheduleEntry(
       registration,
-      findAcceptedPrimaryAssignment(assignments, registration)
+      findPrimaryAssignmentForRegistration(assignments, registration)
+        ?? findAcceptedPrimaryAssignment(assignments, registration)
     ))
     .sort((first, second) => {
       const firstDate = first.date && first.date !== "Date unavailable" ? new Date(first.date).getTime() : Number.POSITIVE_INFINITY;
@@ -3289,7 +3315,7 @@ function OwnerSchedule() {
                   <strong>{race.clock}</strong>
                 </div>
                 <div className="owner-schedule-slot__race">
-                  <span className="owner-kicker">{race.round && race.round !== "Round unavailable" && !isMongoObjectId(race.round) ? race.round : "Race day"}</span>
+                  <span className="owner-kicker">{race.round && race.round !== "Round unavailable" && !isMongoObjectId(race.round) && !isUuidLike(race.round) ? race.round : "Race day"}</span>
                   <h3>{race.race}</h3>
                   <small><MapPin size={13} /> {race.venue}</small>
                 </div>

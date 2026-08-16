@@ -1,7 +1,6 @@
 const assert = require('node:assert/strict');
 const test = require('node:test');
-const mongoose = require('mongoose');
-
+const { newObjectId } = require('../utils/objectId');
 const { ROLE_NAMES } = require('../constants/roles');
 const roleRepository = require('../repositories/roleRepository');
 const userRepository = require('../repositories/userRepository');
@@ -31,10 +30,10 @@ test.afterEach(() => {
 });
 
 test('registration remains successful when verification email delivery fails', async () => {
-  const userId = new mongoose.Types.ObjectId();
+  const userId = newObjectId();
 
   userRepository.findByEmail = async () => null;
-  roleRepository.findByNames = async () => [{ _id: new mongoose.Types.ObjectId(), role_name: ROLE_NAMES.SPECTATOR }];
+  roleRepository.findByNames = async () => [{ _id: newObjectId(), role_name: ROLE_NAMES.SPECTATOR }];
   cloudinaryService.uploadOptionalSource = async () => null;
   userRepository.createUser = async (payload) => ({
     _id: userId,

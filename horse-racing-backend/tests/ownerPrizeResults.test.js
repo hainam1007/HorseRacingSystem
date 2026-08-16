@@ -9,15 +9,6 @@ function readProjectFile(relativePath) {
   return fs.readFileSync(path.join(projectRoot, relativePath), 'utf8');
 }
 
-test('owner prize result feed exposes race result penalty details', () => {
-  const repositorySource = readProjectFile('repositories/prizeRepository.js');
-
-  assert.match(repositorySource, /path:\s*'applied_violation_ids'/);
-  assert.match(repositorySource, /path:\s*'race_result_id'/);
-  assert.match(repositorySource, /path:\s*'tournament_id'/);
-  assert.match(repositorySource, /path:\s*'round_id'/);
-});
-
 test('owner frontend reads prize awards instead of placeholder result copy', (t) => {
   const frontendReferenceRoot = path.join(projectRoot, '_reference', 'Horse-Riding-Management-System');
 

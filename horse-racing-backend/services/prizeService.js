@@ -1,10 +1,13 @@
 const ApiError = require('../utils/ApiError');
 const { ROLE_NAMES } = require('../constants/roles');
 const { PRIZE_AWARD_STATUS, RACE_RESULT_STATUS } = require('../constants/statuses');
+const { Op } = require('sequelize');
+const { loadSequelizeModels } = require('../models/sequelize/index.js');
 const prizeRepository = require('../repositories/prizeRepository');
 const profileRepository = require('../repositories/profileRepository');
 const raceRepository = require('../repositories/raceRepository');
-const { Race, RaceResult } = require('../models');
+
+function getModels() { return loadSequelizeModels().models; }
 
 const DEFAULT_DISTRIBUTION = [
   { position: 1, percent: 60, label: 'Winner' },
@@ -19,7 +22,7 @@ function hasRole(req, role) {
 }
 
 function getDocumentId(value) {
-  return value && (value._id || value);
+  return value && (value._id || value.id || value);
 }
 
 function toNumber(value, fallback) {
@@ -152,19 +155,18 @@ async function configureRacePrizes(adminUserId, raceId, payload) {
     prize_currency: (payload.prize_currency || payload.currency || 'VND').toUpperCase(),
     prize_distribution: distribution
   };
-  const race = await Race.findByIdAndUpdate(raceId, update, {
-    returnDocument: 'after',
-    runValidators: true
-  });
-
-  if (!race) {
+  const [affected] = await getModels().Race.update(update, { where: { id: raceId } });
+  if (affected === 0) {
     throw new ApiError(404, 'Race not found');
   }
+  const race = await getModels().Race.findByPk(raceId);
+  const racePlain = race && (race.toJSON ? race.toJSON() : race);
+  const raceView = { ...racePlain, _id: raceId };
 
-  const prizes = await syncPrizeDocuments(race, distribution);
+  const prizes = await syncPrizeDocuments(raceView, distribution);
 
   return {
-    race: await raceRepository.findById(race._id),
+    race: await raceRepository.findById(raceId),
     prizes: prizes,
     configured_by: adminUserId
   };
@@ -198,43 +200,38 @@ async function ensurePrizeForDistribution(race, item, session) {
   return prizes[0];
 }
 
-async function calculateRacePrizeAwards(raceId, adminUserId, options) {
-  const session = options && options.session;
-  const raceQuery = Race.findById(raceId);
-  const resultQuery = RaceResult.find({
-    race_id: raceId,
-    status: RACE_RESULT_STATUS.PUBLISHED
-  })
-    .populate({
-      path: 'horse_id',
-      populate: { path: 'owner_id' }
-    })
-    .populate('jockey_id')
-    .sort({ final_position: 1, position: 1 });
-
-  if (session) {
-    raceQuery.session(session);
-    resultQuery.session(session);
-  }
-
-  const race = await raceQuery;
-
+async function calculateRacePrizeAwards(raceId, adminUserId, _options) {
+  const race = await getModels().Race.findByPk(raceId);
   if (!race) {
     throw new ApiError(404, 'Race not found');
   }
+  const racePlain = race.toJSON ? race.toJSON() : race;
+  const raceView = { ...racePlain, _id: raceId };
 
-  const distribution = normalizePrizeDistribution(race.prize_distribution, Number(race.prize_pool || 0));
+  const results = await getModels().RaceResult.findAll({
+    where: { race_id: raceId, status: RACE_RESULT_STATUS.PUBLISHED },
+    include: [
+      {
+        model: getModels().Horse,
+        as: 'horse',
+        include: [{ model: getModels().HorseOwner, as: 'owner' }]
+      },
+      { model: getModels().Jockey, as: 'jockey' }
+    ],
+    order: [['final_position', 'ASC'], ['position', 'ASC']]
+  });
+
+  const distribution = normalizePrizeDistribution(raceView.prize_distribution, Number(raceView.prize_pool || 0));
 
   if (!distribution.length) {
     return {
-      race_id: race._id,
+      race_id: raceId,
       awards: [],
       created_count: 0,
       skipped: 'Race has no prize distribution'
     };
   }
 
-  const results = await resultQuery;
   const createdAwards = [];
   let createdCount = 0;
 
@@ -244,31 +241,31 @@ async function calculateRacePrizeAwards(raceId, adminUserId, options) {
       return item.position === position;
     });
 
-    if (!position || !distributionItem) {
-      continue;
-    }
+    if (!position || !distributionItem) continue;
 
-    const existing = await prizeRepository.findAward({ race_result_id: result._id }, session);
+    const resultPlain = result.toJSON ? result.toJSON() : result;
+    const resultId = resultPlain._id || result.id;
 
+    const existing = await prizeRepository.findAward({ race_result_id: resultId });
     if (existing) {
       createdAwards.push(existing);
       continue;
     }
 
-    const horse = result.horse_id;
+    const horse = result.horse;
     const ownerId = horse && getDocumentId(horse.owner_id);
-    const jockeyId = getDocumentId(result.jockey_id);
+    const jockeyId = getDocumentId(result.jockey);
 
     if (!horse || !ownerId) {
       throw new ApiError(400, 'Race result horse owner is required for prize award');
     }
 
-    const prize = await ensurePrizeForDistribution(race, distributionItem, session);
+    const prize = await ensurePrizeForDistribution(raceView, distributionItem);
     const split = splitPrizeAmount(prize.amount);
     const now = new Date();
     const award = await prizeRepository.createAward({
-      prize_id: prize._id,
-      race_result_id: result._id,
+      prize_id: getDocumentId(prize),
+      race_result_id: resultId,
       horse_id: getDocumentId(horse),
       owner_id: ownerId,
       jockey_id: jockeyId,
@@ -277,18 +274,18 @@ async function calculateRacePrizeAwards(raceId, adminUserId, options) {
       gross_amount: split.gross_amount,
       owner_amount: split.owner_amount,
       jockey_amount: split.jockey_amount,
-      currency: prize.currency || race.prize_currency || 'VND',
+      currency: prize.currency || raceView.prize_currency || 'VND',
       status: PRIZE_AWARD_STATUS.CALCULATED,
       awarded_at: now,
       calculated_at: now
-    }, session);
+    });
 
     createdAwards.push(award);
     createdCount += 1;
   }
 
   return {
-    race_id: race._id,
+    race_id: raceId,
     awards: createdAwards,
     created_count: createdCount,
     calculated_by: adminUserId
@@ -309,7 +306,7 @@ async function approveRaceAwards(adminUserId, raceId) {
     {
       prize_id: {
         $in: prizes.map(function(prize) {
-          return prize._id;
+          return getDocumentId(prize);
         })
       },
       status: PRIZE_AWARD_STATUS.CALCULATED
@@ -350,7 +347,7 @@ async function markAwardPaid(adminUserId, awardId) {
 async function listRaceAwards(req, raceId) {
   const prizes = await prizeRepository.findPrizes({ race_id: raceId });
   const prizeIds = prizes.map(function(prize) {
-    return prize._id;
+    return getDocumentId(prize);
   });
 
   if (!prizeIds.length) {

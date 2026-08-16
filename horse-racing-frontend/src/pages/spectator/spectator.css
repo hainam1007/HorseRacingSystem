@@ -595,6 +595,7 @@
   border-radius: 12px;
   background: rgba(var(--spectator-landing-green-rgb), 0.92);
   box-shadow: 0 18px 42px rgba(0, 0, 0, 0.34);
+  -webkit-backdrop-filter: blur(14px);
   backdrop-filter: blur(14px);
   transform: translateY(-8px) scaleY(0.82);
   transform-origin: top;
@@ -642,6 +643,7 @@
   border: 1px solid rgba(var(--racing-contrast-rgb), 0.28);
   border-radius: 12px;
   background: rgba(var(--racing-contrast-rgb), 0.11);
+  -webkit-backdrop-filter: blur(8px);
   backdrop-filter: blur(8px);
 }
 
@@ -868,6 +870,7 @@
     linear-gradient(rgba(var(--racing-contrast-rgb), 0.035) 1px, transparent 1px),
     linear-gradient(90deg, rgba(var(--racing-contrast-rgb), 0.03) 1px, transparent 1px);
   background-size: 42px 42px;
+  -webkit-mask-image: linear-gradient(90deg, #000 0%, transparent 78%);
   mask-image: linear-gradient(90deg, #000 0%, transparent 78%);
 }
 
@@ -1865,6 +1868,7 @@
   border: 1px solid rgba(var(--racing-contrast-rgb), 0.18);
   border-radius: 8px;
   background: rgba(var(--spectator-landing-green-rgb), 0.72);
+  -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
 }
 
@@ -2049,6 +2053,7 @@
   border: 1px solid rgba(var(--racing-contrast-rgb), 0.18);
   border-radius: 8px;
   background: rgba(var(--spectator-landing-green-rgb), 0.72);
+  -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
 }
 
@@ -2228,6 +2233,7 @@
   padding: 14px;
   border-radius: 8px;
   background: rgba(var(--spectator-landing-green-rgb), 0.7);
+  -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
 }
 
@@ -2774,6 +2780,7 @@
   border: 1px solid rgba(var(--racing-contrast-rgb), 0.28);
   border-radius: 8px;
   background: rgba(27, 50, 38, 0.74);
+  -webkit-backdrop-filter: blur(14px);
   backdrop-filter: blur(14px);
 }
 
@@ -3548,6 +3555,7 @@
   width: fit-content;
   font-size: 0.72rem;
   font-weight: 900;
+  -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.22);
 }
@@ -3732,6 +3740,7 @@
     linear-gradient(rgba(var(--racing-contrast-rgb), 0.04) 1px, transparent 1px),
     linear-gradient(90deg, rgba(var(--racing-contrast-rgb), 0.03) 1px, transparent 1px);
   background-size: 42px 42px;
+  -webkit-mask-image: linear-gradient(90deg, #000 0%, transparent 76%);
   mask-image: linear-gradient(90deg, #000 0%, transparent 76%);
 }
 
@@ -3928,6 +3937,7 @@
   color: var(--spectator-text-strong);
   font-size: 0.72rem;
   font-weight: 900;
+  -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
 }
 
@@ -4115,6 +4125,7 @@
   position: static;
   inset: auto;
   width: fit-content;
+  -webkit-backdrop-filter: none;
   backdrop-filter: none;
 }
 
@@ -4249,6 +4260,7 @@
   place-items: center;
   padding: 20px;
   background: rgba(9, 18, 12, 0.68);
+  -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
   animation: predictionBackdropIn 180ms ease-out;
 }
@@ -4325,6 +4337,7 @@
   border: 1px solid rgba(var(--racing-contrast-rgb), 0.28);
   border-radius: 8px;
   background: rgba(18, 30, 23, 0.7);
+  -webkit-backdrop-filter: blur(12px);
   backdrop-filter: blur(12px);
 }
 
@@ -4441,11 +4454,13 @@
 @keyframes predictionBackdropIn {
   from {
     opacity: 0;
+    -webkit-backdrop-filter: blur(0);
     backdrop-filter: blur(0);
   }
   to {
     opacity: 1;
-    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
   }
 }
 
@@ -4653,6 +4668,7 @@
     linear-gradient(rgba(var(--racing-contrast-rgb), 0.04) 1px, transparent 1px),
     linear-gradient(90deg, rgba(var(--racing-contrast-rgb), 0.03) 1px, transparent 1px);
   background-size: 42px 42px;
+  -webkit-mask-image: linear-gradient(90deg, #000 0%, transparent 76%);
   mask-image: linear-gradient(90deg, #000 0%, transparent 76%);
 }
 
@@ -5273,6 +5289,7 @@
   background:
     radial-gradient(circle at 62% 36%, rgba(var(--racing-accent-rgb), 0.12), transparent 28%),
     rgba(9, 18, 12, 0.72);
+  -webkit-backdrop-filter: blur(14px);
   backdrop-filter: blur(14px);
   animation: predictionBackdropIn 220ms ease-out;
 }
@@ -5303,6 +5320,7 @@
     linear-gradient(rgba(var(--racing-contrast-rgb), 0.035) 1px, transparent 1px),
     linear-gradient(90deg, rgba(var(--racing-contrast-rgb), 0.028) 1px, transparent 1px);
   background-size: 34px 34px;
+  -webkit-mask-image: linear-gradient(180deg, #000 0%, transparent 78%);
   mask-image: linear-gradient(180deg, #000 0%, transparent 78%);
 }
 
@@ -5650,6 +5668,7 @@
     linear-gradient(rgba(var(--racing-contrast-rgb), 0.035) 1px, transparent 1px),
     linear-gradient(90deg, rgba(var(--racing-contrast-rgb), 0.03) 1px, transparent 1px);
   background-size: 40px 40px;
+  -webkit-mask-image: linear-gradient(90deg, #000 0%, transparent 76%);
   mask-image: linear-gradient(90deg, #000 0%, transparent 76%);
 }
 
@@ -5891,6 +5910,7 @@
   background: rgba(29, 48, 36, 0.78);
   border-color: rgba(var(--racing-contrast-rgb), 0.28);
   box-shadow: 0 18px 40px rgba(12, 20, 15, 0.22);
+  -webkit-backdrop-filter: blur(14px);
   backdrop-filter: blur(14px);
 }
 
@@ -6435,6 +6455,7 @@
     linear-gradient(rgba(var(--racing-contrast-rgb), 0.04) 1px, transparent 1px),
     linear-gradient(90deg, rgba(var(--racing-contrast-rgb), 0.035) 1px, transparent 1px);
   background-size: 42px 42px;
+  -webkit-mask-image: linear-gradient(90deg, #000 0%, transparent 78%);
   mask-image: linear-gradient(90deg, #000 0%, transparent 78%);
 }
 
@@ -6810,6 +6831,7 @@
     linear-gradient(rgba(var(--racing-contrast-rgb), 0.032) 1px, transparent 1px),
     linear-gradient(90deg, rgba(var(--racing-contrast-rgb), 0.026) 1px, transparent 1px);
   background-size: 38px 38px;
+  -webkit-mask-image: linear-gradient(90deg, #000 0%, transparent 82%);
   mask-image: linear-gradient(90deg, #000 0%, transparent 82%);
 }
 
@@ -9345,6 +9367,7 @@
   color: var(--spectator-text-soft);
   background: rgba(18, 43, 28, 0.9);
   box-shadow: 0 10px 24px rgba(8, 24, 14, 0.2);
+  -webkit-backdrop-filter: blur(8px);
   backdrop-filter: blur(8px);
 }
 
@@ -13012,6 +13035,7 @@
   background: rgba(18, 43, 28, 0.94);
   box-shadow: 0 14px 32px rgba(8, 24, 14, 0.36);
   transform: none;
+  -webkit-backdrop-filter: blur(8px);
   backdrop-filter: blur(8px);
   animation: live-race-mini-ranking-enter 240ms ease-out both;
 }
@@ -13350,6 +13374,7 @@
   border: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: 6px;
   background: rgba(29, 48, 36, 0.78);
+  -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   color: #fff;
@@ -14945,6 +14970,7 @@
     linear-gradient(rgba(var(--racing-contrast-rgb), 0.045) 1px, transparent 1px),
     linear-gradient(90deg, rgba(var(--racing-contrast-rgb), 0.035) 1px, transparent 1px);
   background-size: 44px 44px;
+  -webkit-mask-image: linear-gradient(90deg, #000 0%, rgba(0, 0, 0, 0.72) 48%, transparent 100%);
   mask-image: linear-gradient(90deg, #000 0%, rgba(0, 0, 0, 0.72) 48%, transparent 100%);
 }
 
@@ -15422,6 +15448,7 @@
     linear-gradient(rgba(var(--racing-contrast-rgb), 0.045) 1px, transparent 1px),
     linear-gradient(90deg, rgba(var(--racing-contrast-rgb), 0.035) 1px, transparent 1px);
   background-size: 48px 48px;
+  -webkit-mask-image: linear-gradient(90deg, #000 0%, rgba(0, 0, 0, 0.68) 46%, transparent 78%);
   mask-image: linear-gradient(90deg, #000 0%, rgba(0, 0, 0, 0.68) 46%, transparent 78%);
 }
 
@@ -15523,6 +15550,7 @@
     linear-gradient(135deg, rgba(var(--racing-contrast-rgb), 0.13), rgba(var(--racing-contrast-rgb), 0.055)),
     rgba(12, 30, 20, 0.3);
   box-shadow: inset 0 1px 0 rgba(var(--racing-contrast-rgb), 0.12);
+  -webkit-backdrop-filter: blur(8px);
   backdrop-filter: blur(8px);
 }
 
@@ -15573,6 +15601,7 @@
   align-items: center;
   justify-content: center;
   background: rgba(8, 24, 14, 0.45);
+  -webkit-backdrop-filter: blur(4px);
   backdrop-filter: blur(4px);
   z-index: 10;
   border-radius: 16px;
@@ -15640,6 +15669,7 @@
   border: 1px solid rgba(255, 208, 138, 0.35);
   border-radius: 12px;
   box-shadow: 0 20px 50px rgba(8, 24, 14, 0.7);
+  -webkit-backdrop-filter: blur(12px);
   backdrop-filter: blur(12px);
   padding: 24px;
   color: var(--spectator-text-strong);
@@ -15979,6 +16009,7 @@
   top: 10px;
   right: 10px;
   background: rgba(29, 48, 36, 0.76);
+  -webkit-backdrop-filter: blur(8px);
   backdrop-filter: blur(8px);
 }
 

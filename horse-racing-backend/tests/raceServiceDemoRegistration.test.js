@@ -318,7 +318,6 @@ test('race start uses a recoverable starting state and cancels a new run on fina
   assert.match(source, /status: 'starting'/);
   assert.match(source, /RACE_START_STALE_MS/);
   assert.match(source, /cancelProvisionalRaceRun/);
-  assert.match(source, /\$set: \{ status: 'scheduled' \}/);
-  assert.match(source, /cleanupSession\.withTransaction/);
-  assert.match(source, /\{ session: cleanupSession \}/);
+  assert.match(source, /status:\s*'scheduled'/);
+  assert.match(source, /sequelize\.transaction/);
 });

@@ -71,7 +71,10 @@ function normalizeProbability(value) {
 }
 
 function getMarketCurrency(apiMarket, race) {
-  return String(apiMarket?.currency || race?.bettingMarket?.currency || "PTS").toUpperCase();
+  const rawCurrency = String(apiMarket?.currency || race?.bettingMarket?.currency || "PTS").trim().toUpperCase();
+  if (rawCurrency === "POINT" || rawCurrency === "POINTS") return "PTS";
+  if (rawCurrency === "TOKEN" || rawCurrency === "TOKENS") return "TOKEN";
+  return rawCurrency;
 }
 
 function getTimestamp(value) {

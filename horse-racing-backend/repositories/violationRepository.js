@@ -1,50 +1,53 @@
-const { Violation } = require('../models');
+const { loadSequelizeModels } = require('../models/sequelize/index.js');
 
-function basePopulate(query) {
-  return query
-    .populate({
-      path: 'race_id',
-      populate: [
-        { path: 'tournament_id' },
-        { path: 'round_id' }
-      ]
-    })
-    .populate('horse_id')
-    .populate({
-      path: 'jockey_id',
-      populate: {
-        path: 'user_id',
-        select: 'full_name email'
-      }
-    })
-    .populate({
-      path: 'referee_id',
-      populate: {
-        path: 'user_id',
-        select: 'full_name email'
-      }
-    })
-    .populate('horse_check_id')
-    .populate('decided_by', 'full_name email');
+function getModels() { return loadSequelizeModels().models; }
+
+function baseInclude() {
+  const { Race, Tournament, Round, Horse, Jockey, RaceReferee, HorseCheck, User } = getModels();
+  return [
+    {
+      model: Race,
+      as: 'race',
+      include: [{ model: Tournament, as: 'tournament' }, { model: Round, as: 'round' }]
+    },
+    { model: Horse, as: 'horse' },
+    {
+      model: Jockey,
+      as: 'jockey',
+      include: [{ model: User, as: 'user', attributes: ['full_name', 'email'] }]
+    },
+    {
+      model: RaceReferee,
+      as: 'referee',
+      include: [{ model: User, as: 'user', attributes: ['full_name', 'email'] }]
+    },
+    { model: HorseCheck, as: 'horse_check' },
+    { model: User, as: 'decider', attributes: ['full_name', 'email'] },
+    { model: User, as: 'proposer', attributes: ['full_name', 'email'] }
+  ];
 }
 
 async function create(data) {
+  const { Violation } = getModels();
   return Violation.create(data);
 }
 
-async function find(filter) {
-  return basePopulate(Violation.find(filter || {}).sort({ created_at: -1 }));
+async function find(filter = {}) {
+  const { Violation } = getModels();
+  return Violation.findAll({ where: filter, include: baseInclude(), order: [['created_at', 'DESC']] });
 }
 
 async function findById(id) {
-  return basePopulate(Violation.findById(id));
+  const { Violation } = getModels();
+  return Violation.findByPk(id, { include: baseInclude() });
 }
 
 async function updateById(id, data) {
-  return Violation.findByIdAndUpdate(id, data, {
-    returnDocument: 'after',
-    runValidators: true
-  });
+  const { Violation } = getModels();
+  const instance = await Violation.findByPk(id);
+  if (!instance) return null;
+  await instance.update(data);
+  return Violation.findByPk(id, { include: baseInclude() });
 }
 
 module.exports = {

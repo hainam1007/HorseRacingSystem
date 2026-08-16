@@ -16,12 +16,17 @@ function asArray(value, key) {
 }
 
 function getId(value) {
-  return value?._id || value?.id || value || "";
+  if (!value) return "";
+  if (typeof value === "string") return value;
+  return value._id || value.id || "";
 }
 
 function getName(value, fallback = "Unknown") {
   if (!value) return fallback;
-  if (typeof value === "string") return value;
+  if (typeof value === "string") {
+    const looksLikeUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value);
+    return looksLikeUuid ? fallback : value;
+  }
   return value.name || value.full_name || value.stable_name || value.title || fallback;
 }
 
@@ -94,9 +99,11 @@ function normalizeAssignmentStatus(item) {
 }
 
 function mapAssignment(item, index = 0) {
-  const race = item.race_id || item.race || {};
-  const horse = item.horse_id || item.horse || {};
-  const owner = item.owner_id || item.owner || horse.owner_id || {};
+  const race = (item.race && typeof item.race === "object") ? item.race : (item.race_id && typeof item.race_id === "object" ? item.race_id : {});
+  const horse = (item.horse && typeof item.horse === "object") ? item.horse : (item.horse_id && typeof item.horse_id === "object" ? item.horse_id : {});
+  const owner = (item.owner && typeof item.owner === "object")
+    ? item.owner
+    : (item.owner_id && typeof item.owner_id === "object" ? item.owner_id : (horse && horse.owner_id && typeof horse.owner_id === "object" ? horse.owner_id : {}));
   const meeting = item.meeting || {};
   const contract = item.contract || {};
   const cancellationRequest = item.cancellation_request || null;
@@ -127,10 +134,10 @@ function mapAssignment(item, index = 0) {
     isBackup: assignmentType === "backup",
     backupPriority: item.backup_priority || "",
     race: getName(race, item.race_name || "Assigned race"),
-    tournament: getName(race.tournament_id || item.tournament_id, item.tournament_name || "Tournament"),
+    tournament: getName(race.tournament_id || race.tournament || item.tournament_id, item.tournament_name || "Tournament"),
     date: formatRaceTime(race.race_date || item.race_date || item.created_at),
     venue: race.location || item.location || "Race track",
-    round: getName(race.round_id || item.round_id, item.round_name || "Race round"),
+    round: getName(race.round_id || race.round || item.round_id, item.round_name || "Race round"),
     note: item.invitation_message || item.response_message || item.note || "Owner invitation is ready for review.",
     rawStatus,
     sourceStatus: item.status || "",
@@ -158,8 +165,8 @@ function mapAssignment(item, index = 0) {
 }
 
 function mapResult(item, index = 0) {
-  const race = item.race_id || item.race || {};
-  const horse = item.horse_id || item.horse || {};
+  const race = (item.race && typeof item.race === "object") ? item.race : (item.race_id && typeof item.race_id === "object" ? item.race_id : {});
+  const horse = (item.horse && typeof item.horse === "object") ? item.horse : (item.horse_id && typeof item.horse_id === "object" ? item.horse_id : {});
   const position = Number(item.position || index + 1);
   const rawTime = item.finish_time;
   const finishTime = rawTime !== null && rawTime !== undefined && rawTime !== "" && !Number.isNaN(Number(rawTime))
@@ -252,9 +259,9 @@ function formatPenalty(penalty) {
 }
 
 function mapViolation(item, index = 0) {
-  const race = item.race_id || item.race || {};
-  const horse = item.horse_id || item.horse || {};
-  const referee = item.referee_id || item.referee || {};
+  const race = (item.race && typeof item.race === "object") ? item.race : (item.race_id && typeof item.race_id === "object" ? item.race_id : {});
+  const horse = (item.horse && typeof item.horse === "object") ? item.horse : (item.horse_id && typeof item.horse_id === "object" ? item.horse_id : {});
+  const referee = (item.referee && typeof item.referee === "object") ? item.referee : (item.referee_id && typeof item.referee_id === "object" ? item.referee_id : {});
   const refereeUser = referee.user_id || referee.user || {};
 
   return {

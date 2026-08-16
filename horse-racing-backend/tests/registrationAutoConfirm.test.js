@@ -1,7 +1,6 @@
 const assert = require('node:assert/strict');
 const test = require('node:test');
-const mongoose = require('mongoose');
-
+const { newObjectId } = require('../utils/objectId');
 const { ROLE_NAMES } = require('../constants/roles');
 const { Horse } = require('../models');
 const raceRepository = require('../repositories/raceRepository');
@@ -12,7 +11,7 @@ const registrationSlotService = require('../services/registrationSlotService');
 const registrationService = require('../services/registrationService');
 
 const originals = {
-  horseFindById: Horse.findById,
+  horseFindByPk: Horse.findByPk,
   raceFindById: raceRepository.findById,
   registrationCount: registrationRepository.count,
   registrationCreate: registrationRepository.create,
@@ -25,7 +24,7 @@ const originals = {
 };
 
 test.afterEach(() => {
-  Horse.findById = originals.horseFindById;
+  Horse.findByPk = originals.horseFindByPk;
   raceRepository.findById = originals.raceFindById;
   registrationRepository.count = originals.registrationCount;
   registrationRepository.create = originals.registrationCreate;
@@ -38,13 +37,13 @@ test.afterEach(() => {
 });
 
 test('admin operational registration is auto-confirmed and queues owner email', async () => {
-  const adminId = new mongoose.Types.ObjectId();
-  const ownerId = new mongoose.Types.ObjectId();
-  const ownerUserId = new mongoose.Types.ObjectId();
-  const horseId = new mongoose.Types.ObjectId();
-  const raceId = new mongoose.Types.ObjectId();
-  const tournamentId = new mongoose.Types.ObjectId();
-  const registrationId = new mongoose.Types.ObjectId();
+  const adminId = newObjectId();
+  const ownerId = newObjectId();
+  const ownerUserId = newObjectId();
+  const horseId = newObjectId();
+  const raceId = newObjectId();
+  const tournamentId = newObjectId();
+  const registrationId = newObjectId();
   let createdPayload = null;
   let emailContext = null;
 
@@ -58,7 +57,7 @@ test('admin operational registration is auto-confirmed and queues owner email', 
   registrationSlotService.reserveRaceSlot = async () => true;
   registrationSlotService.releaseRaceSlot = async () => true;
   registrationRepository.count = async () => 0;
-  Horse.findById = async () => ({ _id: horseId, owner_id: ownerId, name: 'Silver Comet' });
+  Horse.findByPk = async () => ({ _id: horseId, owner_id: ownerId, name: 'Silver Comet' });
   registrationRepository.create = async (payload) => {
     createdPayload = payload;
     return { _id: registrationId, ...payload };

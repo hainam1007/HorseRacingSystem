@@ -109,9 +109,9 @@ function mapRunOrder(item) {
 function mapParticipantStatus(participant, index) {
   const horse = participant.horse || {};
   const jockey = participant.jockey || {};
-  const jockeyUser = jockey.user_id || null;
-  const owner = horse.owner_id || {};
-  const ownerUser = owner.user_id || null;
+  const jockeyUser = jockey.user || jockey.user_id || null;
+  const owner = horse.owner || horse.owner_id || {};
+  const ownerUser = owner.user || owner.user_id || null;
 
   return {
     registration_id: getId(participant.registration),
@@ -148,8 +148,8 @@ function mapRaceRun(raceRun) {
     status: raceRun.status,
     generated_at: raceRun.generated_at,
     seed: raceRun.seed,
-    participants: raceRun.participants.map(mapRunParticipant),
-    finish_order: raceRun.finish_order.map(mapRunOrder)
+    participants: Array.isArray(raceRun.participants) ? raceRun.participants.map(mapRunParticipant) : [],
+    finish_order: Array.isArray(raceRun.finish_order) ? raceRun.finish_order.map(mapRunOrder) : []
   };
 }
 

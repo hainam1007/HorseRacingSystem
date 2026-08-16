@@ -1,11 +1,14 @@
 const ApiError = require('../utils/ApiError');
 const { ASSIGNMENT_STATUS, ASSIGNMENT_TYPE, RACE_RESULT_STATUS } = require('../constants/statuses');
-const { Race } = require('../models');
+const { Op } = require('sequelize');
+const { loadSequelizeModels } = require('../models/sequelize/index.js');
 const jockeyAssignmentRepository = require('../repositories/jockeyAssignmentRepository');
 const profileRepository = require('../repositories/profileRepository');
 const raceResultRepository = require('../repositories/raceResultRepository');
 const violationRepository = require('../repositories/violationRepository');
 const jockeyAssignmentService = require('./jockeyAssignmentService');
+
+function getModels() { return loadSequelizeModels().models; }
 
 async function getJockeyProfile(userId) {
   const jockey = await profileRepository.findJockeyByUserId(userId);
@@ -104,7 +107,8 @@ async function getSchedule(userId, query) {
   const to = query.to ? new Date(query.to) : null;
 
   const schedule = assignments.filter(function(assignment) {
-    const raceDate = assignment.race_id && assignment.race_id.race_date;
+    const race = assignment.race || (assignment.race_id && assignment.race_id.race_date ? assignment.race_id : null);
+    const raceDate = race && race.race_date;
 
     if (!raceDate) {
       return true;
@@ -124,7 +128,9 @@ async function getSchedule(userId, query) {
   });
 
   return {
-    schedule: schedule
+    schedule: schedule.map(function(item) {
+      return item && item.toJSON ? item.toJSON() : item;
+    })
   };
 }
 
@@ -153,49 +159,40 @@ async function getHorseRaceSchedule(horseId, query) {
 
   const assignedRaceIds = assignments
     .map(function(assignment) {
-      return assignment.race_id && assignment.race_id._id;
+      const race = assignment.race || assignment.race_id;
+      return race && (race.id || race._id);
     })
     .filter(Boolean);
 
   const raceFilter = {};
 
   if (assignedRaceIds.length) {
-    raceFilter._id = {
-      $in: assignedRaceIds
-    };
+    raceFilter.id = { [Op.in]: assignedRaceIds };
   } else {
-    return {
-      schedule: []
-    };
+    return { schedule: [] };
   }
 
   if (from || to) {
     raceFilter.race_date = {};
-
-    if (from) {
-      raceFilter.race_date.$gte = from;
-    }
-
-    if (to) {
-      raceFilter.race_date.$lte = to;
-    }
+    if (from) raceFilter.race_date[Op.gte] = from;
+    if (to) raceFilter.race_date[Op.lte] = to;
   }
 
-  const races = await Race.find(raceFilter)
-    .populate('tournament_id')
-    .populate('round_id')
-    .populate({
-      path: 'referee_id',
-      populate: {
-        path: 'user_id',
-        select: 'full_name email'
+  const races = await getModels().Race.findAll({
+    where: raceFilter,
+    include: [
+      { model: getModels().Tournament, as: 'tournament' },
+      { model: getModels().Round, as: 'round' },
+      {
+        model: getModels().RaceReferee,
+        as: 'referee',
+        include: [{ model: getModels().User, as: 'user', attributes: ['full_name', 'email'] }]
       }
-    })
-    .sort({ race_date: 1 });
+    ],
+    order: [['race_date', 'ASC']]
+  });
 
-  return {
-    schedule: races
-  };
+  return { schedule: races.map(r => r.toJSON ? r.toJSON() : r) };
 }
 
 async function getResults(userId) {

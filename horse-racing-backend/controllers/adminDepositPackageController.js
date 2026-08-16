@@ -22,7 +22,7 @@ async function createPackage(req, res) {
 
 /**
  * PUT /api/admin/deposit-packages/:id
- * Update a deposit package by its MongoDB _id.
+ * Update a deposit package by its primary key.
  * Body: any subset of { label, vnd_price, token_received, bonus_token, is_active }
  * Note: package_id is immutable and ignored even if supplied.
  */

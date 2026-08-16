@@ -1,0 +1,514 @@
+[
+  {
+    "id": "27b19ebc-582e-5690-a406-c3dcbc62a770",
+    "race_id": "bb4f094f-a85e-58e6-a5db-3725e1724fe7",
+    "position": 1,
+    "percent": 60,
+    "amount": null,
+    "label": "Champion"
+  },
+  {
+    "id": "a746bc2e-4cf9-59fa-bcbb-053fb179c230",
+    "race_id": "bb4f094f-a85e-58e6-a5db-3725e1724fe7",
+    "position": 2,
+    "percent": 20,
+    "amount": null,
+    "label": "Runner-up"
+  },
+  {
+    "id": "85821fea-b02d-5054-8c38-b91b8953af11",
+    "race_id": "bb4f094f-a85e-58e6-a5db-3725e1724fe7",
+    "position": 3,
+    "percent": 11,
+    "amount": null,
+    "label": "Third Place"
+  },
+  {
+    "id": "4f62f052-07ca-5583-9c27-0eb9bbf1c6c9",
+    "race_id": "bb4f094f-a85e-58e6-a5db-3725e1724fe7",
+    "position": 4,
+    "percent": 6,
+    "amount": null,
+    "label": "Fourth Place"
+  },
+  {
+    "id": "b6e6e3b0-f740-5f77-901f-e9a4289a5919",
+    "race_id": "bb4f094f-a85e-58e6-a5db-3725e1724fe7",
+    "position": 5,
+    "percent": 3,
+    "amount": null,
+    "label": "Fifth Place"
+  },
+  {
+    "id": "689e71d9-d572-58bf-8458-75655786d5fb",
+    "race_id": "2ddfccc9-b137-52e7-9238-e1266602f589",
+    "position": 1,
+    "percent": 60,
+    "amount": null,
+    "label": "Champion"
+  },
+  {
+    "id": "78aa8ec9-117c-5313-9aec-2a051f2f6816",
+    "race_id": "2ddfccc9-b137-52e7-9238-e1266602f589",
+    "position": 2,
+    "percent": 20,
+    "amount": null,
+    "label": "Runner-up"
+  },
+  {
+    "id": "3819f548-eca9-5863-ac1d-a6c9ec510a0d",
+    "race_id": "2ddfccc9-b137-52e7-9238-e1266602f589",
+    "position": 3,
+    "percent": 11,
+    "amount": null,
+    "label": "Third Place"
+  },
+  {
+    "id": "b400fc3c-a57f-5a56-995e-c46fffa3648c",
+    "race_id": "2ddfccc9-b137-52e7-9238-e1266602f589",
+    "position": 4,
+    "percent": 6,
+    "amount": null,
+    "label": "Fourth Place"
+  },
+  {
+    "id": "49fc10bf-fe77-58fa-a491-c55699d67954",
+    "race_id": "2ddfccc9-b137-52e7-9238-e1266602f589",
+    "position": 5,
+    "percent": 3,
+    "amount": null,
+    "label": "Fifth Place"
+  },
+  {
+    "id": "db8d9935-cc2d-5f54-bcc8-7dc383415d45",
+    "race_id": "93ff3d27-31a2-5e45-a9b3-06bab82f9daf",
+    "position": 1,
+    "percent": 60,
+    "amount": null,
+    "label": "Champion"
+  },
+  {
+    "id": "ae6cbaf2-403b-5062-a4a2-46895a67c834",
+    "race_id": "93ff3d27-31a2-5e45-a9b3-06bab82f9daf",
+    "position": 2,
+    "percent": 20,
+    "amount": null,
+    "label": "Runner-up"
+  },
+  {
+    "id": "95b19d3c-101d-5d12-8e0b-163b1b3011c6",
+    "race_id": "93ff3d27-31a2-5e45-a9b3-06bab82f9daf",
+    "position": 3,
+    "percent": 11,
+    "amount": null,
+    "label": "Third Place"
+  },
+  {
+    "id": "9f9a48c2-acda-56f0-aaf7-4c5abf1d4716",
+    "race_id": "93ff3d27-31a2-5e45-a9b3-06bab82f9daf",
+    "position": 4,
+    "percent": 6,
+    "amount": null,
+    "label": "Fourth Place"
+  },
+  {
+    "id": "4d697ed9-6c62-5f0b-bde6-9ed046f97300",
+    "race_id": "93ff3d27-31a2-5e45-a9b3-06bab82f9daf",
+    "position": 5,
+    "percent": 3,
+    "amount": null,
+    "label": "Fifth Place"
+  },
+  {
+    "id": "ab50e3ea-acf9-5585-b2bd-65a275aa54bf",
+    "race_id": "23756a7a-17a6-56f5-989a-3226cc1f30f7",
+    "position": 1,
+    "percent": 60,
+    "amount": null,
+    "label": "Champion"
+  },
+  {
+    "id": "18a16e6c-04a8-5398-a4bb-c495bcafbbe3",
+    "race_id": "23756a7a-17a6-56f5-989a-3226cc1f30f7",
+    "position": 2,
+    "percent": 20,
+    "amount": null,
+    "label": "Runner-up"
+  },
+  {
+    "id": "45571aab-1b4c-5d79-8f42-d22c807bf155",
+    "race_id": "23756a7a-17a6-56f5-989a-3226cc1f30f7",
+    "position": 3,
+    "percent": 11,
+    "amount": null,
+    "label": "Third Place"
+  },
+  {
+    "id": "ced020dd-daa8-5417-9615-c7d4a03ef43c",
+    "race_id": "23756a7a-17a6-56f5-989a-3226cc1f30f7",
+    "position": 4,
+    "percent": 6,
+    "amount": null,
+    "label": "Fourth Place"
+  },
+  {
+    "id": "96316f01-1bd1-5ebc-ad9b-353e12a70527",
+    "race_id": "23756a7a-17a6-56f5-989a-3226cc1f30f7",
+    "position": 5,
+    "percent": 3,
+    "amount": null,
+    "label": "Fifth Place"
+  },
+  {
+    "id": "65d15d01-6894-53a2-aceb-19250781e045",
+    "race_id": "22de2553-1df9-5946-8e35-63b5d41f528f",
+    "position": 1,
+    "percent": 60,
+    "amount": null,
+    "label": "Champion"
+  },
+  {
+    "id": "e0364629-9215-5c94-a70d-db1102aff400",
+    "race_id": "22de2553-1df9-5946-8e35-63b5d41f528f",
+    "position": 2,
+    "percent": 20,
+    "amount": null,
+    "label": "Runner-up"
+  },
+  {
+    "id": "9627664b-1370-5bef-902c-273934b61aa1",
+    "race_id": "22de2553-1df9-5946-8e35-63b5d41f528f",
+    "position": 3,
+    "percent": 11,
+    "amount": null,
+    "label": "Third Place"
+  },
+  {
+    "id": "2f89f108-7fc2-5d02-a3a5-d11ce12a540e",
+    "race_id": "22de2553-1df9-5946-8e35-63b5d41f528f",
+    "position": 4,
+    "percent": 6,
+    "amount": null,
+    "label": "Fourth Place"
+  },
+  {
+    "id": "a2ca8de2-9873-5496-b58a-b944225d347e",
+    "race_id": "22de2553-1df9-5946-8e35-63b5d41f528f",
+    "position": 5,
+    "percent": 3,
+    "amount": null,
+    "label": "Fifth Place"
+  },
+  {
+    "id": "085a2743-316b-5bc1-bb69-50f81a7b99cb",
+    "race_id": "08387fd4-a614-5cdd-a770-bfc9fa9ea69e",
+    "position": 1,
+    "percent": 60,
+    "amount": null,
+    "label": "Champion"
+  },
+  {
+    "id": "6c34f79f-9deb-5aed-8632-8b721a7be022",
+    "race_id": "08387fd4-a614-5cdd-a770-bfc9fa9ea69e",
+    "position": 2,
+    "percent": 20,
+    "amount": null,
+    "label": "Runner-up"
+  },
+  {
+    "id": "75e95715-ffc3-51fc-a8ff-0e16d49f46a9",
+    "race_id": "08387fd4-a614-5cdd-a770-bfc9fa9ea69e",
+    "position": 3,
+    "percent": 11,
+    "amount": null,
+    "label": "Third Place"
+  },
+  {
+    "id": "4853904f-7509-5c08-b1ee-0838c69b44c0",
+    "race_id": "08387fd4-a614-5cdd-a770-bfc9fa9ea69e",
+    "position": 4,
+    "percent": 6,
+    "amount": null,
+    "label": "Fourth Place"
+  },
+  {
+    "id": "02bdb714-50d2-5569-beec-a3db43c94d3b",
+    "race_id": "08387fd4-a614-5cdd-a770-bfc9fa9ea69e",
+    "position": 5,
+    "percent": 3,
+    "amount": null,
+    "label": "Fifth Place"
+  },
+  {
+    "id": "70fc0ba9-d439-5c51-864b-f7f76d2ac85e",
+    "race_id": "92de665f-0113-5ddc-bb5f-41c93a953fde",
+    "position": 1,
+    "percent": 60,
+    "amount": null,
+    "label": "Champion"
+  },
+  {
+    "id": "85baebf9-0822-5e37-a022-d186a4eb7ab5",
+    "race_id": "92de665f-0113-5ddc-bb5f-41c93a953fde",
+    "position": 2,
+    "percent": 20,
+    "amount": null,
+    "label": "Runner-up"
+  },
+  {
+    "id": "718e5d2e-2a83-5242-8629-c469c9140dc4",
+    "race_id": "92de665f-0113-5ddc-bb5f-41c93a953fde",
+    "position": 3,
+    "percent": 11,
+    "amount": null,
+    "label": "Third Place"
+  },
+  {
+    "id": "cf3155d3-b1bb-524e-9126-1b06cede9862",
+    "race_id": "92de665f-0113-5ddc-bb5f-41c93a953fde",
+    "position": 4,
+    "percent": 6,
+    "amount": null,
+    "label": "Fourth Place"
+  },
+  {
+    "id": "6a530b66-43ea-58aa-872b-fadc5929aca1",
+    "race_id": "92de665f-0113-5ddc-bb5f-41c93a953fde",
+    "position": 5,
+    "percent": 3,
+    "amount": null,
+    "label": "Fifth Place"
+  },
+  {
+    "id": "3d8d9342-7421-5952-8fdb-3fb00241dbe9",
+    "race_id": "428482bd-d44d-5001-a8b7-38b6ed1f85c3",
+    "position": 1,
+    "percent": 60,
+    "amount": null,
+    "label": "Champion"
+  },
+  {
+    "id": "416f77f9-6e5e-5597-b5f0-b83097d682ab",
+    "race_id": "428482bd-d44d-5001-a8b7-38b6ed1f85c3",
+    "position": 2,
+    "percent": 20,
+    "amount": null,
+    "label": "Runner-up"
+  },
+  {
+    "id": "e86c15a0-9b3f-5863-a2f3-5204eff4a3d5",
+    "race_id": "428482bd-d44d-5001-a8b7-38b6ed1f85c3",
+    "position": 3,
+    "percent": 11,
+    "amount": null,
+    "label": "Third Place"
+  },
+  {
+    "id": "be0ec588-82cd-5f87-b760-e18bb02fbad1",
+    "race_id": "428482bd-d44d-5001-a8b7-38b6ed1f85c3",
+    "position": 4,
+    "percent": 6,
+    "amount": null,
+    "label": "Fourth Place"
+  },
+  {
+    "id": "5f503e2e-2c14-5c1a-91be-5c5a04bfad6a",
+    "race_id": "428482bd-d44d-5001-a8b7-38b6ed1f85c3",
+    "position": 5,
+    "percent": 3,
+    "amount": null,
+    "label": "Fifth Place"
+  },
+  {
+    "id": "d0f60ca5-2847-5d08-ab13-90814f9d375e",
+    "race_id": "f8ea600d-1b70-5fc2-b961-74be4f49a097",
+    "position": 1,
+    "percent": 60,
+    "amount": null,
+    "label": "Champion"
+  },
+  {
+    "id": "1b51d847-04de-5576-8bfa-5b45ff217919",
+    "race_id": "f8ea600d-1b70-5fc2-b961-74be4f49a097",
+    "position": 2,
+    "percent": 20,
+    "amount": null,
+    "label": "Runner-up"
+  },
+  {
+    "id": "ce950d65-35c3-5178-b9fd-f00ca05daf93",
+    "race_id": "f8ea600d-1b70-5fc2-b961-74be4f49a097",
+    "position": 3,
+    "percent": 11,
+    "amount": null,
+    "label": "Third Place"
+  },
+  {
+    "id": "022228f4-a3a7-5f4d-a43c-aaab9d1784be",
+    "race_id": "f8ea600d-1b70-5fc2-b961-74be4f49a097",
+    "position": 4,
+    "percent": 6,
+    "amount": null,
+    "label": "Fourth Place"
+  },
+  {
+    "id": "a9035338-6379-527a-9024-75514bcda80d",
+    "race_id": "f8ea600d-1b70-5fc2-b961-74be4f49a097",
+    "position": 5,
+    "percent": 3,
+    "amount": null,
+    "label": "Fifth Place"
+  },
+  {
+    "id": "702712ca-e3e2-568e-a426-940dd04b603b",
+    "race_id": "1e4c6ee2-3f62-54ec-baeb-ded17d8cb3cc",
+    "position": 1,
+    "percent": 60,
+    "amount": null,
+    "label": "Champion"
+  },
+  {
+    "id": "847000e0-ec12-5dad-8f17-b19520a83de1",
+    "race_id": "1e4c6ee2-3f62-54ec-baeb-ded17d8cb3cc",
+    "position": 2,
+    "percent": 20,
+    "amount": null,
+    "label": "Runner-up"
+  },
+  {
+    "id": "886894b1-5a85-593d-ada6-c314c7785caa",
+    "race_id": "1e4c6ee2-3f62-54ec-baeb-ded17d8cb3cc",
+    "position": 3,
+    "percent": 11,
+    "amount": null,
+    "label": "Third Place"
+  },
+  {
+    "id": "a259f61d-3bb6-5db2-ba5c-3da8b07a277d",
+    "race_id": "1e4c6ee2-3f62-54ec-baeb-ded17d8cb3cc",
+    "position": 4,
+    "percent": 6,
+    "amount": null,
+    "label": "Fourth Place"
+  },
+  {
+    "id": "5d9e6b55-fdf7-544d-940e-df479620fcec",
+    "race_id": "1e4c6ee2-3f62-54ec-baeb-ded17d8cb3cc",
+    "position": 5,
+    "percent": 3,
+    "amount": null,
+    "label": "Fifth Place"
+  },
+  {
+    "id": "ef8cf6a9-f7a8-56a2-aec2-e9fc6bf4f66c",
+    "race_id": "3394deb1-5116-5a94-a7a4-2d87f147aeea",
+    "position": 1,
+    "percent": 60,
+    "amount": null,
+    "label": "Champion"
+  },
+  {
+    "id": "a3cd34b1-9279-50f0-bc5e-54785ef9c8f5",
+    "race_id": "3394deb1-5116-5a94-a7a4-2d87f147aeea",
+    "position": 2,
+    "percent": 20,
+    "amount": null,
+    "label": "Runner-up"
+  },
+  {
+    "id": "7bfe3dd8-e1f4-5d96-b774-f0a2af21d005",
+    "race_id": "3394deb1-5116-5a94-a7a4-2d87f147aeea",
+    "position": 3,
+    "percent": 11,
+    "amount": null,
+    "label": "Third Place"
+  },
+  {
+    "id": "548f9f82-02d8-5418-a387-50679ba071f6",
+    "race_id": "3394deb1-5116-5a94-a7a4-2d87f147aeea",
+    "position": 4,
+    "percent": 6,
+    "amount": null,
+    "label": "Fourth Place"
+  },
+  {
+    "id": "b6836535-68fd-5f47-bc8d-1373bf5bfeb5",
+    "race_id": "3394deb1-5116-5a94-a7a4-2d87f147aeea",
+    "position": 5,
+    "percent": 3,
+    "amount": null,
+    "label": "Fifth Place"
+  },
+  {
+    "id": "fed03e23-f5d1-5b38-aede-39bc16d52ac6",
+    "race_id": "c24116c9-92b2-5ad6-90f3-4fc7840ff834",
+    "position": 1,
+    "percent": 60,
+    "amount": null,
+    "label": "Winner"
+  },
+  {
+    "id": "fb4ab3a2-f543-57fb-bb43-ad44053f0274",
+    "race_id": "c24116c9-92b2-5ad6-90f3-4fc7840ff834",
+    "position": 2,
+    "percent": 25,
+    "amount": null,
+    "label": "Runner-up"
+  },
+  {
+    "id": "18d9338c-7346-5fe7-ad03-44029d0ab4a9",
+    "race_id": "c24116c9-92b2-5ad6-90f3-4fc7840ff834",
+    "position": 3,
+    "percent": 15,
+    "amount": null,
+    "label": "Third place"
+  },
+  {
+    "id": "c1591600-5ec7-599e-802e-0890439f4c9b",
+    "race_id": "5cc51c3a-0ff1-5006-9e04-df7fb2cea4da",
+    "position": 1,
+    "percent": 60,
+    "amount": null,
+    "label": "Winner"
+  },
+  {
+    "id": "7cace48b-7914-517c-b2b1-0d22c10defff",
+    "race_id": "5cc51c3a-0ff1-5006-9e04-df7fb2cea4da",
+    "position": 2,
+    "percent": 25,
+    "amount": null,
+    "label": "Runner-up"
+  },
+  {
+    "id": "6fb35025-a51a-5989-b726-4303db7e434a",
+    "race_id": "5cc51c3a-0ff1-5006-9e04-df7fb2cea4da",
+    "position": 3,
+    "percent": 15,
+    "amount": null,
+    "label": "Third place"
+  },
+  {
+    "id": "34d7bef7-bf89-53e8-a7a6-c094e5d62cc9",
+    "race_id": "8a9eb071-5361-5000-acbe-570ba7aa24c0",
+    "position": 1,
+    "percent": 60,
+    "amount": null,
+    "label": "Winner"
+  },
+  {
+    "id": "4f5fcf5e-075c-5e41-a80a-f3de1cce236f",
+    "race_id": "8a9eb071-5361-5000-acbe-570ba7aa24c0",
+    "position": 2,
+    "percent": 25,
+    "amount": null,
+    "label": "Runner-up"
+  },
+  {
+    "id": "bd0fd420-52f3-5fbc-9c57-206817b153bd",
+    "race_id": "8a9eb071-5361-5000-acbe-570ba7aa24c0",
+    "position": 3,
+    "percent": 15,
+    "amount": null,
+    "label": "Third place"
+  }
+]

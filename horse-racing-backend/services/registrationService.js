@@ -1,13 +1,15 @@
 const ApiError = require('../utils/ApiError');
 const { ROLE_NAMES } = require('../constants/roles');
 const { REGISTRATION_STATUS } = require('../constants/statuses');
-const { Horse } = require('../models');
+const { loadSequelizeModels } = require('../models/sequelize/index.js');
 const profileRepository = require('../repositories/profileRepository');
 const raceRepository = require('../repositories/raceRepository');
 const registrationRepository = require('../repositories/registrationRepository');
 const emailService = require('./emailService');
 const raceEngineService = require('./raceEngineService');
 const registrationSlotService = require('./registrationSlotService');
+
+function getModels() { return loadSequelizeModels().models; }
 
 function hasRole(req, role) {
   return (req.roles || req.auth.roles || []).includes(role);
@@ -59,7 +61,7 @@ async function createRegistration(req, payload) {
     throw new ApiError(400, 'Only scheduled races accept registrations');
   }
 
-  const horse = await Horse.findById(payload.horse_id);
+  const horse = await getModels().Horse.findByPk(payload.horse_id);
 
   if (!horse) {
     throw new ApiError(404, 'Horse not found');
@@ -67,7 +69,7 @@ async function createRegistration(req, payload) {
 
   const ownerId = await resolveOwner(req, payload);
 
-  if (!sameId(horse.owner_id._id || horse.owner_id, ownerId)) {
+  if (!sameId(horse.owner_id && (horse.owner_id._id || horse.owner_id), ownerId)) {
     throw new ApiError(403, 'Horse does not belong to this owner');
   }
 
@@ -145,10 +147,12 @@ async function listRegistrations(req, query) {
     filter.owner_id = query.owner_id;
   }
 
+  const registrations = (await registrationRepository.find(filter)).sort(function(first, second) {
+    return registrationRank(first) - registrationRank(second) || registrationTime(second) - registrationTime(first);
+  });
+
   return {
-    registrations: (await registrationRepository.find(filter)).sort(function(first, second) {
-      return registrationRank(first) - registrationRank(second) || registrationTime(second) - registrationTime(first);
-    })
+    registrations
   };
 }
 
@@ -160,7 +164,7 @@ async function getRegistration(id) {
   }
 
   return {
-    registration: registration
+    registration
   };
 }
 

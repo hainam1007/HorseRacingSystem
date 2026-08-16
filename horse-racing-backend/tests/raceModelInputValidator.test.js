@@ -14,8 +14,8 @@ function runValidator(validator, body) {
 
 test('race validator accepts supported probability model fields', () => {
   const result = runValidator(validateCreateRace, {
-    tournament_id: '507f1f77bcf86cd799439011',
-    round_id: '507f1f77bcf86cd799439012',
+    tournament_id: '507f1f77-bcf8-4cd7-9943-901100000001',
+    round_id: '507f1f77-bcf8-4cd7-9943-901100000002',
     name: 'Race 1',
     race_no: 1,
     venue_code: 'st',
@@ -32,8 +32,8 @@ test('race validator accepts supported probability model fields', () => {
 
 test('race validator rejects the unsupported restricted class label', () => {
   const result = runValidator(validateCreateRace, {
-    tournament_id: '507f1f77bcf86cd799439011',
-    round_id: '507f1f77bcf86cd799439012',
+    tournament_id: '507f1f77-bcf8-4cd7-9943-901100000001',
+    round_id: '507f1f77-bcf8-4cd7-9943-901100000002',
     name: 'Restricted Race',
     race_class: '4 (Restricted)'
   });
@@ -44,14 +44,14 @@ test('race validator rejects the unsupported restricted class label', () => {
 
 test('race validator accepts an uploaded image data URI and rejects non-image data', () => {
   const valid = runValidator(validateCreateRace, {
-    tournament_id: '507f1f77bcf86cd799439011',
-    round_id: '507f1f77bcf86cd799439012',
+    tournament_id: '507f1f77-bcf8-4cd7-9943-901100000001',
+    round_id: '507f1f77-bcf8-4cd7-9943-901100000002',
     name: 'Image race',
     image_file_data: 'data:image/png;base64,aGVsbG8='
   });
   const invalid = runValidator(validateCreateRace, {
-    tournament_id: '507f1f77bcf86cd799439011',
-    round_id: '507f1f77bcf86cd799439012',
+    tournament_id: '507f1f77-bcf8-4cd7-9943-901100000001',
+    round_id: '507f1f77-bcf8-4cd7-9943-901100000002',
     name: 'Invalid image race',
     image_file_data: 'data:text/plain;base64,aGVsbG8='
   });

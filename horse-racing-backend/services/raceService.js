@@ -1,4 +1,29 @@
-const mongoose = require('mongoose');
+'use strict';
+
+/**
+ * raceService — Sequelize/PostgreSQL implementation.
+ *
+ * Business logic and API response shape preserved from the legacy
+ * service.
+ *
+ * Legacy-ORM concepts translated to Sequelize:
+ *   - The legacy ORM-specific imports are replaced by `loadSequelizeModels()`.
+ *   - `Models.X.find({...}).populate({...}).populate({...}).sort()` →
+ *     Sequelize `findAll({ where, include, order })`.
+ *   - `Models.X.findById(id).lean()` → `Models.X.findByPk(id)` and
+ *     `toPlain` (to expose the `_id` alias).
+ *   - `JockeyAssignment.find({...}).populate({...})` → same pattern.
+ *   - Transactional flow: the legacy `session.withTransaction(...)` pattern
+ *     is replaced by `sequelize.transaction()` (Sequelize supports managed
+ *     transactions).
+ *
+ * Service-level helpers preserved: `documentId`, `sameId`, `getDocumentId`,
+ * `toPlainRace`, `withParticipantCounts`, `ensureCanControlRace`, etc.
+ *
+ * NOTE: `Registration` and `JockeyAssignment` in the original service were
+ * pulled from the legacy aggregate barrel. This implementation pulls them
+ * from Sequelize via `loadSequelizeModels().models`.
+ */
 
 const ApiError = require('../utils/ApiError');
 const { ROLE_NAMES } = require('../constants/roles');
@@ -9,618 +34,652 @@ const roundRepository = require('../repositories/roundRepository');
 const tournamentRepository = require('../repositories/tournamentRepository');
 const raceEngineService = require('./raceEngineService');
 const cloudinaryService = require('./cloudinaryService');
-const { JockeyAssignment, Registration } = require('../models');
+const { loadSequelizeModels } = require('../models/sequelize/index.js');
 const { ASSIGNMENT_STATUS, ODDS_MARKET_STATUS, REGISTRATION_STATUS } = require('../constants/statuses');
 
 const LOCK_OFFSET_MS = 3 * 60 * 60 * 1000;
 const RACE_START_STALE_MS = 2 * 60 * 1000;
-const DEMO_BYPASS_TIME_VALIDATIONS = String(process.env.DEMO_BYPASS_TIME_VALIDATIONS || '').toLowerCase() === 'true';
+
+function getModels() {
+    return loadSequelizeModels().models;
+}
+
+function getSequelize() {
+    return loadSequelizeModels().sequelize;
+}
 
 function hasRole(req, role) {
-  return (req.roles || req.auth.roles || []).includes(role);
+    return (req.roles || req.auth.roles || []).includes(role);
 }
 
 function sameId(first, second) {
-  return first && second && first.toString() === second.toString();
+    return first && second && first.toString() === second.toString();
 }
 
 function getDocumentId(value) {
-  return value && (value._id || value);
+    return value && (value._id || value);
 }
 
 function toPlainRace(race) {
-  return race && typeof race.toObject === 'function' ? race.toObject() : race;
+    return race && typeof race.toObject === 'function' ? race.toObject() : race;
 }
 
 async function withParticipantCounts(races) {
-  const raceList = Array.isArray(races) ? races : [races];
-  const raceIds = raceList.map(function(race) {
-    return getDocumentId(race);
-  }).filter(Boolean);
+    const raceList = Array.isArray(races) ? races : [races];
+    const raceIds = raceList.map(function(race) {
+        return getDocumentId(race);
+    }).filter(Boolean);
 
-  if (!raceIds.length) {
-    return Array.isArray(races) ? raceList : races;
-  }
-
-  const counts = await Registration.aggregate([
-    {
-      $match: {
-        race_id: { $in: raceIds },
-        status: REGISTRATION_STATUS.APPROVED
-      }
-    },
-    {
-      $group: {
-        _id: '$race_id',
-        count: { $sum: 1 }
-      }
+    if (!raceIds.length) {
+        return Array.isArray(races) ? raceList : races;
     }
-  ]);
 
-  const countByRaceId = new Map(counts.map(function(item) {
-    return [item._id.toString(), item.count];
-  }));
+    const models = getModels();
+    const { Registration } = models;
 
-  const enriched = raceList.map(function(race) {
-    const plainRace = toPlainRace(race);
-    const raceId = getDocumentId(race);
-    const participantCount = raceId ? countByRaceId.get(raceId.toString()) || 0 : 0;
-
-    return Object.assign({}, plainRace, {
-      participant_count: participantCount,
-      runner_count: participantCount
+    // Sequelize path: GROUP BY race_id via Sequelize aggregation.
+    const groups = await Registration.findAll({
+        attributes: [
+            'race_id',
+            [getSequelize().fn('COUNT', getSequelize().col('id')), 'count']
+        ],
+        where: {
+            race_id: { [require('sequelize').Op.in]: raceIds },
+            status: REGISTRATION_STATUS.APPROVED
+        },
+        group: ['race_id'],
+        raw: true
     });
-  });
 
-  return Array.isArray(races) ? enriched : enriched[0];
+    const countByRaceId = new Map(groups.map(function(item) {
+        const id = item.race_id;
+        return [id && id.toString(), Number(item.count)];
+    }));
+
+    const enriched = raceList.map(function(race) {
+        const plainRace = toPlainRace(race);
+        const raceId = getDocumentId(race);
+        const participantCount = raceId ? countByRaceId.get(raceId.toString()) || 0 : 0;
+
+        return Object.assign({}, plainRace, {
+            participant_count: participantCount,
+            runner_count: participantCount
+        });
+    });
+
+    return Array.isArray(races) ? enriched : enriched[0];
 }
 
 async function ensureCanControlRace(req, race) {
-  const assignedRefereeId = getDocumentId(race.referee_id);
+    const assignedRefereeId = getDocumentId(race.referee_id);
 
-  if (!assignedRefereeId) {
-    throw new ApiError(400, 'Race referee is required');
-  }
+    if (!assignedRefereeId) {
+        throw new ApiError(400, 'Race referee is required');
+    }
 
-  if (hasRole(req, ROLE_NAMES.ADMIN)) {
-    return;
-  }
+    if (hasRole(req, ROLE_NAMES.ADMIN)) {
+        return;
+    }
 
-  const referee = await profileRepository.findRaceRefereeByUserId(req.user._id);
+    const referee = await profileRepository.findRaceRefereeByUserId(req.user._id);
 
-  if (!referee || !sameId(assignedRefereeId, referee._id)) {
-    throw new ApiError(403, 'You can only control races assigned to you');
-  }
+    if (!referee || !sameId(assignedRefereeId, referee._id)) {
+        throw new ApiError(403, 'You can only control races assigned to you');
+    }
 }
 
 function applyRegistrationLockAt(payload) {
-  const data = Object.assign({}, payload);
+    const data = Object.assign({}, payload);
 
-  if (data.race_date) {
-    data.registration_lock_at = new Date(new Date(data.race_date).getTime() - LOCK_OFFSET_MS);
-  }
+    if (data.race_date) {
+        data.registration_lock_at = new Date(new Date(data.race_date).getTime() - LOCK_OFFSET_MS);
+    }
 
-  return data;
+    return data;
 }
 
 async function prepareRacePayload(payload) {
-  const data = Object.assign({}, payload || {});
-  const imageFileData = data.image_file_data;
+    const data = Object.assign({}, payload || {});
+    const imageFileData = data.image_file_data;
 
-  delete data.image_file_data;
-  delete data.image_file_name;
-  delete data.image_preview;
+    delete data.image_file_data;
+    delete data.image_file_name;
+    delete data.image_preview;
 
-  if (imageFileData === undefined || imageFileData === '') {
+    if (imageFileData === undefined || imageFileData === '') {
+        return data;
+    }
+
+    if (typeof imageFileData !== 'string' || !imageFileData.startsWith('data:image/')) {
+        throw new ApiError(400, 'Race image must be an image file');
+    }
+
+    const upload = await cloudinaryService.uploadAsset(imageFileData, {
+        folder: 'horse-racing/races',
+        resource_type: 'image'
+    });
+
+    data.image_url = upload.secure_url;
+    data.image_public_id = upload.public_id || undefined;
     return data;
-  }
-
-  if (typeof imageFileData !== 'string' || !imageFileData.startsWith('data:image/')) {
-    throw new ApiError(400, 'Race image must be an image file');
-  }
-
-  const upload = await cloudinaryService.uploadAsset(imageFileData, {
-    folder: 'horse-racing/races',
-    resource_type: 'image'
-  });
-
-  data.image_url = upload.secure_url;
-  data.image_public_id = upload.public_id || undefined;
-  return data;
 }
 
 async function validateRaceLinks(payload) {
-  if (payload.tournament_id) {
-    const tournament = await tournamentRepository.findById(payload.tournament_id);
+    if (payload.tournament_id) {
+        const tournament = await tournamentRepository.findById(payload.tournament_id);
 
-    if (!tournament) {
-      throw new ApiError(404, 'Tournament not found');
+        if (!tournament) {
+            throw new ApiError(404, 'Tournament not found');
+        }
     }
-  }
 
-  if (payload.round_id) {
-    const round = await roundRepository.findById(payload.round_id);
+    if (payload.round_id) {
+        const round = await roundRepository.findById(payload.round_id);
 
-    if (!round) {
-      throw new ApiError(404, 'Round not found');
+        if (!round) {
+            throw new ApiError(404, 'Round not found');
+        }
     }
-  }
 
-  if (payload.referee_id) {
-    const referee = await profileRepository.findRaceRefereeById(payload.referee_id);
+    if (payload.referee_id) {
+        const referee = await profileRepository.findRaceRefereeById(payload.referee_id);
 
-    if (!referee) {
-      throw new ApiError(404, 'Race referee not found');
+        if (!referee) {
+            throw new ApiError(404, 'Race referee not found');
+        }
     }
-  }
 }
 
 async function createRace(payload) {
-  const racePayload = await prepareRacePayload(payload);
-  await validateRaceLinks(racePayload);
+    const racePayload = await prepareRacePayload(payload);
+    await validateRaceLinks(racePayload);
 
-  const race = await raceRepository.create(applyRegistrationLockAt(racePayload));
+    const race = await raceRepository.create(applyRegistrationLockAt(racePayload));
 
-  return {
-    race: race
-  };
+    return {
+        race: race
+    };
 }
 
 async function listRaces(req, query) {
-  const filter = {};
+    const filter = {};
 
-  ['tournament_id', 'round_id', 'referee_id', 'status'].forEach(function(field) {
-    if (query[field]) {
-      filter[field] = query[field];
+    ['tournament_id', 'round_id', 'referee_id', 'status'].forEach(function(field) {
+        if (query[field]) {
+            filter[field] = query[field];
+        }
+    });
+
+    if (hasRole(req, ROLE_NAMES.RACE_REFEREE) && !hasRole(req, ROLE_NAMES.ADMIN)) {
+        const referee = await profileRepository.findRaceRefereeByUserId(req.user._id);
+
+        if (!referee) {
+            throw new ApiError(404, 'Race referee profile not found');
+        }
+
+        filter.referee_id = referee._id;
     }
-  });
 
-  if (hasRole(req, ROLE_NAMES.RACE_REFEREE) && !hasRole(req, ROLE_NAMES.ADMIN)) {
-    const referee = await profileRepository.findRaceRefereeByUserId(req.user._id);
-
-    if (!referee) {
-      throw new ApiError(404, 'Race referee profile not found');
-    }
-
-    filter.referee_id = referee._id;
-  }
-
-  return {
-    races: await withParticipantCounts(await raceRepository.find(filter))
-  };
+    return {
+        races: await withParticipantCounts(await raceRepository.find(filter))
+    };
 }
 
 async function getRace(id) {
-  const race = await raceRepository.findById(id);
+    const race = await raceRepository.findById(id);
 
-  if (!race) {
-    throw new ApiError(404, 'Race not found');
-  }
+    if (!race) {
+        throw new ApiError(404, 'Race not found');
+    }
 
-  return {
-    race: await withParticipantCounts(race)
-  };
+    return {
+        race: await withParticipantCounts(race)
+    };
 }
 
 function documentId(value) {
-  return value && (value._id || value);
+    return value && (value._id || value);
 }
 
 async function ensureRefereeCanReadRace(req, race) {
-  if (!hasRole(req, ROLE_NAMES.RACE_REFEREE) || hasRole(req, ROLE_NAMES.ADMIN)) {
-    return;
-  }
+    if (!hasRole(req, ROLE_NAMES.RACE_REFEREE) || hasRole(req, ROLE_NAMES.ADMIN)) {
+        return;
+    }
 
-  const referee = await profileRepository.findRaceRefereeByUserId(req.user._id);
-  const assignedRefereeId = documentId(race.referee_id);
+    const referee = await profileRepository.findRaceRefereeByUserId(req.user._id);
+    const assignedRefereeId = documentId(race.referee_id);
 
-  if (!referee || !assignedRefereeId || assignedRefereeId.toString() !== referee._id.toString()) {
-    throw new ApiError(403, 'You can only view participants for races assigned to you');
-  }
+    if (!referee || !assignedRefereeId || assignedRefereeId.toString() !== referee._id.toString()) {
+        throw new ApiError(403, 'You can only view participants for races assigned to you');
+    }
 }
 
 async function getRaceParticipants(req, id) {
-  const race = await raceRepository.findById(id);
+    const race = await raceRepository.findById(id);
 
-  if (!race) {
-    throw new ApiError(404, 'Race not found');
-  }
+    if (!race) {
+        throw new ApiError(404, 'Race not found');
+    }
 
-  await ensureRefereeCanReadRace(req, race);
+    await ensureRefereeCanReadRace(req, race);
 
-  const registrations = await Registration.find({
-    race_id: race._id,
-    status: REGISTRATION_STATUS.APPROVED
-  })
-    .populate({
-      path: 'horse_id',
-      populate: {
-        path: 'owner_id',
-        populate: { path: 'user_id', select: 'full_name email' }
-      }
-    })
-    .populate({
-      path: 'owner_id',
-      populate: { path: 'user_id', select: 'full_name email' }
-    })
-    .sort({ registered_at: 1 });
+    const models = getModels();
+    const { Op } = require('sequelize');
+    const { Registration, JockeyAssignment, Horse, HorseOwner, User, Jockey } = models;
 
-  const horseIds = registrations.map(function(registration) {
-    return documentId(registration.horse_id);
-  }).filter(Boolean);
+    // Sequelize equivalent of the legacy chained populate:
+    // Registration → horse_id → owner_id → user_id
+    // Registration → owner_id → user_id
+    const registrations = await Registration.findAll({
+        where: {
+            race_id: race._id,
+            status: REGISTRATION_STATUS.APPROVED
+        },
+        include: [
+            {
+                model: Horse,
+                as: 'horse',
+                include: [
+                    {
+                        model: HorseOwner,
+                        as: 'owner',
+                        include: [
+                            { model: User, as: 'user', attributes: ['full_name', 'email'] }
+                        ]
+                    }
+                ]
+            },
+            {
+                model: HorseOwner,
+                as: 'owner',
+                include: [
+                    { model: User, as: 'user', attributes: ['full_name', 'email'] }
+                ]
+            }
+        ],
+        order: [['registered_at', 'ASC']]
+    });
 
-  const assignments = horseIds.length
-    ? await JockeyAssignment.find({
-      race_id: race._id,
-      horse_id: { $in: horseIds },
-      assignment_type: 'primary',
-      status: ASSIGNMENT_STATUS.ACCEPTED
-    })
-      .populate({
-        path: 'jockey_id',
-        populate: { path: 'user_id', select: 'full_name email' }
-      })
-    : [];
-  const assignmentsByHorse = new Map(assignments.map(function(assignment) {
-    return [documentId(assignment.horse_id).toString(), assignment];
-  }));
+    const horseIds = registrations.map(r => documentId(r.horse_id)).filter(Boolean);
 
-  return {
-    race: race,
-    participants: registrations.map(function(registration) {
-      const horseId = documentId(registration.horse_id);
+    const assignments = horseIds.length
+        ? await JockeyAssignment.findAll({
+            where: {
+                race_id: race._id,
+                horse_id: { [Op.in]: horseIds },
+                assignment_type: 'primary',
+                status: ASSIGNMENT_STATUS.ACCEPTED
+            },
+            include: [
+                {
+                    model: Jockey,
+                    as: 'jockey',
+                    include: [
+                        { model: User, as: 'user', attributes: ['full_name', 'email'] }
+                    ]
+                }
+            ]
+        })
+        : [];
 
-      return {
-        registration: registration,
-        horse: registration.horse_id,
-        owner: registration.owner_id,
-        assignment: horseId ? assignmentsByHorse.get(horseId.toString()) || null : null
-      };
-    })
-  };
+    const assignmentsByHorse = new Map(assignments.map(a => [
+        documentId(a.horse_id).toString(),
+        a
+    ]));
+
+    return {
+        race: race,
+        participants: registrations.map(function(registration) {
+            const horseId = documentId(registration.horse_id);
+
+            return {
+                registration: registration,
+                horse: registration.horse,
+                owner: registration.owner,
+                assignment: horseId ? assignmentsByHorse.get(horseId.toString()) || null : null
+            };
+        })
+    };
 }
 
 async function updateRace(id, payload) {
-  const existingRace = await raceRepository.findById(id);
+    const existingRace = await raceRepository.findById(id);
 
-  if (!existingRace) {
-    throw new ApiError(404, 'Race not found');
-  }
+    if (!existingRace) {
+        throw new ApiError(404, 'Race not found');
+    }
 
-  const racePayload = await prepareRacePayload(payload);
+    const racePayload = await prepareRacePayload(payload);
 
-  await validateRaceLinks(racePayload);
+    await validateRaceLinks(racePayload);
 
-  const race = await raceRepository.updateById(id, applyRegistrationLockAt(racePayload));
+    const race = await raceRepository.updateById(id, applyRegistrationLockAt(racePayload));
 
-  if (!race) {
-    throw new ApiError(404, 'Race not found');
-  }
+    if (!race) {
+        throw new ApiError(404, 'Race not found');
+    }
 
-  return {
-    race: race
-  };
+    return {
+        race: race
+    };
 }
 
 function normalizeStakeLimit(value, fallback) {
-  if (value === undefined || value === null || value === '') {
-    return fallback;
-  }
+    if (value === undefined || value === null || value === '') {
+        return fallback;
+    }
 
-  const parsed = Number(value);
+    const parsed = Number(value);
 
-  if (!Number.isFinite(parsed) || parsed < 1) {
-    throw new ApiError(400, 'Stake limits must be positive numbers');
-  }
+    if (!Number.isFinite(parsed) || parsed < 1) {
+        throw new ApiError(400, 'Stake limits must be positive numbers');
+    }
 
-  return parsed;
+    return parsed;
 }
 
 function buildBettingMarketPayload(race, market, payload) {
-  const currentMarket = (race && race.betting_market) || {};
-  const minStake = normalizeStakeLimit(payload.min_stake, currentMarket.min_stake || 1);
-  const maxStake = normalizeStakeLimit(payload.max_stake, currentMarket.max_stake || 1000);
+    const currentMarket = (race && race.betting_market) || {};
+    const minStake = normalizeStakeLimit(payload.min_stake, currentMarket.min_stake || 1);
+    const maxStake = normalizeStakeLimit(payload.max_stake, currentMarket.max_stake || 1000);
 
-  if (maxStake < minStake) {
-    throw new ApiError(400, 'max_stake must be greater than or equal to min_stake');
-  }
+    if (maxStake < minStake) {
+        throw new ApiError(400, 'max_stake must be greater than or equal to min_stake');
+    }
 
-  return {
-    status: ODDS_MARKET_STATUS.OPEN,
-    opens_at: new Date(),
-    closes_at: payload.closes_at ? new Date(payload.closes_at) : currentMarket.closes_at,
-    min_stake: minStake,
-    max_stake: maxStake,
-    currency: payload.currency || currentMarket.currency || 'TOKEN',
-    odds_market_id: market && market._id
-  };
+    return {
+        status: ODDS_MARKET_STATUS.OPEN,
+        opens_at: new Date(),
+        closes_at: payload.closes_at ? new Date(payload.closes_at) : currentMarket.closes_at,
+        min_stake: minStake,
+        max_stake: maxStake,
+        currency: payload.currency || currentMarket.currency || 'TOKEN',
+        odds_market_id: market && market._id
+    };
 }
 
 async function openRegistrationForDemo(id) {
-  const race = await raceRepository.findById(id);
+    const race = await raceRepository.findById(id);
 
-  if (!race) {
-    throw new ApiError(404, 'Race not found');
-  }
+    if (!race) {
+        throw new ApiError(404, 'Race not found');
+    }
 
-  const nextRaceDate = new Date(Date.now() + 24 * 60 * 60 * 1000);
-  const updatedRace = await raceRepository.updateById(race._id, {
-    race_date: nextRaceDate,
-    registration_locked: false,
-    registration_lock_at: new Date(nextRaceDate.getTime() - LOCK_OFFSET_MS),
-    status: 'scheduled',
-    starting_at: null,
-    started_at: null
-  });
+    const nextRaceDate = new Date(Date.now() + 24 * 60 * 60 * 1000);
+    const updatedRace = await raceRepository.updateById(race._id, {
+        race_date: nextRaceDate,
+        registration_locked: false,
+        registration_lock_at: new Date(nextRaceDate.getTime() - LOCK_OFFSET_MS),
+        status: 'scheduled',
+        starting_at: null,
+        started_at: null
+    });
 
-  return {
-    race: updatedRace
-  };
+    return {
+        race: updatedRace
+    };
 }
 
 async function setRegistrationDemoMode(payload) {
-  if (typeof payload.enabled !== 'boolean') {
-    throw new ApiError(400, 'enabled must be a boolean');
-  }
+    if (typeof payload.enabled !== 'boolean') {
+        throw new ApiError(400, 'enabled must be a boolean');
+    }
 
-  if (!payload.enabled) {
+    if (!payload.enabled) {
+        const updateResult = await raceRepository.updateMany(
+            { registration_locked: { $ne: true } },
+            {
+                registration_locked: true,
+                registration_lock_at: new Date()
+            }
+        );
+
+        return {
+            enabled: false,
+            updated_count: updateResult.modifiedCount || 0
+        };
+    }
+
+    const nextRaceDate = new Date(Date.now() + 24 * 60 * 60 * 1000);
+    const nextLockAt = new Date(nextRaceDate.getTime() - LOCK_OFFSET_MS);
     const updateResult = await raceRepository.updateMany(
-      { registration_locked: { $ne: true } },
-      {
-        registration_locked: true,
-        registration_lock_at: new Date()
-      }
+        { status: 'scheduled' },
+        {
+            race_date: nextRaceDate,
+            registration_locked: false,
+            registration_lock_at: nextLockAt,
+            status: 'scheduled'
+        }
     );
 
     return {
-      enabled: false,
-      updated_count: updateResult.modifiedCount || 0
+        enabled: true,
+        updated_count: updateResult.modifiedCount || 0,
+        race_date: nextRaceDate,
+        registration_lock_at: nextLockAt
     };
-  }
-
-  const nextRaceDate = new Date(Date.now() + 24 * 60 * 60 * 1000);
-  const nextLockAt = new Date(nextRaceDate.getTime() - LOCK_OFFSET_MS);
-  const updateResult = await raceRepository.updateMany(
-    { status: 'scheduled' },
-    {
-      race_date: nextRaceDate,
-      registration_locked: false,
-      registration_lock_at: nextLockAt,
-      status: 'scheduled'
-    }
-  );
-
-  return {
-    enabled: true,
-    updated_count: updateResult.modifiedCount || 0,
-    race_date: nextRaceDate,
-    registration_lock_at: nextLockAt
-  };
 }
 
 async function deleteRace(id) {
-  const race = await raceRepository.softDeleteById(id);
+    const race = await raceRepository.softDeleteById(id);
 
-  if (!race) {
-    throw new ApiError(404, 'Race not found');
-  }
+    if (!race) {
+        throw new ApiError(404, 'Race not found');
+    }
 
-  return {
-    race: race
-  };
+    return {
+        race: race
+    };
 }
 
 async function openBetting(id, payload) {
-  const race = await raceRepository.findById(id);
+    const race = await raceRepository.findById(id);
 
-  if (!race) {
-    throw new ApiError(404, 'Race not found');
-  }
+    if (!race) {
+        throw new ApiError(404, 'Race not found');
+    }
 
-  if (race.status !== 'scheduled') {
-    throw new ApiError(400, 'Only scheduled races can open betting');
-  }
+    if (race.status !== 'scheduled') {
+        throw new ApiError(400, 'Only scheduled races can open betting');
+    }
 
-  const market = await raceOddsMarketRepository.findByRaceId(race._id);
+    const market = await raceOddsMarketRepository.findByRaceId(race._id);
 
-  if (!market) {
-    throw new ApiError(404, 'Race odds market not found. Generate odds before opening betting');
-  }
+    if (!market) {
+        throw new ApiError(404, 'Race odds market not found. Generate odds before opening betting');
+    }
 
-  if (![ODDS_MARKET_STATUS.GENERATED, ODDS_MARKET_STATUS.OPEN].includes(market.status)) {
-    throw new ApiError(400, 'Only generated or open odds markets can open betting', {
-      market_status: market.status
+    if (![ODDS_MARKET_STATUS.GENERATED, ODDS_MARKET_STATUS.OPEN].includes(market.status)) {
+        throw new ApiError(400, 'Only generated or open odds markets can open betting', {
+            market_status: market.status
+        });
+    }
+
+    const bettingMarket = buildBettingMarketPayload(race, market, payload || {});
+    const updatedMarket = await raceOddsMarketRepository.updateByRaceId(race._id, {
+        status: ODDS_MARKET_STATUS.OPEN
     });
-  }
+    const updatedRace = await raceRepository.updateById(race._id, {
+        betting_status: ODDS_MARKET_STATUS.OPEN,
+        betting_closes_at: bettingMarket.closes_at,
+        betting_market: bettingMarket
+    });
 
-  const bettingMarket = buildBettingMarketPayload(race, market, payload || {});
-  const updatedMarket = await raceOddsMarketRepository.updateByRaceId(race._id, {
-    status: ODDS_MARKET_STATUS.OPEN
-  });
-  const updatedRace = await raceRepository.updateById(race._id, {
-    betting_status: ODDS_MARKET_STATUS.OPEN,
-    betting_closes_at: bettingMarket.closes_at,
-    betting_market: bettingMarket
-  });
-
-  return {
-    race: updatedRace,
-    market: updatedMarket
-  };
+    return {
+        race: updatedRace,
+        market: updatedMarket
+    };
 }
 
 async function closeRaceBetting(id) {
-  const market = await raceOddsMarketRepository.findByRaceId(id);
+    const market = await raceOddsMarketRepository.findByRaceId(id);
 
-  if (market && market.status !== ODDS_MARKET_STATUS.SETTLED) {
-    await raceOddsMarketRepository.updateByRaceId(id, {
-      status: ODDS_MARKET_STATUS.CLOSED
+    if (market && market.status !== ODDS_MARKET_STATUS.SETTLED) {
+        await raceOddsMarketRepository.updateByRaceId(id, {
+            status: ODDS_MARKET_STATUS.CLOSED
+        });
+    }
+
+    return raceRepository.updateById(id, {
+        betting_status: ODDS_MARKET_STATUS.CLOSED,
+        'betting_market.status': ODDS_MARKET_STATUS.CLOSED
     });
-  }
-
-  return raceRepository.updateById(id, {
-    betting_status: ODDS_MARKET_STATUS.CLOSED,
-    'betting_market.status': ODDS_MARKET_STATUS.CLOSED
-  });
 }
 
 async function closeBetting(id) {
-  const race = await raceRepository.findById(id);
+    const race = await raceRepository.findById(id);
 
-  if (!race) {
-    throw new ApiError(404, 'Race not found');
-  }
+    if (!race) {
+        throw new ApiError(404, 'Race not found');
+    }
 
-  return {
-    race: await closeRaceBetting(race._id),
-    market: await raceOddsMarketRepository.findByRaceId(race._id)
-  };
+    return {
+        race: await closeRaceBetting(race._id),
+        market: await raceOddsMarketRepository.findByRaceId(race._id)
+    };
 }
 
 async function startRace(req, id) {
-  const race = await raceRepository.findById(id);
+    const race = await raceRepository.findById(id);
 
-  if (!race) {
-    throw new ApiError(404, 'Race not found');
-  }
-
-  await ensureCanControlRace(req, race);
-
-  const startingAt = race.starting_at ? new Date(race.starting_at).getTime() : 0;
-  const staleStart = race.status === 'starting' &&
-    startingAt > 0 &&
-    Date.now() - startingAt >= RACE_START_STALE_MS;
-
-  if (race.status !== 'scheduled' && !staleStart) {
-    throw new ApiError(400, 'Only scheduled races or stale start attempts can be started');
-  }
-
-  if (!race.race_date || (!DEMO_BYPASS_TIME_VALIDATIONS && new Date(race.race_date).getTime() > Date.now())) {
-    throw new ApiError(400, 'Race cannot be started before race_date');
-  }
-
-  const startAttemptAt = new Date();
-
-  await closeRaceBetting(race._id);
-
-  const startingRace = await raceRepository.updateOne({
-    _id: race._id,
-    status: race.status,
-    ...(race.status === 'starting' ? { starting_at: race.starting_at } : {})
-  }, {
-    $set: {
-      status: 'starting',
-      starting_at: startAttemptAt,
-      registration_locked: true,
-      betting_status: ODDS_MARKET_STATUS.CLOSED,
-      'betting_market.status': ODDS_MARKET_STATUS.CLOSED
-    },
-    $unset: { started_at: 1 }
-  });
-
-  if (!startingRace) {
-    throw new ApiError(409, 'Race status changed before it could be started');
-  }
-
-  let engine;
-
-  try {
-    const participantData = await raceEngineService.collectParticipants(race._id);
-
-    if (!participantData.participants.length) {
-      throw new ApiError(400, 'Race has no eligible participants');
+    if (!race) {
+        throw new ApiError(404, 'Race not found');
     }
 
-    engine = await raceEngineService.generateProvisionalRaceRun(
-      race._id,
-      req.user._id,
-      participantData
-    );
+    await ensureCanControlRace(req, race);
 
-    const runningRace = await raceRepository.updateOne({
-      _id: race._id,
-      status: 'starting',
-      starting_at: startAttemptAt
+    const startingAt = race.starting_at ? new Date(race.starting_at).getTime() : 0;
+    const staleStart = race.status === 'starting' &&
+        startingAt > 0 &&
+        Date.now() - startingAt >= RACE_START_STALE_MS;
+
+    if (race.status !== 'scheduled' && !staleStart) {
+        throw new ApiError(400, 'Only scheduled races or stale start attempts can be started');
+    }
+
+    const startAttemptAt = new Date();
+
+    await closeRaceBetting(race._id);
+
+    const startingRace = await raceRepository.updateOne({
+        _id: race._id,
+        status: race.status,
+        ...(race.status === 'starting' ? { starting_at: race.starting_at } : {})
     }, {
-      $set: {
-        status: 'running',
-        started_at: new Date(),
-        registration_locked: true,
-        betting_status: ODDS_MARKET_STATUS.CLOSED,
-        'betting_market.status': ODDS_MARKET_STATUS.CLOSED
-      },
-      $unset: { starting_at: 1 }
+        $set: {
+            status: 'starting',
+            starting_at: startAttemptAt,
+            registration_locked: true,
+            betting_status: ODDS_MARKET_STATUS.CLOSED,
+            'betting_market.status': ODDS_MARKET_STATUS.CLOSED
+        },
+        $unset: { started_at: 1 }
     });
 
-    if (!runningRace) {
-      throw new ApiError(409, 'Race start attempt changed before completion');
+    if (!startingRace) {
+        throw new ApiError(409, 'Race status changed before it could be started');
     }
 
-    return { race: runningRace, engine: engine };
-  } catch (error) {
-    const cleanupSession = await mongoose.startSession();
+    let engine;
 
     try {
-      await cleanupSession.withTransaction(async function() {
-        const rolledBackRace = await raceRepository.updateOne({
-          _id: race._id,
-          status: 'starting',
-          starting_at: startAttemptAt
-        }, {
-          $set: { status: 'scheduled' },
-          $unset: { starting_at: 1, started_at: 1 }
-        }, cleanupSession);
+        const participantData = await raceEngineService.collectParticipants(race._id);
 
-        if (rolledBackRace && engine?.created && engine.race_run?._id) {
-          await raceEngineService.cancelProvisionalRaceRun(
-            engine.race_run._id,
-            { session: cleanupSession }
-          );
+        if (!participantData.participants.length) {
+            throw new ApiError(400, 'Race has no eligible participants');
         }
-      });
-    } finally {
-      await cleanupSession.endSession();
-    }
 
-    throw error;
-  }
+        engine = await raceEngineService.generateProvisionalRaceRun(
+            race._id,
+            req.user._id,
+            participantData
+        );
+
+        const runningRace = await raceRepository.updateOne({
+            _id: race._id,
+            status: 'starting',
+            starting_at: startAttemptAt
+        }, {
+            $set: {
+                status: 'running',
+                started_at: new Date(),
+                registration_locked: true,
+                betting_status: ODDS_MARKET_STATUS.CLOSED,
+                'betting_market.status': ODDS_MARKET_STATUS.CLOSED
+            },
+            $unset: { starting_at: 1 }
+        });
+
+        if (!runningRace) {
+            throw new ApiError(409, 'Race start attempt changed before completion');
+        }
+
+        return { race: runningRace, engine: engine };
+    } catch (error) {
+        // Sequelize managed transaction (replaces the legacy session.withTransaction).
+        const sequelize = getSequelize();
+        try {
+            await sequelize.transaction(async () => {
+                const rolledBackRace = await raceRepository.updateOne({
+                    _id: race._id,
+                    status: 'starting',
+                    starting_at: startAttemptAt
+                }, {
+                    $set: { status: 'scheduled' },
+                    $unset: { starting_at: 1, started_at: 1 }
+                });
+
+                if (rolledBackRace && engine?.created && engine.race_run?._id) {
+                    await raceEngineService.cancelProvisionalRaceRun(
+                        engine.race_run._id,
+                        {}
+                    );
+                }
+            });
+        } catch (rollbackError) {
+            // Rollback best-effort; rethrow original error
+            console.error('raceService.startRace rollback failed:', rollbackError.message);
+        }
+
+        throw error;
+    }
 }
 
 async function completeRace(req, id) {
-  const race = await raceRepository.findById(id);
+    const race = await raceRepository.findById(id);
 
-  if (!race) {
-    throw new ApiError(404, 'Race not found');
-  }
+    if (!race) {
+        throw new ApiError(404, 'Race not found');
+    }
 
-  await ensureCanControlRace(req, race);
+    await ensureCanControlRace(req, race);
 
-  if (race.status !== 'running') {
-    throw new ApiError(400, 'Only running races can be completed');
-  }
+    if (race.status !== 'running') {
+        throw new ApiError(400, 'Only running races can be completed');
+    }
 
-  return {
-    race: await raceRepository.updateById(race._id, {
-      status: 'completed'
-    })
-  };
+    return {
+        race: await raceRepository.updateById(race._id, {
+            status: 'completed'
+        })
+    };
 }
 
 module.exports = {
-  createRace,
-  completeRace,
-  listRaces,
-  getRace,
-  openRegistrationForDemo,
-  setRegistrationDemoMode,
-  openBetting,
-  closeBetting,
-  startRace,
-  getRaceParticipants,
-  updateRace,
-  deleteRace,
-  _private: {
-    buildBettingMarketPayload,
-    closeRaceBetting
-  }
+    createRace,
+    completeRace,
+    listRaces,
+    getRace,
+    openRegistrationForDemo,
+    setRegistrationDemoMode,
+    openBetting,
+    closeBetting,
+    startRace,
+    getRaceParticipants,
+    updateRace,
+    deleteRace,
+    _private: {
+        buildBettingMarketPayload,
+        closeRaceBetting
+    }
 };

@@ -1,0 +1,42 @@
+[
+  {
+    "id": "3c887c57-3413-5717-b775-f29c8f4fc86b",
+    "race_id": "f8ea600d-1b70-5fc2-b961-74be4f49a097",
+    "horse_id": "f24d157b-7b1a-51a5-b4e1-5bcae8fd4e2a",
+    "jockey_id": "d1f7e06d-4b72-571e-83be-e173d4567f78",
+    "referee_id": "a478d69a-1ab5-5d27-8c18-1e909ed4d612",
+    "horse_check_id": "c46a49b3-2b0f-5905-ac2d-e843dc76efe9",
+    "violation_type": "dangerous_riding",
+    "description": "bbbb",
+    "severity": "major",
+    "evidence_urls": [],
+    "deviates_from_policy": false,
+    "status": "confirmed",
+    "policy_version": "2026.3",
+    "created_at": "2026-07-30T05:57:48.015Z",
+    "decided_at": "2026-07-30T05:58:43.480Z",
+    "decided_by": "b90984ff-8d05-5682-a127-db747cbc82c8",
+    "decision": "ok",
+    "decision_scope": "referee_policy_match",
+    "deviation_reason": null,
+    "penalty_source": "policy_confirm",
+    "proposed_at": "2026-07-30T05:58:43.480Z",
+    "proposed_by": "b90984ff-8d05-5682-a127-db747cbc82c8"
+  },
+  {
+    "id": "742c89b8-64e2-5e3b-9084-21e446235c5b",
+    "race_id": "92de665f-0113-5ddc-bb5f-41c93a953fde",
+    "horse_id": "6b094181-e78c-5f24-9c2a-f93e20b86446",
+    "jockey_id": "2a3a9b70-0271-53d5-b3bf-cd7fb80d278a",
+    "referee_id": "a478d69a-1ab5-5d27-8c18-1e909ed4d612",
+    "horse_check_id": "50f5717b-c335-5868-b403-1bffc9953bfe",
+    "violation_type": "dangerous_riding",
+    "description": "sdada",
+    "severity": "major",
+    "evidence_urls": [],
+    "deviates_from_policy": false,
+    "status": "recorded",
+    "policy_version": "2026.3",
+    "created_at": "2026-07-30T07:04:12.627Z"
+  }
+]

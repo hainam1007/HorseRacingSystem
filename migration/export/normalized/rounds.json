@@ -1,0 +1,90 @@
+[
+  {
+    "id": "c20219f2-d28a-55f7-91de-8c558fd3c228",
+    "tournament_id": "12e0602f-46b8-56dc-84ba-b0ef893f2f29",
+    "name": "Heritage Qualifiers",
+    "round_order": 1,
+    "description": "Completed qualification races.",
+    "status": "completed"
+  },
+  {
+    "id": "45275559-7d03-5e99-ab3d-e8a952d161d4",
+    "tournament_id": "12e0602f-46b8-56dc-84ba-b0ef893f2f29",
+    "name": "Heritage Finals",
+    "round_order": 2,
+    "description": "Completed final races.",
+    "status": "completed"
+  },
+  {
+    "id": "ef4ed21e-135c-59d0-8e12-1f18949d62d7",
+    "tournament_id": "71d39f80-ad46-586a-8218-33829aaf77c5",
+    "name": "Opening Round",
+    "round_order": 1,
+    "description": "Open races for registration and jockey invitation demonstrations.",
+    "status": "active"
+  },
+  {
+    "id": "61d3e5ec-3021-599c-8727-8af74d7142ab",
+    "tournament_id": "71d39f80-ad46-586a-8218-33829aaf77c5",
+    "name": "Championship Round",
+    "round_order": 2,
+    "description": "Later races in the current demo tournament.",
+    "status": "scheduled"
+  },
+  {
+    "id": "1c0f92f3-bca6-5554-9f5e-929ecb4d8b0a",
+    "tournament_id": "d03e79f5-0225-5c6d-94ba-a8ee632b4a26",
+    "name": "Demo round",
+    "round_order": 1,
+    "description": "Demo round",
+    "status": "active"
+  },
+  {
+    "id": "e6e571b2-efe1-58da-93fa-b75c1fd752b2",
+    "tournament_id": "a76f8076-35ab-5ee0-882a-f29d16a711c1",
+    "name": "Open Finale",
+    "round_order": 3,
+    "description": "Round 3 for Open Entry Triple Crown Demo.",
+    "status": "active"
+  },
+  {
+    "id": "e91b473f-32e7-58c4-be44-bbb8ea43e9a6",
+    "tournament_id": "a76f8076-35ab-5ee0-882a-f29d16a711c1",
+    "name": "Featured Field",
+    "round_order": 1,
+    "description": "Round 1 for Open Entry Triple Crown Demo.",
+    "status": "active"
+  },
+  {
+    "id": "ad83c689-8517-5cae-b072-2927eed02745",
+    "tournament_id": "a76f8076-35ab-5ee0-882a-f29d16a711c1",
+    "name": "Open Sprint",
+    "round_order": 2,
+    "description": "Round 2 for Open Entry Triple Crown Demo.",
+    "status": "active"
+  },
+  {
+    "id": "2cb5d719-ed8a-59f6-9b81-657a1efba6f4",
+    "tournament_id": "8f4f3ad8-497f-5256-bade-057cac2d9e32",
+    "name": "Round 1: Ocean Race",
+    "round_order": 1,
+    "description": "",
+    "status": "active"
+  },
+  {
+    "id": "f3b4af07-f419-5d10-8c4a-c6b891692492",
+    "tournament_id": "f69b5baf-fb4d-5adb-b35f-8e812c2cec67",
+    "name": "round 1",
+    "round_order": 1,
+    "description": "",
+    "status": "active"
+  },
+  {
+    "id": "e7a3256b-d686-554c-b7d8-772dc6d879e8",
+    "tournament_id": "cc4373db-7da2-56ec-a934-0dcdc9f5997b",
+    "name": "Vòng Loại",
+    "round_order": 1,
+    "description": "oke",
+    "status": "active"
+  }
+]

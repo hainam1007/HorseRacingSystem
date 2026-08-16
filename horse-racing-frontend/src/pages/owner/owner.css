@@ -121,6 +121,7 @@
   border: 1px solid rgba(var(--racing-contrast-rgb), 0.28);
   border-radius: 999px;
   background: rgba(var(--racing-contrast-rgb), 0.10);
+  -webkit-backdrop-filter: blur(12px);
   backdrop-filter: blur(12px);
 }
 
@@ -189,6 +190,7 @@
   border-radius: 12px;
   background: rgba(24, 43, 31, 0.97);
   box-shadow: 0 24px 55px rgba(8, 20, 13, 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  -webkit-backdrop-filter: blur(18px);
   backdrop-filter: blur(18px);
   animation: ownerSwitchIn 160ms ease-out;
 }
@@ -325,6 +327,7 @@
   border-radius: 8px;
   background: rgba(29, 48, 36, 0.96);
   box-shadow: 0 26px 60px rgba(12, 24, 17, 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  -webkit-backdrop-filter: blur(18px);
   backdrop-filter: blur(18px);
   opacity: 0;
   transform: translateY(-8px) scale(0.98);
@@ -639,6 +642,7 @@
   border: 1px solid rgba(var(--racing-contrast-rgb), 0.28);
   border-radius: 8px;
   background: rgba(29, 48, 36, 0.68);
+  -webkit-backdrop-filter: blur(14px);
   backdrop-filter: blur(14px);
 }
 
@@ -715,6 +719,7 @@
   border: 1px solid rgba(var(--racing-contrast-rgb), 0.28);
   border-radius: 8px;
   background: rgba(29, 48, 36, 0.68);
+  -webkit-backdrop-filter: blur(14px);
   backdrop-filter: blur(14px);
 }
 
@@ -851,6 +856,7 @@
   border: 1px solid rgba(var(--racing-contrast-rgb), 0.24);
   border-radius: 8px;
   background: rgba(29, 48, 36, 0.68);
+  -webkit-backdrop-filter: blur(12px);
   backdrop-filter: blur(12px);
   opacity: 0;
   transform: translateY(18px);
@@ -1221,6 +1227,13 @@
   padding: 16px;
 }
 
+.owner-registration-list .owner-registration > .owner-badge {
+  min-width: 110px;
+  padding-inline: 16px;
+  flex-shrink: 0;
+  justify-self: end;
+}
+
 .owner-registration__body {
   display: grid;
   gap: 5px;
@@ -1421,6 +1434,7 @@
   border: 1px solid rgba(var(--racing-contrast-rgb), 0.28);
   border-radius: 8px;
   background: rgba(29, 48, 36, 0.68);
+  -webkit-backdrop-filter: blur(14px);
   backdrop-filter: blur(14px);
 }
 
@@ -1512,6 +1526,7 @@
   min-height: 38px;
   padding-inline: 15px;
   border-radius: 999px;
+  -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
   box-shadow: 0 12px 30px rgba(8, 20, 13, 0.24);
 }
@@ -1984,6 +1999,7 @@
   border: 1px solid rgba(var(--racing-contrast-rgb), 0.28);
   border-radius: 8px;
   background: rgba(29, 48, 36, 0.76);
+  -webkit-backdrop-filter: blur(14px);
   backdrop-filter: blur(14px);
 }
 
@@ -2995,6 +3011,7 @@
   border: 1px solid rgba(var(--racing-contrast-rgb), 0.28);
   border-radius: 8px;
   background: rgba(29, 48, 36, 0.72);
+  -webkit-backdrop-filter: blur(14px);
   backdrop-filter: blur(14px);
 }
 
@@ -3250,7 +3267,7 @@
 
 .owner-assignment-workflow__layout {
   display: grid;
-  grid-template-columns: minmax(350px, 0.34fr) minmax(0, 1fr);
+  grid-template-columns: minmax(280px, 320px) minmax(0, 1fr);
   gap: 16px;
   align-items: start;
 }
@@ -3282,6 +3299,7 @@
 .owner-assignment-workflow__list {
   display: grid;
   gap: 6px;
+  align-content: start;
   max-block-size: none;
   overflow-y: auto;
   overscroll-behavior: contain;
@@ -5693,6 +5711,7 @@
   border: 1px solid rgba(var(--racing-contrast-rgb), 0.28);
   border-radius: 8px;
   background: rgba(29, 48, 36, 0.72);
+  -webkit-backdrop-filter: blur(14px);
   backdrop-filter: blur(14px);
 }
 
@@ -5818,6 +5837,7 @@
   z-index: 1;
   top: 14px;
   left: 14px;
+  -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
 }
 
@@ -5834,6 +5854,7 @@
   border-radius: 4px;
   color: var(--racing-success-soft);
   background: rgba(31, 83, 47, 0.84);
+  -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
   font-size: 0.74rem;
   font-weight: 900;
@@ -6052,6 +6073,7 @@
   border: 1px solid rgba(var(--racing-contrast-rgb), 0.28);
   border-radius: 8px;
   background: rgba(29, 48, 36, 0.72);
+  -webkit-backdrop-filter: blur(14px);
   backdrop-filter: blur(14px);
 }
 
@@ -6325,6 +6347,7 @@
   border: 1px solid rgba(var(--racing-contrast-rgb), 0.28);
   border-radius: 8px;
   background: rgba(29, 48, 36, 0.72);
+  -webkit-backdrop-filter: blur(14px);
   backdrop-filter: blur(14px);
 }
 
@@ -6337,8 +6360,8 @@
   max-width: 100%;
   color: var(--owner-text-strong);
   font-family: "Sora", sans-serif;
-  font-size: clamp(2.15rem, 4.2vw, 3.65rem);
-  line-height: 0.95;
+  font-size: clamp(1.6rem, 3.4vw, 3.2rem);
+  line-height: 1.05;
   font-variant-numeric: tabular-nums;
   overflow-wrap: anywhere;
 }
@@ -6347,7 +6370,8 @@
   margin: 0;
   color: var(--owner-text-soft);
   line-height: 1.55;
-  overflow-wrap: anywhere;
+  overflow-wrap: normal;
+  word-break: normal;
 }
 
 .owner-results-stats {
@@ -6458,6 +6482,7 @@
 .owner-results-feature__facts strong,
 .owner-results-row__metrics strong {
   min-width: 0;
+  max-width: 100%;
   color: var(--owner-text-strong);
   font-family: "Sora", sans-serif;
   line-height: 1.12;
@@ -6636,6 +6661,7 @@
   border: 1px solid rgba(var(--racing-contrast-rgb), 0.28);
   border-radius: 8px;
   background: rgba(20, 39, 27, 0.82);
+  -webkit-backdrop-filter: blur(14px);
   backdrop-filter: blur(14px);
   box-shadow: 0 20px 45px rgba(14, 30, 20, 0.28);
 }
@@ -7314,6 +7340,7 @@
   border: 1px solid rgba(var(--racing-contrast-rgb), 0.28);
   border-radius: 8px;
   background: rgba(29, 48, 36, 0.78);
+  -webkit-backdrop-filter: blur(14px);
   backdrop-filter: blur(14px);
 }
 

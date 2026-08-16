@@ -3,7 +3,7 @@ const fs = require('node:fs');
 const http = require('node:http');
 const path = require('node:path');
 const test = require('node:test');
-const mongoose = require('mongoose');
+const { newObjectId } = require('../utils/objectId');
 
 const probabilityEngineService = require('../services/probabilityEngineService');
 const probabilityFeatureBuilderService = require('../services/probabilityFeatureBuilderService');
@@ -16,21 +16,21 @@ function readProjectFile(relativePath) {
 
 test('race odds routes and model are wired into the backend', () => {
   const routeSource = readProjectFile('routes/races.js');
-  const modelIndexSource = readProjectFile('models/index.js');
+  const modelIndexSource = readProjectFile('models/sequelize/RaceOddsMarket.js');
   const apiDocsSource = readProjectFile('docs/API.md');
 
   assert.match(routeSource, /raceOddsController/);
   assert.match(routeSource, /\/:id\/odds/);
   assert.match(routeSource, /\/:id\/odds\/generate/);
   assert.match(routeSource, /router\.patch\('\/:id\/odds'/);
-  assert.match(modelIndexSource, /RaceOddsMarket/);
+  assert.match(modelIndexSource, /define|RaceOddsMarket/);
   assert.match(apiDocsSource, /Race Odds APIs/);
 });
 
 test('historical feature builder ignores future race results', () => {
-  const horseId = new mongoose.Types.ObjectId();
-  const ownerId = new mongoose.Types.ObjectId();
-  const jockeyId = new mongoose.Types.ObjectId();
+  const horseId = newObjectId();
+  const ownerId = newObjectId();
+  const jockeyId = newObjectId();
   const futureRace = {
     race_date: new Date('2026-08-01T00:00:00.000Z'),
     distance: 1200,

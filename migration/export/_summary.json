@@ -1,0 +1,130 @@
+{
+  "reward_items": {
+    "count": 4,
+    "bytes": 1895
+  },
+  "races": {
+    "count": 18,
+    "bytes": 32487
+  },
+  "race_referees": {
+    "count": 2,
+    "bytes": 367
+  },
+  "redemption_histories": {
+    "count": 0,
+    "bytes": 2
+  },
+  "horse_rating_history": {
+    "count": 16,
+    "bytes": 7202
+  },
+  "race_odds_markets": {
+    "count": 9,
+    "bytes": 56097
+  },
+  "jockey_assignments": {
+    "count": 79,
+    "bytes": 143297
+  },
+  "notifications": {
+    "count": 0,
+    "bytes": 2
+  },
+  "deposit_packages": {
+    "count": 1,
+    "bytes": 310
+  },
+  "horse_checks": {
+    "count": 107,
+    "bytes": 91949
+  },
+  "horse_owners": {
+    "count": 4,
+    "bytes": 970
+  },
+  "prize_awards": {
+    "count": 40,
+    "bytes": 30934
+  },
+  "race_results": {
+    "count": 43,
+    "bytes": 46234
+  },
+  "race_runs": {
+    "count": 12,
+    "bytes": 28268
+  },
+  "horses": {
+    "count": 19,
+    "bytes": 13316
+  },
+  "referee_reports": {
+    "count": 9,
+    "bytes": 4479
+  },
+  "violations": {
+    "count": 2,
+    "bytes": 2623
+  },
+  "jockeys": {
+    "count": 8,
+    "bytes": 3079
+  },
+  "race_engine_runs": {
+    "count": 9,
+    "bytes": 3140
+  },
+  "transaction_histories": {
+    "count": 52,
+    "bytes": 22623
+  },
+  "wallets": {
+    "count": 7,
+    "bytes": 1461
+  },
+  "prizes": {
+    "count": 64,
+    "bytes": 26409
+  },
+  "bets": {
+    "count": 35,
+    "bytes": 34794
+  },
+  "registrations": {
+    "count": 81,
+    "bytes": 77804
+  },
+  "tournaments": {
+    "count": 9,
+    "bytes": 4883
+  },
+  "registration_cancellation_tickets": {
+    "count": 0,
+    "bytes": 2
+  },
+  "roles": {
+    "count": 5,
+    "bytes": 598
+  },
+  "user_roles": {
+    "count": 22,
+    "bytes": 2928
+  },
+  "rounds": {
+    "count": 11,
+    "bytes": 2444
+  },
+  "role_applications": {
+    "count": 1,
+    "bytes": 601
+  },
+  "users": {
+    "count": 21,
+    "bytes": 12466
+  },
+  "deposit_requests": {
+    "count": 12,
+    "bytes": 5015
+  }
+}

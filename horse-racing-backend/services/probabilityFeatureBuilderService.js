@@ -1,13 +1,19 @@
 const ApiError = require('../utils/ApiError');
 const { ASSIGNMENT_STATUS, ASSIGNMENT_TYPE, RACE_RESULT_STATUS, REGISTRATION_STATUS } = require('../constants/statuses');
-const { JockeyAssignment, Race, RaceResult, Registration } = require('../models');
+const { Op } = require('sequelize');
+const { loadSequelizeModels } = require('../models/sequelize/index.js');
+
+function getModels() { return loadSequelizeModels().models; }
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 const NEUTRAL_FINISH_AVG = 8;
 const DEFAULT_DAYS_SINCE_LAST_RACE = 365;
 
 function documentId(value) {
-  return value && (value._id || value);
+  // The PostgreSQL/Sequelize models expose `id`, while the legacy Mongo
+  // adapters expose `_id`.  Returning the model instance here makes Op.in
+  // receive an invalid value (and causes odds generation to fail with 500).
+  return value && (value._id || value.id || value);
 }
 
 function idString(value) {
@@ -265,10 +271,10 @@ function computeHistoricalFeatures(options) {
 function buildFeatureEntry(context) {
   const race = context.race;
   const registration = context.registration;
-  const horse = registration.horse_id;
-  const owner = registration.owner_id;
+  const horse = registration.horse || registration.horse_id;
+  const owner = registration.owner || registration.owner_id;
   const assignment = context.assignment;
-  const jockey = assignment && assignment.jockey_id;
+  const jockey = assignment && (assignment.jockey || assignment.jockey_id);
   const fallbacks = [];
   const currentDistance = toNumber(getLooseField(race, 'distance'), 1200);
   const currentGoing = getLooseField(race, 'going') || 'Good';
@@ -356,63 +362,85 @@ function buildFeatureEntry(context) {
 }
 
 async function buildRaceProbabilityPayload(raceId) {
-  const race = await Race.findById(raceId)
-    .populate('tournament_id')
-    .populate('round_id');
+  const { Race, Registration, JockeyAssignment, RaceResult } = getModels();
+  const race = await Race.findByPk(raceId, {
+    include: [
+      { model: getModels().Tournament, as: 'tournament' },
+      { model: getModels().Round, as: 'round' }
+    ]
+  });
 
   if (!race) {
     throw new ApiError(404, 'Race not found');
   }
+  const racePlain = race.toJSON ? race.toJSON() : race;
+  const raceView = { ...racePlain, _id: racePlain.id };
 
   const currentRaceDate = race.race_date && !Number.isNaN(new Date(race.race_date).getTime())
     ? new Date(race.race_date)
     : new Date();
-  const registrations = await Registration.find({
-    race_id: race._id,
-    status: REGISTRATION_STATUS.APPROVED
-  })
-    .populate({
-      path: 'horse_id',
-      populate: {
-        path: 'owner_id',
-        populate: { path: 'user_id', select: 'full_name email' }
+  const registrations = await Registration.findAll({
+    where: { race_id: raceId, status: REGISTRATION_STATUS.APPROVED },
+    include: [
+      {
+        model: getModels().Horse,
+        as: 'horse',
+        include: [{
+          model: getModels().HorseOwner,
+          as: 'owner',
+          include: [{ model: getModels().User, as: 'user', attributes: ['full_name', 'email'] }]
+        }]
+      },
+      {
+        model: getModels().HorseOwner,
+        as: 'owner',
+        include: [{ model: getModels().User, as: 'user', attributes: ['full_name', 'email'] }]
       }
-    })
-    .populate({
-      path: 'owner_id',
-      populate: { path: 'user_id', select: 'full_name email' }
-    })
-    .sort({ registered_at: 1 });
+    ],
+    order: [['registered_at', 'ASC']]
+  });
 
   if (registrations.length < 2) {
     throw new ApiError(400, 'At least two approved race registrations are required to generate odds');
   }
 
   const horseIds = registrations.map(function(registration) {
-    return documentId(registration.horse_id);
+    return documentId(registration.horse);
   }).filter(Boolean);
   const assignments = horseIds.length
-    ? await JockeyAssignment.find({
-      race_id: race._id,
-      horse_id: { $in: horseIds },
-      assignment_type: ASSIGNMENT_TYPE.PRIMARY,
-      status: ASSIGNMENT_STATUS.ACCEPTED
+    ? await JockeyAssignment.findAll({
+      where: {
+        race_id: raceId,
+        horse_id: { [Op.in]: horseIds },
+        assignment_type: ASSIGNMENT_TYPE.PRIMARY,
+        status: ASSIGNMENT_STATUS.ACCEPTED
+      },
+      include: [{
+        model: getModels().Jockey,
+        as: 'jockey',
+        include: [{ model: getModels().User, as: 'user', attributes: ['full_name', 'email'] }]
+      }]
     })
-      .populate({
-        path: 'jockey_id',
-        populate: { path: 'user_id', select: 'full_name email' }
-      })
     : [];
   const assignmentByHorse = new Map(assignments.map(function(assignment) {
     return [idString(assignment.horse_id), assignment];
   }));
-  const pastResults = await RaceResult.find({ status: RACE_RESULT_STATUS.PUBLISHED })
-    .populate('race_id')
-    .populate('horse_id')
-    .populate('jockey_id');
-  const entries = registrations.map(function(registration, index) {
+  const pastResults = await RaceResult.findAll({
+    where: { status: RACE_RESULT_STATUS.PUBLISHED },
+    include: [
+      { model: getModels().Race, as: 'race' },
+      { model: getModels().Horse, as: 'horse' },
+      { model: getModels().Jockey, as: 'jockey' }
+    ]
+  });
+  const regRes = registrations.map(function(r) {
+    const plain = r.toJSON ? r.toJSON() : r;
+    return { ...plain, _id: plain.id };
+  });
+  const raceRes = raceView;
+  const entries = regRes.map(function(registration, index) {
     return buildFeatureEntry({
-      race: race,
+      race: raceRes,
       registration: registration,
       assignment: assignmentByHorse.get(idString(registration.horse_id)),
       currentRaceDate: currentRaceDate,
@@ -428,7 +456,7 @@ async function buildRaceProbabilityPayload(raceId) {
   const raceNo = normalizeRaceNo(race);
 
   return {
-    race: race,
+    race: raceRes,
     payload: {
       race_info: {
         race_date: currentRaceDate.toISOString(),

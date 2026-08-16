@@ -3,8 +3,27 @@ const { ROLE_NAMES } = require('../constants/roles');
 const roleApplicationRepository = require('../repositories/roleApplicationRepository');
 const roleRepository = require('../repositories/roleRepository');
 const userRepository = require('../repositories/userRepository');
-const { HorseOwner, Jockey, RaceReferee } = require('../models');
+const { loadSequelizeModels } = require('../models/sequelize/index.js');
 const cloudinaryService = require('./cloudinaryService');
+
+function getModels() { return loadSequelizeModels().models; }
+
+/**
+ * Sequelize equivalent of the legacy
+ * `Model.findOneAndUpdate({...}, data, { upsert: true, returnDocument: 'after' })`.
+ * Returns the upserted row, with a plain-object shape compatible with the
+ * previous call site.
+ */
+async function upsertProfile(modelName, where, data) {
+    const Model = getModels()[modelName];
+    const existing = await Model.findOne({ where });
+    if (existing) {
+        await existing.update(data);
+        return existing.toJSON ? existing.toJSON() : existing;
+    }
+    const created = await Model.create({ ...where, ...data });
+    return created.toJSON ? created.toJSON() : created;
+}
 
 function getDocumentId(value) {
   return value && (value._id || value);
@@ -168,54 +187,30 @@ async function ensureRoleAssigned(userId, roleName) {
 
 async function upsertProfileFromApplication(userId, roleName, applicationData) {
   if (roleName === ROLE_NAMES.HORSE_OWNER) {
-    return HorseOwner.findOneAndUpdate(
-      { user_id: userId },
-      {
-        stable_name: applicationData.stable_name,
-        address: applicationData.address,
-        license_number: applicationData.license_number,
-        status: 'active'
-      },
-      {
-        upsert: true,
-        returnDocument: 'after',
-        runValidators: true
-      }
-    );
+    return upsertProfile('HorseOwner', { user_id: userId }, {
+      stable_name: applicationData.stable_name,
+      address: applicationData.address,
+      license_number: applicationData.license_number,
+      status: 'active'
+    });
   }
 
   if (roleName === ROLE_NAMES.JOCKEY) {
-    return Jockey.findOneAndUpdate(
-      { user_id: userId },
-      {
-        height: applicationData.height,
-        weight_kg: applicationData.weight_kg,
-        experience_years: applicationData.experience_years,
-        license_number: applicationData.license_number,
-        status: 'active'
-      },
-      {
-        upsert: true,
-        returnDocument: 'after',
-        runValidators: true
-      }
-    );
+    return upsertProfile('Jockey', { user_id: userId }, {
+      height: applicationData.height,
+      weight_kg: applicationData.weight_kg,
+      experience_years: applicationData.experience_years,
+      license_number: applicationData.license_number,
+      status: 'active'
+    });
   }
 
   if (roleName === ROLE_NAMES.RACE_REFEREE) {
-    return RaceReferee.findOneAndUpdate(
-      { user_id: userId },
-      {
-        experience_years: applicationData.experience_years,
-        license_number: applicationData.license_number,
-        status: 'active'
-      },
-      {
-        upsert: true,
-        returnDocument: 'after',
-        runValidators: true
-      }
-    );
+    return upsertProfile('RaceReferee', { user_id: userId }, {
+      experience_years: applicationData.experience_years,
+      license_number: applicationData.license_number,
+      status: 'active'
+    });
   }
 
   return null;

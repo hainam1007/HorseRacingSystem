@@ -1,157 +1,148 @@
-const { RewardItem, RedemptionHistory } = require('../models');
+const { Op, literal } = require('sequelize');
+const { loadSequelizeModels } = require('../models/sequelize/index.js');
 
-/**
- * Find a single active reward item by its ID.
- * Returns null if the item does not exist or is inactive.
- *
- * @param {string|ObjectId} itemId
- * @returns {Promise<RewardItem|null>}
- */
+function getModels() { return loadSequelizeModels().models; }
+
 async function findActiveItem(itemId) {
-  return RewardItem.findOne({ _id: itemId, is_active: true }).lean();
+  const { RewardItem } = getModels();
+  return RewardItem.findOne({ where: { id: itemId, is_active: true }, raw: true });
 }
 
-/**
- * Return all active reward items ordered by token_price ascending.
- *
- * @returns {Promise<RewardItem[]>}
- */
 async function findAllActiveItems() {
-  return RewardItem.find({ is_active: true }).sort({ token_price: 1 }).lean();
+  const { RewardItem } = getModels();
+  return RewardItem.findAll({ where: { is_active: true }, order: [['token_price', 'ASC']], raw: true });
 }
 
-/**
- * Atomically decrement stock by 1 — only when stock is currently > 0.
- * Returns the updated document, or null if stock was already 0 (out of stock)
- * or the item was not found.
- *
- * This is the key concurrency guard: the filter `{ stock: { $gt: 0 } }` ensures
- * stock never goes below 0 even when multiple requests fire simultaneously.
- *
- * @param {string|ObjectId} itemId
- * @returns {Promise<RewardItem|null>}
- */
 async function deductStock(itemId) {
-  return RewardItem.findOneAndUpdate(
-    { _id: itemId, is_active: true, stock: { $gt: 0 } },
-    { $inc: { stock: -1 } },
-    { returnDocument: 'after', runValidators: true }
+  const { RewardItem } = getModels();
+  const [affected] = await RewardItem.update(
+    { stock: literal('stock - 1') },
+    { where: { id: itemId, is_active: true, stock: { [Op.gt]: 0 } } }
   );
+  if (affected === 0) return null;
+  return RewardItem.findByPk(itemId);
 }
 
-/**
- * Persist a new redemption record.
- *
- * @param {object} data
- * @returns {Promise<RedemptionHistory>}
- */
 async function createRedemption(data) {
+  const { RedemptionHistory } = getModels();
   return RedemptionHistory.create(data);
 }
 
-/**
- * Paginated redemption history for a user with item details populated.
- *
- * @param {string|ObjectId} userId
- * @param {{ skip: number, limit: number }} pagination
- * @returns {Promise<RedemptionHistory[]>}
- */
 async function findRedemptionsByUserId(userId, { skip = 0, limit = 20 } = {}) {
-  return RedemptionHistory.find({ user_id: userId })
-    .sort({ created_at: -1 })
-    .skip(skip)
-    .limit(limit)
-    .populate('item_id', 'name description token_price image_url')
-    .lean();
+  const { RedemptionHistory, RewardItem } = getModels();
+  return RedemptionHistory.findAll({
+    where: { user_id: userId },
+    order: [['created_at', 'DESC']],
+    offset: skip,
+    limit,
+    include: [{ model: RewardItem, as: 'item', attributes: ['name', 'description', 'token_price', 'image_url'] }]
+  });
 }
 
-/**
- * Count redemptions for a user (used for pagination metadata).
- *
- * @param {string|ObjectId} userId
- * @returns {Promise<number>}
- */
 async function countRedemptionsByUserId(userId) {
-  return RedemptionHistory.countDocuments({ user_id: userId });
+  const { RedemptionHistory } = getModels();
+  return RedemptionHistory.count({ where: { user_id: userId } });
 }
-
-// ─── ADMIN METHODS ────────────────────────────────────────────────────────────
 
 async function createItem(data) {
+  const { RewardItem } = getModels();
   return RewardItem.create(data);
 }
 
 async function updateItem(id, data) {
-  return RewardItem.findByIdAndUpdate(id, { $set: data }, { new: true, runValidators: true });
+  const { RewardItem } = getModels();
+  const instance = await RewardItem.findByPk(id);
+  if (!instance) return null;
+  await instance.update(data);
+  return instance;
 }
 
 async function findItemById(id) {
-  return RewardItem.findById(id).lean();
+  const { RewardItem } = getModels();
+  return RewardItem.findByPk(id, { raw: true });
 }
 
 async function findItemByName(name) {
-  // Case-insensitive exact match
-  return RewardItem.findOne({ name: { $regex: new RegExp(`^${name}$`, 'i') } }).lean();
+  const { RewardItem, sequelize } = getModels();
+  return RewardItem.findOne({
+    where: { name: { [Op.iLike]: name } },
+    raw: true
+  });
 }
 
-async function findAllItemsAdmin(filter, sort, skip = 0, limit = 20) {
-  return RewardItem.find(filter)
-    .sort(sort)
-    .skip(skip)
-    .limit(limit)
-    .lean();
+async function findAllItemsAdmin(filter = {}, sort = [['created_at', 'DESC']], skip = 0, limit = 20) {
+  const { RewardItem } = getModels();
+  return RewardItem.findAll({ where: filter, order: sort, offset: skip, limit, raw: true });
 }
 
-async function countAllItemsAdmin(filter) {
-  return RewardItem.countDocuments(filter);
+async function countAllItemsAdmin(filter = {}) {
+  const { RewardItem } = getModels();
+  return RewardItem.count({ where: filter });
 }
 
 async function updateStockAdmin(id, operation, value) {
-  let updateQuery = {};
-  let filterQuery = { _id: id };
-
+  const { RewardItem } = getModels();
   if (operation === 'increase') {
-    updateQuery = { $inc: { stock: value } };
-  } else if (operation === 'decrease') {
-    filterQuery.stock = { $gte: value };
-    updateQuery = { $inc: { stock: -value } };
-  } else if (operation === 'set') {
-    updateQuery = { $set: { stock: value } };
+    const [affected] = await RewardItem.update({ stock: literal('stock + ' + Number(value)) }, { where: { id } });
+    if (affected === 0) return null;
+    return RewardItem.findByPk(id);
   }
-
-  return RewardItem.findOneAndUpdate(filterQuery, updateQuery, { new: true, runValidators: true });
+  if (operation === 'decrease') {
+    const [affected] = await RewardItem.update({ stock: literal('stock - ' + Number(value)) }, { where: { id, stock: { [Op.gte]: value } } });
+    if (affected === 0) return null;
+    return RewardItem.findByPk(id);
+  }
+  if (operation === 'set') {
+    const [affected] = await RewardItem.update({ stock: value }, { where: { id } });
+    if (affected === 0) return null;
+    return RewardItem.findByPk(id);
+  }
+  return null;
 }
 
 async function countRedemptionsByItemId(itemId) {
-  return RedemptionHistory.countDocuments({ item_id: itemId });
+  const { RedemptionHistory } = getModels();
+  return RedemptionHistory.count({ where: { item_id: itemId } });
 }
 
 async function countRedemptionsByItemIdAndStatus(itemId, statuses) {
-  return RedemptionHistory.countDocuments({ item_id: itemId, status: { $in: statuses } });
+  const { RedemptionHistory } = getModels();
+  return RedemptionHistory.count({ where: { item_id: itemId, status: { [Op.in]: statuses } } });
 }
 
-async function findRedemptionsForAdmin(filter, skip = 0, limit = 20) {
-  return RedemptionHistory.find(filter)
-    .sort({ created_at: -1 })
-    .skip(skip)
-    .limit(limit)
-    .populate('user_id', 'full_name email')
-    .populate('item_id', 'name token_price image_url')
-    .lean();
+async function findRedemptionsForAdmin(filter = {}, skip = 0, limit = 20) {
+  const { RedemptionHistory, User, RewardItem } = getModels();
+  return RedemptionHistory.findAll({
+    where: filter,
+    order: [['created_at', 'DESC']],
+    offset: skip,
+    limit,
+    include: [
+      { model: User, as: 'user', attributes: ['full_name', 'email'] },
+      { model: RewardItem, as: 'item', attributes: ['name', 'token_price', 'image_url'] }
+    ]
+  });
 }
 
-async function countRedemptionsForAdmin(filter) {
-  return RedemptionHistory.countDocuments(filter);
+async function countRedemptionsForAdmin(filter = {}) {
+  const { RedemptionHistory } = getModels();
+  return RedemptionHistory.count({ where: filter });
 }
 
 async function findRedemptionById(id) {
-  return RedemptionHistory.findById(id).populate('item_id', 'name token_price image_url').lean();
+  const { RedemptionHistory, RewardItem } = getModels();
+  return RedemptionHistory.findByPk(id, {
+    include: [{ model: RewardItem, as: 'item', attributes: ['name', 'token_price', 'image_url'] }]
+  });
 }
 
 async function updateRedemptionStatus(id, status) {
-  return RedemptionHistory.findByIdAndUpdate(id, { $set: { status } }, { new: true });
+  const { RedemptionHistory } = getModels();
+  const instance = await RedemptionHistory.findByPk(id);
+  if (!instance) return null;
+  await instance.update({ status });
+  return instance;
 }
-
 
 module.exports = {
   findActiveItem,

@@ -1,0 +1,996 @@
+[
+  {
+    "_id": "6a6ad6e6b9b0bd29ca7b96cc",
+    "race_id": "6a6ad6e5b9b0bd29ca7b96b2",
+    "status": "used",
+    "generated_by": "6a6ad6e1b9b0bd29ca7b9670",
+    "generated_at": "2026-07-03T02:00:00.000Z",
+    "seed": "clean-july-historical-1",
+    "participants": [
+      {
+        "horse_id": "6a6ad6e4b9b0bd29ca7b96a4",
+        "jockey_id": "6a6ad6e2b9b0bd29ca7b9683",
+        "assignment_id": "6a6ad6e5b9b0bd29ca7b96b9",
+        "lane": 1,
+        "seed_position": 1
+      },
+      {
+        "horse_id": "6a6ad6e4b9b0bd29ca7b96a5",
+        "jockey_id": "6a6ad6e2b9b0bd29ca7b9686",
+        "assignment_id": "6a6ad6e5b9b0bd29ca7b96bd",
+        "lane": 2,
+        "seed_position": 2
+      },
+      {
+        "horse_id": "6a6ad6e4b9b0bd29ca7b96a6",
+        "jockey_id": "6a6ad6e2b9b0bd29ca7b9689",
+        "assignment_id": "6a6ad6e5b9b0bd29ca7b96c1",
+        "lane": 3,
+        "seed_position": 3
+      },
+      {
+        "horse_id": "6a6ad6e4b9b0bd29ca7b96a7",
+        "jockey_id": "6a6ad6e2b9b0bd29ca7b968c",
+        "assignment_id": "6a6ad6e5b9b0bd29ca7b96c5",
+        "lane": 4,
+        "seed_position": 4
+      },
+      {
+        "horse_id": "6a6ad6e4b9b0bd29ca7b96a8",
+        "jockey_id": "6a6ad6e3b9b0bd29ca7b968f",
+        "assignment_id": "6a6ad6e6b9b0bd29ca7b96c9",
+        "lane": 5,
+        "seed_position": 5
+      }
+    ],
+    "finish_order": [
+      {
+        "horse_id": "6a6ad6e4b9b0bd29ca7b96a5",
+        "jockey_id": "6a6ad6e2b9b0bd29ca7b9686",
+        "position": 1,
+        "finish_time": 70.11,
+        "score": 100
+      },
+      {
+        "horse_id": "6a6ad6e4b9b0bd29ca7b96a6",
+        "jockey_id": "6a6ad6e2b9b0bd29ca7b9689",
+        "position": 2,
+        "finish_time": 71.46,
+        "score": 95
+      },
+      {
+        "horse_id": "6a6ad6e4b9b0bd29ca7b96a7",
+        "jockey_id": "6a6ad6e2b9b0bd29ca7b968c",
+        "position": 3,
+        "finish_time": 72.81,
+        "score": 90
+      },
+      {
+        "horse_id": "6a6ad6e4b9b0bd29ca7b96a8",
+        "jockey_id": "6a6ad6e3b9b0bd29ca7b968f",
+        "position": 4,
+        "finish_time": 74.16,
+        "score": 85
+      },
+      {
+        "horse_id": "6a6ad6e4b9b0bd29ca7b96a4",
+        "jockey_id": "6a6ad6e2b9b0bd29ca7b9683",
+        "position": 5,
+        "finish_time": 75.51,
+        "score": 80
+      }
+    ],
+    "created_at": "2026-07-30T04:45:26.129Z",
+    "updated_at": "2026-07-30T04:45:26.129Z"
+  },
+  {
+    "_id": "6a6ad6e8b9b0bd29ca7b96fe",
+    "race_id": "6a6ad6e7b9b0bd29ca7b96e4",
+    "status": "used",
+    "generated_by": "6a6ad6e1b9b0bd29ca7b9670",
+    "generated_at": "2026-07-05T08:00:00.000Z",
+    "seed": "clean-july-historical-2",
+    "participants": [
+      {
+        "horse_id": "6a6ad6e4b9b0bd29ca7b96a4",
+        "jockey_id": "6a6ad6e2b9b0bd29ca7b9683",
+        "assignment_id": "6a6ad6e7b9b0bd29ca7b96eb",
+        "lane": 1,
+        "seed_position": 1
+      },
+      {
+        "horse_id": "6a6ad6e4b9b0bd29ca7b96a5",
+        "jockey_id": "6a6ad6e2b9b0bd29ca7b9686",
+        "assignment_id": "6a6ad6e7b9b0bd29ca7b96ef",
+        "lane": 2,
+        "seed_position": 2
+      },
+      {
+        "horse_id": "6a6ad6e4b9b0bd29ca7b96a6",
+        "jockey_id": "6a6ad6e2b9b0bd29ca7b9689",
+        "assignment_id": "6a6ad6e7b9b0bd29ca7b96f3",
+        "lane": 3,
+        "seed_position": 3
+      },
+      {
+        "horse_id": "6a6ad6e4b9b0bd29ca7b96a7",
+        "jockey_id": "6a6ad6e2b9b0bd29ca7b968c",
+        "assignment_id": "6a6ad6e7b9b0bd29ca7b96f7",
+        "lane": 4,
+        "seed_position": 4
+      },
+      {
+        "horse_id": "6a6ad6e4b9b0bd29ca7b96a8",
+        "jockey_id": "6a6ad6e3b9b0bd29ca7b968f",
+        "assignment_id": "6a6ad6e8b9b0bd29ca7b96fb",
+        "lane": 5,
+        "seed_position": 5
+      }
+    ],
+    "finish_order": [
+      {
+        "horse_id": "6a6ad6e4b9b0bd29ca7b96a6",
+        "jockey_id": "6a6ad6e2b9b0bd29ca7b9689",
+        "position": 1,
+        "finish_time": 70.22,
+        "score": 100
+      },
+      {
+        "horse_id": "6a6ad6e4b9b0bd29ca7b96a7",
+        "jockey_id": "6a6ad6e2b9b0bd29ca7b968c",
+        "position": 2,
+        "finish_time": 71.57,
+        "score": 95
+      },
+      {
+        "horse_id": "6a6ad6e4b9b0bd29ca7b96a8",
+        "jockey_id": "6a6ad6e3b9b0bd29ca7b968f",
+        "position": 3,
+        "finish_time": 72.92,
+        "score": 90
+      },
+      {
+        "horse_id": "6a6ad6e4b9b0bd29ca7b96a4",
+        "jockey_id": "6a6ad6e2b9b0bd29ca7b9683",
+        "position": 4,
+        "finish_time": 74.27,
+        "score": 85
+      },
+      {
+        "horse_id": "6a6ad6e4b9b0bd29ca7b96a5",
+        "jockey_id": "6a6ad6e2b9b0bd29ca7b9686",
+        "position": 5,
+        "finish_time": 75.62,
+        "score": 80
+      }
+    ],
+    "created_at": "2026-07-30T04:45:28.273Z",
+    "updated_at": "2026-07-30T04:45:28.273Z"
+  },
+  {
+    "_id": "6a6ad6eab9b0bd29ca7b9730",
+    "race_id": "6a6ad6e9b9b0bd29ca7b9716",
+    "status": "used",
+    "generated_by": "6a6ad6e1b9b0bd29ca7b9670",
+    "generated_at": "2026-07-07T02:00:00.000Z",
+    "seed": "clean-july-historical-3",
+    "participants": [
+      {
+        "horse_id": "6a6ad6e4b9b0bd29ca7b96a4",
+        "jockey_id": "6a6ad6e2b9b0bd29ca7b9683",
+        "assignment_id": "6a6ad6e9b9b0bd29ca7b971d",
+        "lane": 1,
+        "seed_position": 1
+      },
+      {
+        "horse_id": "6a6ad6e4b9b0bd29ca7b96a5",
+        "jockey_id": "6a6ad6e2b9b0bd29ca7b9686",
+        "assignment_id": "6a6ad6e9b9b0bd29ca7b9721",
+        "lane": 2,
+        "seed_position": 2
+      },
+      {
+        "horse_id": "6a6ad6e4b9b0bd29ca7b96a6",
+        "jockey_id": "6a6ad6e2b9b0bd29ca7b9689",
+        "assignment_id": "6a6ad6e9b9b0bd29ca7b9725",
+        "lane": 3,
+        "seed_position": 3
+      },
+      {
+        "horse_id": "6a6ad6e4b9b0bd29ca7b96a7",
+        "jockey_id": "6a6ad6e2b9b0bd29ca7b968c",
+        "assignment_id": "6a6ad6eab9b0bd29ca7b9729",
+        "lane": 4,
+        "seed_position": 4
+      },
+      {
+        "horse_id": "6a6ad6e4b9b0bd29ca7b96a8",
+        "jockey_id": "6a6ad6e3b9b0bd29ca7b968f",
+        "assignment_id": "6a6ad6eab9b0bd29ca7b972d",
+        "lane": 5,
+        "seed_position": 5
+      }
+    ],
+    "finish_order": [
+      {
+        "horse_id": "6a6ad6e4b9b0bd29ca7b96a7",
+        "jockey_id": "6a6ad6e2b9b0bd29ca7b968c",
+        "position": 1,
+        "finish_time": 70.33,
+        "score": 100
+      },
+      {
+        "horse_id": "6a6ad6e4b9b0bd29ca7b96a8",
+        "jockey_id": "6a6ad6e3b9b0bd29ca7b968f",
+        "position": 2,
+        "finish_time": 71.68,
+        "score": 95
+      },
+      {
+        "horse_id": "6a6ad6e4b9b0bd29ca7b96a4",
+        "jockey_id": "6a6ad6e2b9b0bd29ca7b9683",
+        "position": 3,
+        "finish_time": 73.03,
+        "score": 90
+      },
+      {
+        "horse_id": "6a6ad6e4b9b0bd29ca7b96a5",
+        "jockey_id": "6a6ad6e2b9b0bd29ca7b9686",
+        "position": 4,
+        "finish_time": 74.38,
+        "score": 85
+      },
+      {
+        "horse_id": "6a6ad6e4b9b0bd29ca7b96a6",
+        "jockey_id": "6a6ad6e2b9b0bd29ca7b9689",
+        "position": 5,
+        "finish_time": 75.73,
+        "score": 80
+      }
+    ],
+    "created_at": "2026-07-30T04:45:30.416Z",
+    "updated_at": "2026-07-30T04:45:30.416Z"
+  },
+  {
+    "_id": "6a6ad6ecb9b0bd29ca7b9762",
+    "race_id": "6a6ad6ebb9b0bd29ca7b9748",
+    "status": "used",
+    "generated_by": "6a6ad6e1b9b0bd29ca7b9670",
+    "generated_at": "2026-07-09T08:00:00.000Z",
+    "seed": "clean-july-historical-4",
+    "participants": [
+      {
+        "horse_id": "6a6ad6e4b9b0bd29ca7b96a4",
+        "jockey_id": "6a6ad6e2b9b0bd29ca7b9683",
+        "assignment_id": "6a6ad6ebb9b0bd29ca7b974f",
+        "lane": 1,
+        "seed_position": 1
+      },
+      {
+        "horse_id": "6a6ad6e4b9b0bd29ca7b96a5",
+        "jockey_id": "6a6ad6e2b9b0bd29ca7b9686",
+        "assignment_id": "6a6ad6ebb9b0bd29ca7b9753",
+        "lane": 2,
+        "seed_position": 2
+      },
+      {
+        "horse_id": "6a6ad6e4b9b0bd29ca7b96a6",
+        "jockey_id": "6a6ad6e2b9b0bd29ca7b9689",
+        "assignment_id": "6a6ad6ecb9b0bd29ca7b9757",
+        "lane": 3,
+        "seed_position": 3
+      },
+      {
+        "horse_id": "6a6ad6e4b9b0bd29ca7b96a7",
+        "jockey_id": "6a6ad6e2b9b0bd29ca7b968c",
+        "assignment_id": "6a6ad6ecb9b0bd29ca7b975b",
+        "lane": 4,
+        "seed_position": 4
+      },
+      {
+        "horse_id": "6a6ad6e4b9b0bd29ca7b96a8",
+        "jockey_id": "6a6ad6e3b9b0bd29ca7b968f",
+        "assignment_id": "6a6ad6ecb9b0bd29ca7b975f",
+        "lane": 5,
+        "seed_position": 5
+      }
+    ],
+    "finish_order": [
+      {
+        "horse_id": "6a6ad6e4b9b0bd29ca7b96a8",
+        "jockey_id": "6a6ad6e3b9b0bd29ca7b968f",
+        "position": 1,
+        "finish_time": 70.44,
+        "score": 100
+      },
+      {
+        "horse_id": "6a6ad6e4b9b0bd29ca7b96a4",
+        "jockey_id": "6a6ad6e2b9b0bd29ca7b9683",
+        "position": 2,
+        "finish_time": 71.79,
+        "score": 95
+      },
+      {
+        "horse_id": "6a6ad6e4b9b0bd29ca7b96a5",
+        "jockey_id": "6a6ad6e2b9b0bd29ca7b9686",
+        "position": 3,
+        "finish_time": 73.14,
+        "score": 90
+      },
+      {
+        "horse_id": "6a6ad6e4b9b0bd29ca7b96a6",
+        "jockey_id": "6a6ad6e2b9b0bd29ca7b9689",
+        "position": 4,
+        "finish_time": 74.49,
+        "score": 85
+      },
+      {
+        "horse_id": "6a6ad6e4b9b0bd29ca7b96a7",
+        "jockey_id": "6a6ad6e2b9b0bd29ca7b968c",
+        "position": 5,
+        "finish_time": 75.84,
+        "score": 80
+      }
+    ],
+    "created_at": "2026-07-30T04:45:32.574Z",
+    "updated_at": "2026-07-30T04:45:32.574Z"
+  },
+  {
+    "_id": "6a6ad6eeb9b0bd29ca7b9794",
+    "race_id": "6a6ad6edb9b0bd29ca7b977a",
+    "status": "used",
+    "generated_by": "6a6ad6e1b9b0bd29ca7b9670",
+    "generated_at": "2026-07-11T02:00:00.000Z",
+    "seed": "clean-july-historical-5",
+    "participants": [
+      {
+        "horse_id": "6a6ad6e4b9b0bd29ca7b96a4",
+        "jockey_id": "6a6ad6e2b9b0bd29ca7b9683",
+        "assignment_id": "6a6ad6edb9b0bd29ca7b9781",
+        "lane": 1,
+        "seed_position": 1
+      },
+      {
+        "horse_id": "6a6ad6e4b9b0bd29ca7b96a5",
+        "jockey_id": "6a6ad6e2b9b0bd29ca7b9686",
+        "assignment_id": "6a6ad6eeb9b0bd29ca7b9785",
+        "lane": 2,
+        "seed_position": 2
+      },
+      {
+        "horse_id": "6a6ad6e4b9b0bd29ca7b96a6",
+        "jockey_id": "6a6ad6e2b9b0bd29ca7b9689",
+        "assignment_id": "6a6ad6eeb9b0bd29ca7b9789",
+        "lane": 3,
+        "seed_position": 3
+      },
+      {
+        "horse_id": "6a6ad6e4b9b0bd29ca7b96a7",
+        "jockey_id": "6a6ad6e2b9b0bd29ca7b968c",
+        "assignment_id": "6a6ad6eeb9b0bd29ca7b978d",
+        "lane": 4,
+        "seed_position": 4
+      },
+      {
+        "horse_id": "6a6ad6e4b9b0bd29ca7b96a8",
+        "jockey_id": "6a6ad6e3b9b0bd29ca7b968f",
+        "assignment_id": "6a6ad6eeb9b0bd29ca7b9791",
+        "lane": 5,
+        "seed_position": 5
+      }
+    ],
+    "finish_order": [
+      {
+        "horse_id": "6a6ad6e4b9b0bd29ca7b96a4",
+        "jockey_id": "6a6ad6e2b9b0bd29ca7b9683",
+        "position": 1,
+        "finish_time": 70.55,
+        "score": 100
+      },
+      {
+        "horse_id": "6a6ad6e4b9b0bd29ca7b96a5",
+        "jockey_id": "6a6ad6e2b9b0bd29ca7b9686",
+        "position": 2,
+        "finish_time": 71.9,
+        "score": 95
+      },
+      {
+        "horse_id": "6a6ad6e4b9b0bd29ca7b96a6",
+        "jockey_id": "6a6ad6e2b9b0bd29ca7b9689",
+        "position": 3,
+        "finish_time": 73.25,
+        "score": 90
+      },
+      {
+        "horse_id": "6a6ad6e4b9b0bd29ca7b96a7",
+        "jockey_id": "6a6ad6e2b9b0bd29ca7b968c",
+        "position": 4,
+        "finish_time": 74.6,
+        "score": 85
+      },
+      {
+        "horse_id": "6a6ad6e4b9b0bd29ca7b96a8",
+        "jockey_id": "6a6ad6e3b9b0bd29ca7b968f",
+        "position": 5,
+        "finish_time": 75.95,
+        "score": 80
+      }
+    ],
+    "created_at": "2026-07-30T04:45:34.689Z",
+    "updated_at": "2026-07-30T04:45:34.689Z"
+  },
+  {
+    "_id": "6a6ad6f0b9b0bd29ca7b97c6",
+    "race_id": "6a6ad6efb9b0bd29ca7b97ac",
+    "status": "used",
+    "generated_by": "6a6ad6e1b9b0bd29ca7b9670",
+    "generated_at": "2026-07-13T08:00:00.000Z",
+    "seed": "clean-july-historical-6",
+    "participants": [
+      {
+        "horse_id": "6a6ad6e4b9b0bd29ca7b96a4",
+        "jockey_id": "6a6ad6e2b9b0bd29ca7b9683",
+        "assignment_id": "6a6ad6efb9b0bd29ca7b97b3",
+        "lane": 1,
+        "seed_position": 1
+      },
+      {
+        "horse_id": "6a6ad6e4b9b0bd29ca7b96a5",
+        "jockey_id": "6a6ad6e2b9b0bd29ca7b9686",
+        "assignment_id": "6a6ad6f0b9b0bd29ca7b97b7",
+        "lane": 2,
+        "seed_position": 2
+      },
+      {
+        "horse_id": "6a6ad6e4b9b0bd29ca7b96a6",
+        "jockey_id": "6a6ad6e2b9b0bd29ca7b9689",
+        "assignment_id": "6a6ad6f0b9b0bd29ca7b97bb",
+        "lane": 3,
+        "seed_position": 3
+      },
+      {
+        "horse_id": "6a6ad6e4b9b0bd29ca7b96a7",
+        "jockey_id": "6a6ad6e2b9b0bd29ca7b968c",
+        "assignment_id": "6a6ad6f0b9b0bd29ca7b97bf",
+        "lane": 4,
+        "seed_position": 4
+      },
+      {
+        "horse_id": "6a6ad6e4b9b0bd29ca7b96a8",
+        "jockey_id": "6a6ad6e3b9b0bd29ca7b968f",
+        "assignment_id": "6a6ad6f0b9b0bd29ca7b97c3",
+        "lane": 5,
+        "seed_position": 5
+      }
+    ],
+    "finish_order": [
+      {
+        "horse_id": "6a6ad6e4b9b0bd29ca7b96a5",
+        "jockey_id": "6a6ad6e2b9b0bd29ca7b9686",
+        "position": 1,
+        "finish_time": 70.66,
+        "score": 100
+      },
+      {
+        "horse_id": "6a6ad6e4b9b0bd29ca7b96a6",
+        "jockey_id": "6a6ad6e2b9b0bd29ca7b9689",
+        "position": 2,
+        "finish_time": 72.01,
+        "score": 95
+      },
+      {
+        "horse_id": "6a6ad6e4b9b0bd29ca7b96a7",
+        "jockey_id": "6a6ad6e2b9b0bd29ca7b968c",
+        "position": 3,
+        "finish_time": 73.36,
+        "score": 90
+      },
+      {
+        "horse_id": "6a6ad6e4b9b0bd29ca7b96a8",
+        "jockey_id": "6a6ad6e3b9b0bd29ca7b968f",
+        "position": 4,
+        "finish_time": 74.71,
+        "score": 85
+      },
+      {
+        "horse_id": "6a6ad6e4b9b0bd29ca7b96a4",
+        "jockey_id": "6a6ad6e2b9b0bd29ca7b9683",
+        "position": 5,
+        "finish_time": 76.06,
+        "score": 80
+      }
+    ],
+    "created_at": "2026-07-30T04:45:36.827Z",
+    "updated_at": "2026-07-30T04:45:36.827Z"
+  },
+  {
+    "_id": "6a6ae78f7fc3aad02f5a21f3",
+    "race_id": "6a6ad6f9b9b0bd29ca7b985d",
+    "status": "used",
+    "generated_by": "6a6ad6e3b9b0bd29ca7b9693",
+    "generated_at": "2026-07-30T05:56:31.018Z",
+    "seed": null,
+    "participants": [
+      {
+        "horse_id": "6a6ad6e4b9b0bd29ca7b96a4",
+        "jockey_id": "6a6ad6e2b9b0bd29ca7b9683",
+        "assignment_id": "6a6ad6f9b9b0bd29ca7b9864",
+        "lane": 1,
+        "seed_position": 1
+      },
+      {
+        "horse_id": "6a6ad6e4b9b0bd29ca7b96a5",
+        "jockey_id": "6a6ad6e2b9b0bd29ca7b9686",
+        "assignment_id": "6a6ad6f9b9b0bd29ca7b9866",
+        "lane": 2,
+        "seed_position": 2
+      },
+      {
+        "horse_id": "6a6ad6e4b9b0bd29ca7b96a6",
+        "jockey_id": "6a6ad6e2b9b0bd29ca7b9689",
+        "assignment_id": "6a6ad6f9b9b0bd29ca7b9868",
+        "lane": 3,
+        "seed_position": 3
+      },
+      {
+        "horse_id": "6a6ad6e4b9b0bd29ca7b96a7",
+        "jockey_id": "6a6ad6e2b9b0bd29ca7b968c",
+        "assignment_id": "6a6ad6f9b9b0bd29ca7b986a",
+        "lane": 4,
+        "seed_position": 4
+      },
+      {
+        "horse_id": "6a6ad6e4b9b0bd29ca7b96a8",
+        "jockey_id": "6a6ad6e3b9b0bd29ca7b968f",
+        "assignment_id": "6a6ad6f9b9b0bd29ca7b986c",
+        "lane": 5,
+        "seed_position": 5
+      },
+      {
+        "horse_id": "6a6adfc27fc3aad02f5a18d9",
+        "jockey_id": "6a6ad6e1b9b0bd29ca7b967d",
+        "assignment_id": "6a6ae38c7fc3aad02f5a1e3f",
+        "lane": 6,
+        "seed_position": 6
+      }
+    ],
+    "finish_order": [
+      {
+        "horse_id": "6a6ad6e4b9b0bd29ca7b96a4",
+        "jockey_id": "6a6ad6e2b9b0bd29ca7b9683",
+        "position": 1,
+        "finish_time": 60.03,
+        "score": 100
+      },
+      {
+        "horse_id": "6a6ad6e4b9b0bd29ca7b96a8",
+        "jockey_id": "6a6ad6e3b9b0bd29ca7b968f",
+        "position": 2,
+        "finish_time": 60.573,
+        "score": 90
+      },
+      {
+        "horse_id": "6a6adfc27fc3aad02f5a18d9",
+        "jockey_id": "6a6ad6e1b9b0bd29ca7b967d",
+        "position": 3,
+        "finish_time": 61.268,
+        "score": 80
+      },
+      {
+        "horse_id": "6a6ad6e4b9b0bd29ca7b96a5",
+        "jockey_id": "6a6ad6e2b9b0bd29ca7b9686",
+        "position": 4,
+        "finish_time": 61.687,
+        "score": 60
+      },
+      {
+        "horse_id": "6a6ad6e4b9b0bd29ca7b96a7",
+        "jockey_id": "6a6ad6e2b9b0bd29ca7b968c",
+        "position": 5,
+        "finish_time": 62.01,
+        "score": 50
+      },
+      {
+        "horse_id": "6a6ad6e4b9b0bd29ca7b96a6",
+        "jockey_id": "6a6ad6e2b9b0bd29ca7b9689",
+        "position": 6,
+        "finish_time": 62.621,
+        "score": 50
+      }
+    ],
+    "created_at": "2026-07-30T05:56:31.021Z",
+    "updated_at": "2026-07-30T05:59:22.599Z"
+  },
+  {
+    "_id": "6a6aeb98761fa2b91b4104c7",
+    "race_id": "6a6aea6a4b45dab10065ed64",
+    "status": "generated",
+    "generated_by": "6a6ad6e3b9b0bd29ca7b9693",
+    "generated_at": "2026-07-30T06:13:44.387Z",
+    "seed": null,
+    "participants": [
+      {
+        "horse_id": "6a6adfc27fc3aad02f5a18d9",
+        "jockey_id": "6a6ad6e1b9b0bd29ca7b967d",
+        "assignment_id": "6a6aea6b4b45dab10065ed69",
+        "lane": 1,
+        "seed_position": 1
+      },
+      {
+        "horse_id": "6a6ad6e4b9b0bd29ca7b96a8",
+        "jockey_id": "6a6ad6e3b9b0bd29ca7b968f",
+        "assignment_id": "6a6aea6b4b45dab10065ed6c",
+        "lane": 2,
+        "seed_position": 2
+      },
+      {
+        "horse_id": "6a6ad6e4b9b0bd29ca7b96a7",
+        "jockey_id": "6a6ad6e2b9b0bd29ca7b968c",
+        "assignment_id": "6a6aea6b4b45dab10065ed6f",
+        "lane": 3,
+        "seed_position": 3
+      },
+      {
+        "horse_id": "6a6ad6e4b9b0bd29ca7b96a6",
+        "jockey_id": "6a6ad6e2b9b0bd29ca7b9689",
+        "assignment_id": "6a6aea6b4b45dab10065ed72",
+        "lane": 4,
+        "seed_position": 4
+      },
+      {
+        "horse_id": "6a6ad6e4b9b0bd29ca7b96a5",
+        "jockey_id": "6a6ad6e2b9b0bd29ca7b9686",
+        "assignment_id": "6a6aea6c4b45dab10065ed75",
+        "lane": 5,
+        "seed_position": 5
+      }
+    ],
+    "finish_order": [
+      {
+        "horse_id": "6a6ad6e4b9b0bd29ca7b96a6",
+        "jockey_id": "6a6ad6e2b9b0bd29ca7b9689",
+        "position": 1,
+        "finish_time": 60.051,
+        "score": 100
+      },
+      {
+        "horse_id": "6a6ad6e4b9b0bd29ca7b96a7",
+        "jockey_id": "6a6ad6e2b9b0bd29ca7b968c",
+        "position": 2,
+        "finish_time": 60.697,
+        "score": 90
+      },
+      {
+        "horse_id": "6a6ad6e4b9b0bd29ca7b96a8",
+        "jockey_id": "6a6ad6e3b9b0bd29ca7b968f",
+        "position": 3,
+        "finish_time": 61.193,
+        "score": 80
+      },
+      {
+        "horse_id": "6a6ad6e4b9b0bd29ca7b96a5",
+        "jockey_id": "6a6ad6e2b9b0bd29ca7b9686",
+        "position": 4,
+        "finish_time": 61.562,
+        "score": 60
+      },
+      {
+        "horse_id": "6a6adfc27fc3aad02f5a18d9",
+        "jockey_id": "6a6ad6e1b9b0bd29ca7b967d",
+        "position": 5,
+        "finish_time": 62.165,
+        "score": 50
+      }
+    ],
+    "created_at": "2026-07-30T06:13:44.396Z",
+    "updated_at": "2026-07-30T06:13:44.396Z"
+  },
+  {
+    "_id": "6a6af708761fa2b91b4116eb",
+    "race_id": "6a6ad6f7b9b0bd29ca7b9833",
+    "status": "generated",
+    "generated_by": "6a6ad6e3b9b0bd29ca7b9693",
+    "generated_at": "2026-07-30T07:02:32.830Z",
+    "seed": null,
+    "participants": [
+      {
+        "horse_id": "6a6ad6e4b9b0bd29ca7b96a4",
+        "jockey_id": "6a6ad6e2b9b0bd29ca7b9683",
+        "assignment_id": "6a6ad6f7b9b0bd29ca7b983a",
+        "lane": 1,
+        "seed_position": 1
+      },
+      {
+        "horse_id": "6a6ad6e4b9b0bd29ca7b96a5",
+        "jockey_id": "6a6ad6e2b9b0bd29ca7b9686",
+        "assignment_id": "6a6ad6f7b9b0bd29ca7b983c",
+        "lane": 2,
+        "seed_position": 2
+      },
+      {
+        "horse_id": "6a6ad6e4b9b0bd29ca7b96a6",
+        "jockey_id": "6a6ad6e2b9b0bd29ca7b9689",
+        "assignment_id": "6a6ad6f7b9b0bd29ca7b983e",
+        "lane": 3,
+        "seed_position": 3
+      },
+      {
+        "horse_id": "6a6ad6e4b9b0bd29ca7b96a7",
+        "jockey_id": "6a6ad6e2b9b0bd29ca7b968c",
+        "assignment_id": "6a6ad6f7b9b0bd29ca7b9840",
+        "lane": 4,
+        "seed_position": 4
+      },
+      {
+        "horse_id": "6a6ad6e4b9b0bd29ca7b96a8",
+        "jockey_id": "6a6ad6e3b9b0bd29ca7b968f",
+        "assignment_id": "6a6ad6f7b9b0bd29ca7b9842",
+        "lane": 5,
+        "seed_position": 5
+      }
+    ],
+    "finish_order": [
+      {
+        "horse_id": "6a6ad6e4b9b0bd29ca7b96a8",
+        "jockey_id": "6a6ad6e3b9b0bd29ca7b968f",
+        "position": 1,
+        "finish_time": 60.219,
+        "score": 100
+      },
+      {
+        "horse_id": "6a6ad6e4b9b0bd29ca7b96a5",
+        "jockey_id": "6a6ad6e2b9b0bd29ca7b9686",
+        "position": 2,
+        "finish_time": 60.731,
+        "score": 90
+      },
+      {
+        "horse_id": "6a6ad6e4b9b0bd29ca7b96a6",
+        "jockey_id": "6a6ad6e2b9b0bd29ca7b9689",
+        "position": 3,
+        "finish_time": 61.001,
+        "score": 80
+      },
+      {
+        "horse_id": "6a6ad6e4b9b0bd29ca7b96a4",
+        "jockey_id": "6a6ad6e2b9b0bd29ca7b9683",
+        "position": 4,
+        "finish_time": 61.642,
+        "score": 60
+      },
+      {
+        "horse_id": "6a6ad6e4b9b0bd29ca7b96a7",
+        "jockey_id": "6a6ad6e2b9b0bd29ca7b968c",
+        "position": 5,
+        "finish_time": 62.012,
+        "score": 50
+      }
+    ],
+    "created_at": "2026-07-30T07:02:32.834Z",
+    "updated_at": "2026-07-30T07:02:32.834Z"
+  },
+  {
+    "_id": "6a79dedc924c44036ed4b1ce",
+    "race_id": "6a6ad6fbb9b0bd29ca7b9887",
+    "status": "used",
+    "generated_by": "6a6ad6e3b9b0bd29ca7b9693",
+    "generated_at": "2026-08-10T14:23:24.129Z",
+    "seed": null,
+    "participants": [
+      {
+        "horse_id": "6a6ad6e4b9b0bd29ca7b96a4",
+        "jockey_id": "6a6ad6e2b9b0bd29ca7b9683",
+        "assignment_id": "6a6ad6fbb9b0bd29ca7b988e",
+        "lane": 1,
+        "seed_position": 1
+      },
+      {
+        "horse_id": "6a6ad6e4b9b0bd29ca7b96a5",
+        "jockey_id": "6a6ad6e2b9b0bd29ca7b9686",
+        "assignment_id": "6a6ad6fbb9b0bd29ca7b9890",
+        "lane": 2,
+        "seed_position": 2
+      },
+      {
+        "horse_id": "6a6ad6e4b9b0bd29ca7b96a6",
+        "jockey_id": "6a6ad6e2b9b0bd29ca7b9689",
+        "assignment_id": "6a6ad6fbb9b0bd29ca7b9892",
+        "lane": 3,
+        "seed_position": 3
+      },
+      {
+        "horse_id": "6a6ad6e4b9b0bd29ca7b96a7",
+        "jockey_id": "6a6ad6e2b9b0bd29ca7b968c",
+        "assignment_id": "6a6ad6fbb9b0bd29ca7b9894",
+        "lane": 4,
+        "seed_position": 4
+      },
+      {
+        "horse_id": "6a6ad6e4b9b0bd29ca7b96a8",
+        "jockey_id": "6a6ad6e3b9b0bd29ca7b968f",
+        "assignment_id": "6a6ad6fbb9b0bd29ca7b9896",
+        "lane": 5,
+        "seed_position": 5
+      }
+    ],
+    "finish_order": [
+      {
+        "horse_id": "6a6ad6e4b9b0bd29ca7b96a5",
+        "jockey_id": "6a6ad6e2b9b0bd29ca7b9686",
+        "position": 1,
+        "finish_time": 60.106,
+        "score": 100
+      },
+      {
+        "horse_id": "6a6ad6e4b9b0bd29ca7b96a7",
+        "jockey_id": "6a6ad6e2b9b0bd29ca7b968c",
+        "position": 2,
+        "finish_time": 60.663,
+        "score": 90
+      },
+      {
+        "horse_id": "6a6ad6e4b9b0bd29ca7b96a6",
+        "jockey_id": "6a6ad6e2b9b0bd29ca7b9689",
+        "position": 3,
+        "finish_time": 61.185,
+        "score": 80
+      },
+      {
+        "horse_id": "6a6ad6e4b9b0bd29ca7b96a8",
+        "jockey_id": "6a6ad6e3b9b0bd29ca7b968f",
+        "position": 4,
+        "finish_time": 61.768,
+        "score": 60
+      },
+      {
+        "horse_id": "6a6ad6e4b9b0bd29ca7b96a4",
+        "jockey_id": "6a6ad6e2b9b0bd29ca7b9683",
+        "position": 5,
+        "finish_time": 62.002,
+        "score": 50
+      }
+    ],
+    "created_at": "2026-08-10T14:23:24.134Z",
+    "updated_at": "2026-08-10T14:24:44.546Z"
+  },
+  {
+    "_id": "6a7af2148c1e6c8108bfc478",
+    "race_id": "6a7ac9a59ffb12d7f38ff8b5",
+    "status": "generated",
+    "generated_by": "6a6ad6e3b9b0bd29ca7b9693",
+    "generated_at": "2026-08-11T09:57:40.847Z",
+    "seed": null,
+    "participants": [
+      {
+        "horse_id": "6a7ac3569ffb12d7f38ff4dd",
+        "jockey_id": "6a6ad6e1b9b0bd29ca7b967d",
+        "assignment_id": "6a7acb0d9ffb12d7f390052d",
+        "lane": 1,
+        "seed_position": 1
+      },
+      {
+        "horse_id": "6a6ad6e4b9b0bd29ca7b96a4",
+        "jockey_id": "6a6ad6e2b9b0bd29ca7b9680",
+        "assignment_id": "6a7acc519ffb12d7f3901298",
+        "lane": 2,
+        "seed_position": 2
+      },
+      {
+        "horse_id": "6a6ad6e4b9b0bd29ca7b96ac",
+        "jockey_id": "6a6ad6e2b9b0bd29ca7b9683",
+        "assignment_id": "6a7ad3ab09b55bd59bab6d86",
+        "lane": 3,
+        "seed_position": 3
+      },
+      {
+        "horse_id": "6a6ad6e4b9b0bd29ca7b96a9",
+        "jockey_id": "6a6ad6e2b9b0bd29ca7b9686",
+        "assignment_id": "6a7ad45009b55bd59bab7e2a",
+        "lane": 4,
+        "seed_position": 4
+      },
+      {
+        "horse_id": "6a6ad6e4b9b0bd29ca7b96a3",
+        "jockey_id": "6a6ad6e2b9b0bd29ca7b968c",
+        "assignment_id": "6a7ad83209b55bd59baba13b",
+        "lane": 5,
+        "seed_position": 5
+      },
+      {
+        "horse_id": "6a7ab8e0e34d6586e327b9d9",
+        "jockey_id": "6a6ad6e2b9b0bd29ca7b9689",
+        "assignment_id": "6a7ad7c409b55bd59bab9226",
+        "lane": 6,
+        "seed_position": 6
+      }
+    ],
+    "finish_order": [
+      {
+        "horse_id": "6a7ab8e0e34d6586e327b9d9",
+        "jockey_id": "6a6ad6e2b9b0bd29ca7b9689",
+        "position": 1,
+        "finish_time": 60.236,
+        "score": 100
+      },
+      {
+        "horse_id": "6a6ad6e4b9b0bd29ca7b96ac",
+        "jockey_id": "6a6ad6e2b9b0bd29ca7b9683",
+        "position": 2,
+        "finish_time": 60.777,
+        "score": 90
+      },
+      {
+        "horse_id": "6a6ad6e4b9b0bd29ca7b96a4",
+        "jockey_id": "6a6ad6e2b9b0bd29ca7b9680",
+        "position": 3,
+        "finish_time": 61.215,
+        "score": 80
+      },
+      {
+        "horse_id": "6a7ac3569ffb12d7f38ff4dd",
+        "jockey_id": "6a6ad6e1b9b0bd29ca7b967d",
+        "position": 4,
+        "finish_time": 61.611,
+        "score": 60
+      },
+      {
+        "horse_id": "6a6ad6e4b9b0bd29ca7b96a3",
+        "jockey_id": "6a6ad6e2b9b0bd29ca7b968c",
+        "position": 5,
+        "finish_time": 62.276,
+        "score": 50
+      },
+      {
+        "horse_id": "6a6ad6e4b9b0bd29ca7b96a9",
+        "jockey_id": "6a6ad6e2b9b0bd29ca7b9686",
+        "position": 6,
+        "finish_time": 62.626,
+        "score": 50
+      }
+    ],
+    "created_at": "2026-08-11T09:57:40.904Z",
+    "updated_at": "2026-08-11T09:57:40.904Z"
+  },
+  {
+    "_id": "6a7d627b62cc2e0986a27ac1",
+    "race_id": "6a7d4a8c39be49bbe5c58e32",
+    "status": "used",
+    "generated_by": "6a6ad6e3b9b0bd29ca7b9696",
+    "generated_at": "2026-08-13T06:21:47.878Z",
+    "seed": null,
+    "participants": [
+      {
+        "horse_id": "6a7d513839be49bbe5c5ab3c",
+        "jockey_id": "6a6ad6e1b9b0bd29ca7b967d",
+        "assignment_id": "6a7d562e39be49bbe5c5d15d",
+        "lane": 1,
+        "seed_position": 1
+      },
+      {
+        "horse_id": "6a7ab8e0e34d6586e327b9d9",
+        "jockey_id": "6a6ad6e2b9b0bd29ca7b9680",
+        "assignment_id": "6a7d59dc39be49bbe5c5e7ff",
+        "lane": 2,
+        "seed_position": 2
+      }
+    ],
+    "finish_order": [
+      {
+        "horse_id": "6a7d513839be49bbe5c5ab3c",
+        "jockey_id": "6a6ad6e1b9b0bd29ca7b967d",
+        "position": 1,
+        "finish_time": 60.259,
+        "score": 100
+      },
+      {
+        "horse_id": "6a7ab8e0e34d6586e327b9d9",
+        "jockey_id": "6a6ad6e2b9b0bd29ca7b9680",
+        "position": 2,
+        "finish_time": 60.651,
+        "score": 90
+      }
+    ],
+    "created_at": "2026-08-13T06:21:47.882Z",
+    "updated_at": "2026-08-13T06:25:45.116Z"
+  }
+]

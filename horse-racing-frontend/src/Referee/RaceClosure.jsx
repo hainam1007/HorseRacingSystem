@@ -233,7 +233,6 @@ function RaceClosure() {
   const hasCorrectionRequest = Boolean(correctionResult);
   const isSubmitted = (race.report?.status || "draft") === "submitted";
   const readinessChecks = readiness ? [
-    ["Race date passed", readiness.race_date_passed],
     ["Registration locked", readiness.registration_locked],
     ["Race completed", ["completed", "finished"].includes(String(readiness.race_status).toLowerCase())],
     ["Eligible participants", readiness.eligible_participant_count > 0],

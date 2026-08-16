@@ -1,10 +1,13 @@
 const ApiError = require('../utils/ApiError');
 const { MODEL_INPUT_DEFAULTS } = require('../constants/raceModelInput');
 const horseRatingRepository = require('../repositories/horseRatingRepository');
-const { Race, RaceResult } = require('../models');
+const { loadSequelizeModels } = require('../models/sequelize/index.js');
 
 const ELO_SCALE = 40;
 const MAX_DELTA = 8;
+
+function getModels() { return loadSequelizeModels().models; }
+function getSequelize() { return loadSequelizeModels().sequelize; }
 
 function classK(raceClass) {
   return { '1': 10, '2': 9, '3': 8, '4': 7, '5': 6 }[String(raceClass || '5')] || 6;
@@ -43,18 +46,15 @@ function calculateRatingChanges(entries, raceClass) {
   });
 }
 
-async function applyPublishedRaceRatings(raceId, adminUserId, options) {
-  const session = options && options.session;
-  if (await horseRatingRepository.countHistory({ race_id: raceId, source: 'published_result' }, { session })) {
+async function applyPublishedRaceRatings(raceId, adminUserId, _options) {
+  if (await horseRatingRepository.countHistory({ race_id: raceId, source: 'published_result' })) {
     return { applied: false, reason: 'already_applied', changes: [] };
   }
-  const raceQuery = Race.findById(raceId);
-  const resultQuery = RaceResult.find({ race_id: raceId, status: 'published' }).populate('horse_id');
-  if (session) {
-    raceQuery.session(session);
-    resultQuery.session(session);
-  }
-  const [race, results] = await Promise.all([raceQuery, resultQuery]);
+  const race = await getModels().Race.findByPk(raceId);
+  const results = await getModels().RaceResult.findAll({
+    where: { race_id: raceId, status: 'published' },
+    include: [{ model: getModels().Horse, as: 'horse' }]
+  });
   if (!race) throw new ApiError(404, 'Race not found');
   const entries = results.filter(function(result) {
     return Number.isFinite(Number(result.raw_position ?? result.position));
@@ -75,7 +75,7 @@ async function applyPublishedRaceRatings(raceId, adminUserId, options) {
       current_rating: change.new_rating,
       rating_updated_at: calculatedAt,
       rating_updated_by: adminUserId
-    }, { session });
+    });
     await horseRatingRepository.createHistory({
       horse_id: change.horse_id,
       race_id: raceId,
@@ -89,7 +89,7 @@ async function applyPublishedRaceRatings(raceId, adminUserId, options) {
       source: 'published_result',
       calculated_by: adminUserId,
       calculated_at: calculatedAt
-    }, { session });
+    });
   }
   return { applied: true, changes: changes };
 }

@@ -60,15 +60,25 @@ function formatDate(value) {
 }
 
 function normalizeBet(bet) {
-  const race = bet?.race_id && typeof bet.race_id === "object" ? bet.race_id : {};
-  const tournament = race?.tournament_id && typeof race.tournament_id === "object" ? race.tournament_id : {};
+  // The legacy API embedded the race under race_id. Sequelize returns the
+  // scalar race_id plus the eager-loaded race association under race.
+  const race = bet?.race && typeof bet.race === "object"
+    ? bet.race
+    : bet?.race_id && typeof bet.race_id === "object"
+      ? bet.race_id
+      : {};
+  const tournament = race?.tournament && typeof race.tournament === "object"
+    ? race.tournament
+    : race?.tournament_id && typeof race.tournament_id === "object"
+      ? race.tournament_id
+      : {};
   const status = String(bet?.status || "pending").toLowerCase();
   const safeStatus = STATUS_META[status] ? status : "pending";
   const stake = Number(bet?.stake_amount ?? 0);
   const payout = Number(bet?.payout_amount ?? 0);
   const potentialPayout = Number(bet?.potential_payout ?? 0);
-  const raceId = getEntityId(bet?.race_id);
-  const tournamentId = getEntityId(race?.tournament_id);
+  const raceId = getEntityId(bet?.race_id) || getEntityId(race);
+  const tournamentId = getEntityId(race?.tournament_id) || getEntityId(tournament);
   const currency = race?.betting_market?.currency || "TOKEN";
   const odds = Number(bet?.odds_snapshot?.game_odds ?? 0);
   const selection =

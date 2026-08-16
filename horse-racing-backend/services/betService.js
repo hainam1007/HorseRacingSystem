@@ -1,11 +1,14 @@
 const ApiError = require('../utils/ApiError');
 const { BET_STATUS, ODDS_MARKET_STATUS, RACE_RESULT_STATUS } = require('../constants/statuses');
+const { Op } = require('sequelize');
+const { loadSequelizeModels } = require('../models/sequelize/index.js');
 const betRepository = require('../repositories/betRepository');
 const raceOddsMarketRepository = require('../repositories/raceOddsMarketRepository');
 const raceRepository = require('../repositories/raceRepository');
 const transactionRepository = require('../repositories/transactionRepository');
 const walletRepository = require('../repositories/walletRepository');
-const { HorseCheck, RaceResult, Violation } = require('../models');
+
+function getModels() { return loadSequelizeModels().models; }
 
 const BETTABLE_MARKET_STATUSES = [
   ODDS_MARKET_STATUS.OPEN
@@ -210,7 +213,9 @@ async function placeBet(req, payload) {
     });
 
     return {
-      bet: await betRepository.findById(bet._id),
+      // Sequelize models expose `id`; Mongo-style documents expose `_id`.
+      // Use either shape so the response lookup never queries with undefined.
+      bet: await betRepository.findById(bet.id || bet._id),
       wallet: deduction.wallet,
       transaction: transaction
     };
@@ -359,9 +364,9 @@ async function settleRaceBets(raceId, settledByUserId) {
   }
 
   const pendingBets = await betRepository.findPendingByRaceId(raceId);
-  const results = await RaceResult.find({
-    race_id: raceId,
-    status: RACE_RESULT_STATUS.PUBLISHED
+  const { RaceResult, HorseCheck, Violation } = getModels();
+  const results = await RaceResult.findAll({
+    where: { race_id: raceId, status: RACE_RESULT_STATUS.PUBLISHED }
   });
 
   if (!results.length) {
@@ -370,11 +375,16 @@ async function settleRaceBets(raceId, settledByUserId) {
 
   const horseIds = pendingBets.map(function(bet) { return bet.predicted_horse_id; });
   const [preRaceChecks, violations] = await Promise.all([
-    HorseCheck.find({ race_id: raceId, phase: 'pre_race', horse_id: { $in: horseIds } }).sort({ checked_at: -1 }),
-    Violation.find({
-      race_id: raceId,
-      horse_id: { $in: horseIds },
-      status: { $in: ['confirmed', 'resolved'] }
+    HorseCheck.findAll({
+      where: { race_id: raceId, phase: 'pre_race', horse_id: { [Op.in]: horseIds } },
+      order: [['checked_at', 'DESC']]
+    }),
+    Violation.findAll({
+      where: {
+        race_id: raceId,
+        horse_id: { [Op.in]: horseIds },
+        status: { [Op.in]: ['confirmed', 'resolved'] }
+      }
     })
   ]);
   const latestCheckByHorse = new Map();

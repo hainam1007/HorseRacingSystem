@@ -1,32 +1,41 @@
-const { RoleApplication } = require('../models');
+const { loadSequelizeModels } = require('../models/sequelize/index.js');
 
-function basePopulate(query) {
-  return query
-    .populate('user_id', 'full_name email phone_number date_of_birth avatar_url status email_verified')
-    .populate('reviewed_by', 'full_name email');
+function getModels() { return loadSequelizeModels().models; }
+
+function baseInclude() {
+  const { User } = getModels();
+  return [
+    { model: User, as: 'applicant', attributes: ['full_name', 'email', 'phone_number', 'date_of_birth', 'avatar_url', 'status', 'email_verified'] },
+    { model: User, as: 'reviewer', attributes: ['full_name', 'email'] }
+  ];
 }
 
 async function create(data) {
+  const { RoleApplication } = getModels();
   return RoleApplication.create(data);
 }
 
-async function find(filter) {
-  return basePopulate(RoleApplication.find(filter || {}).sort({ created_at: -1 }));
+async function find(filter = {}) {
+  const { RoleApplication } = getModels();
+  return RoleApplication.findAll({ where: filter, include: baseInclude(), order: [['created_at', 'DESC']] });
 }
 
 async function findById(id) {
-  return basePopulate(RoleApplication.findById(id));
+  const { RoleApplication } = getModels();
+  return RoleApplication.findByPk(id, { include: baseInclude() });
 }
 
-async function findOne(filter) {
-  return RoleApplication.findOne(filter || {});
+async function findOne(filter = {}) {
+  const { RoleApplication } = getModels();
+  return RoleApplication.findOne({ where: filter });
 }
 
 async function updateById(id, data) {
-  return RoleApplication.findByIdAndUpdate(id, data, {
-    returnDocument: 'after',
-    runValidators: true
-  });
+  const { RoleApplication } = getModels();
+  const instance = await RoleApplication.findByPk(id);
+  if (!instance) return null;
+  await instance.update(data);
+  return instance;
 }
 
 module.exports = {

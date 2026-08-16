@@ -1,36 +1,41 @@
-const { Horse, HorseRatingHistory } = require('../models');
+const { loadSequelizeModels } = require('../models/sequelize/index.js');
 
-async function findHorseById(id, options) {
-  const query = Horse.findById(id);
-  if (options && options.session) query.session(options.session);
-  return query;
+function getModels() { return loadSequelizeModels().models; }
+
+async function findHorseById(id) {
+  const { Horse } = getModels();
+  return Horse.findByPk(id);
 }
 
-async function updateHorseRating(id, data, options) {
-  return Horse.findByIdAndUpdate(id, { $set: data }, {
-    returnDocument: 'after',
-    runValidators: true,
-    session: options && options.session
+async function updateHorseRating(id, data) {
+  const { Horse } = getModels();
+  const instance = await Horse.findByPk(id);
+  if (!instance) return null;
+  await instance.update(data);
+  return instance;
+}
+
+async function createHistory(data) {
+  const { HorseRatingHistory } = getModels();
+  return HorseRatingHistory.create(data);
+}
+
+async function findHistory(filter = {}) {
+  const { HorseRatingHistory, Horse, Race, User } = getModels();
+  return HorseRatingHistory.findAll({
+    where: filter,
+    include: [
+      { model: Horse, as: 'horse', attributes: ['name', 'registration_number', 'current_rating'] },
+      { model: Race, as: 'race', attributes: ['name', 'race_date', 'race_class'] },
+      { model: User, as: 'calculated_by_user', attributes: ['full_name', 'email'] }
+    ],
+    order: [['calculated_at', 'DESC']]
   });
 }
 
-async function createHistory(data, options) {
-  const documents = await HorseRatingHistory.create([data], { session: options && options.session });
-  return documents[0];
-}
-
-async function findHistory(filter) {
-  return HorseRatingHistory.find(filter || {})
-    .populate('horse_id', 'name registration_number current_rating')
-    .populate('race_id', 'name race_date race_class')
-    .populate('calculated_by', 'full_name email')
-    .sort({ calculated_at: -1 });
-}
-
-async function countHistory(filter, options) {
-  const query = HorseRatingHistory.countDocuments(filter || {});
-  if (options && options.session) query.session(options.session);
-  return query;
+async function countHistory(filter = {}) {
+  const { HorseRatingHistory } = getModels();
+  return HorseRatingHistory.count({ where: filter });
 }
 
 module.exports = { countHistory, createHistory, findHistory, findHorseById, updateHorseRating };

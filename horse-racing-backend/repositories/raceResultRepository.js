@@ -1,66 +1,64 @@
-const { RaceResult } = require('../models');
+const { loadSequelizeModels } = require('../models/sequelize/index.js');
+const { projectUpdate } = require('./sequelize/adapter');
 
-function basePopulate(query) {
-  return query
-    .populate({
-      path: 'race_id',
-      populate: [
-        { path: 'tournament_id' },
-        { path: 'round_id' }
-      ]
-    })
-    .populate('horse_id')
-    .populate({
-      path: 'jockey_id',
-      populate: {
-        path: 'user_id',
-        select: 'full_name email'
-      }
-    })
-    .populate({
-      path: 'recorded_by',
-      populate: {
-        path: 'user_id',
-        select: 'full_name email'
-      }
-    })
-    .populate('confirmed_by', 'full_name email')
-    .populate('published_by', 'full_name email')
-    .populate('penalties_applied_by', 'full_name email')
-    .populate('submitted_to_admin_by', 'full_name email')
-    .populate('correction_requested_by', 'full_name email')
-    .populate('correction_resolved_by', 'full_name email')
-    .populate('applied_violation_ids')
-    .populate('penalty_snapshot_violation_ids');
+function getModels() { return loadSequelizeModels().models; }
+
+function baseInclude() {
+  const { Race, Tournament, Round, Horse, Jockey, User, Violation, RaceResultAppliedViolation, RaceResultPenaltySnapshotViolation } = getModels();
+  return [
+    {
+      model: Race,
+      as: 'race',
+      include: [{ model: Tournament, as: 'tournament' }, { model: Round, as: 'round' }]
+    },
+    { model: Horse, as: 'horse' },
+    { model: Jockey, as: 'jockey', include: [{ model: User, as: 'user', attributes: ['full_name'] }] },
+    { model: User, as: 'penalties_applied_by_user', attributes: ['full_name', 'email'] },
+    { model: User, as: 'submitted_to_admin_by_user', attributes: ['full_name', 'email'] },
+    { model: User, as: 'correction_requested_by_user', attributes: ['full_name', 'email'] },
+    { model: User, as: 'correction_resolved_by_user', attributes: ['full_name', 'email'] },
+    { model: User, as: 'confirmed_by_user', attributes: ['full_name', 'email'] },
+    { model: User, as: 'published_by_user', attributes: ['full_name', 'email'] },
+    { model: RaceResultAppliedViolation, as: 'applied_violations' },
+    { model: RaceResultPenaltySnapshotViolation, as: 'penalty_snapshot_violations' }
+  ];
 }
 
 async function create(data) {
+  const { RaceResult } = getModels();
   return RaceResult.create(data);
 }
 
-async function find(filter) {
-  return basePopulate(RaceResult.find(filter || {}).sort({ published_at: -1, recorded_at: -1 }));
+async function find(filter = {}) {
+  const { RaceResult } = getModels();
+  return RaceResult.findAll({
+    where: filter,
+    include: baseInclude(),
+    order: [['published_at', 'DESC'], ['recorded_at', 'DESC']]
+  });
 }
 
 async function findById(id) {
-  return basePopulate(RaceResult.findById(id));
+  const { RaceResult } = getModels();
+  return RaceResult.findByPk(id, { include: baseInclude() });
 }
 
-async function count(filter) {
-  return RaceResult.countDocuments(filter || {});
+async function count(filter = {}) {
+  const { RaceResult } = getModels();
+  return RaceResult.count({ where: filter });
 }
 
 async function updateById(id, data) {
-  return RaceResult.findByIdAndUpdate(id, data, {
-    returnDocument: 'after',
-    runValidators: true
-  });
+  const { RaceResult } = getModels();
+  const instance = await RaceResult.findByPk(id);
+  if (!instance) return null;
+  await instance.update(projectUpdate(data));
+  return instance;
 }
 
 async function updateMany(filter, data) {
-  return RaceResult.updateMany(filter || {}, data, {
-    runValidators: true
-  });
+  const { RaceResult } = getModels();
+  return RaceResult.update(projectUpdate(data), { where: filter });
 }
 
 module.exports = {

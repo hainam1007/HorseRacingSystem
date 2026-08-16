@@ -1,78 +1,72 @@
-const { JockeyAssignment } = require('../models');
+const { loadSequelizeModels } = require('../models/sequelize/index.js');
 
-function basePopulate(query) {
-  return query
-    .populate({
-      path: 'race_id',
-      populate: [
-        { path: 'tournament_id' },
-        { path: 'round_id' },
-        {
-          path: 'referee_id',
-          populate: {
-            path: 'user_id',
-            select: 'full_name email'
-          }
-        }
+function getModels() { return loadSequelizeModels().models; }
+
+function defaultInclude() {
+  const { Race, Tournament, Round, RaceReferee, User, Horse, HorseOwner, Jockey } = getModels();
+  return [
+    {
+      model: Race,
+      as: 'race',
+      include: [
+        { model: Tournament, as: 'tournament' },
+        { model: Round, as: 'round' },
+        { model: RaceReferee, as: 'referee', include: [{ model: User, as: 'user', attributes: ['full_name', 'email'] }] }
       ]
-    })
-    .populate('horse_id')
-    .populate({
-      path: 'owner_id',
-      populate: {
-        path: 'user_id',
-        select: 'full_name email'
-      }
-    })
-    .populate({
-      path: 'jockey_id',
-      populate: {
-        path: 'user_id',
-        select: 'full_name email'
-      }
-    });
+    },
+    { model: Horse, as: 'horse' },
+    {
+      model: HorseOwner,
+      as: 'owner',
+      include: [{ model: User, as: 'user', attributes: ['full_name', 'email'] }]
+    },
+    {
+      model: Jockey,
+      as: 'jockey',
+      include: [{ model: User, as: 'user', attributes: ['full_name', 'email'] }]
+    }
+  ];
 }
 
-async function create(data, session) {
-  if (session) {
-    const documents = await JockeyAssignment.create([data], { session: session });
-    return documents[0];
-  }
-
+async function create(data) {
+  const { JockeyAssignment } = getModels();
   return JockeyAssignment.create(data);
 }
 
-async function find(filter) {
-  return basePopulate(JockeyAssignment.find(filter || {}).sort({ invited_at: -1 }));
+async function find(filter = {}) {
+  const { JockeyAssignment } = getModels();
+  return JockeyAssignment.findAll({ where: filter, include: defaultInclude(), order: [['invited_at', 'DESC']] });
 }
 
-async function findOne(filter, session) {
-  const query = JockeyAssignment.findOne(filter || {});
-  return session ? query.session(session) : query;
+async function findOne(filter = {}) {
+  const { JockeyAssignment } = getModels();
+  return JockeyAssignment.findOne({ where: filter, include: defaultInclude() });
 }
 
-async function count(filter) {
-  return JockeyAssignment.countDocuments(filter || {});
+async function count(filter = {}) {
+  const { JockeyAssignment } = getModels();
+  return JockeyAssignment.count({ where: filter });
 }
 
 async function findById(id) {
-  return basePopulate(JockeyAssignment.findById(id));
+  const { JockeyAssignment } = getModels();
+  return JockeyAssignment.findByPk(id, { include: defaultInclude() });
 }
 
-async function updateById(id, data, session) {
-  return JockeyAssignment.findByIdAndUpdate(id, data, {
-    returnDocument: 'after',
-    runValidators: true,
-    session: session || null
-  });
+async function updateById(id, data) {
+  const { JockeyAssignment } = getModels();
+  const instance = await JockeyAssignment.findByPk(id);
+  if (!instance) return null;
+  await instance.update(data);
+  return instance;
 }
 
-async function updateOne(filter, data, session) {
-  return basePopulate(JockeyAssignment.findOneAndUpdate(filter, data, {
-    returnDocument: 'after',
-    runValidators: true,
-    session: session || null
-  }));
+async function updateOne(filter, data) {
+  const { JockeyAssignment } = getModels();
+  let instance = await JockeyAssignment.findOne({ where: filter });
+  if (!instance) return null;
+  await instance.update(data);
+  return instance;
 }
 
 module.exports = {
