@@ -1,0 +1,15 @@
+# Force LF line endings for shell scripts (Windows editors + git
+# otherwise reintroduce \r and break the Linux shebang).
+*.sh          text eol=lf
+*.bash        text eol=lf
+Dockerfile*   text eol=lf
+*.dockerfile  text eol=lf
+
+# Keep these as LF too — Node, Sequelize and Docker compose are LF-clean.
+*.yml         text eol=lf
+*.yaml        text eol=lf
+*.env         text eol=lf
+*.js          text eol=lf
+*.ts          text eol=lf
+*.tsx         text eol=lx
+*.json        text eol=lf
