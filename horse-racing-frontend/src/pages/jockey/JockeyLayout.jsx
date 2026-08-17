@@ -81,7 +81,7 @@ function JockeyLayout() {
     <main className="jockey-page" aria-label="Jockey athlete workspace">
       <header className="jockey-topbar">
         <Link className="brand jockey-brand" to="/" aria-label="Horse racing home">
-          <span className="brand-mark">HR</span>
+          <img className="brand-mark" src="/images/horse-logo.png" alt="" />
           <span className="brand-text">
             <strong>horse</strong>
             <span>racing</span>

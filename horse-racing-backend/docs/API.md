@@ -2369,7 +2369,7 @@ Roles:
 list/detail: admin, race_referee
 update draft result row: assigned race_referee
 finalize race and generate draft results: assigned race_referee, admin
-confirm/publish: admin
+confirm/publish: assigned race_referee
 view published race results: spectator
 ```
 
@@ -3686,6 +3686,8 @@ Requires an existing odds market with status open.
 Deducts stake_amount from spectator wallet immediately.
 Stores odds_snapshot on the bet so payout does not change if odds are regenerated later.
 potential_payout = stake_amount * odds_snapshot.game_odds.
+Counts distinct spectators per horse. At every 5th distinct spectator, that horse's odds decrease by 0.10 and the 0.10 increase is divided across the other horses.
+Repeated bets from the same spectator do not advance the threshold.
 If bet creation fails after wallet deduction, backend refunds the stake and writes a bet_refund transaction log.
 ```
 
@@ -3725,6 +3727,20 @@ Output:
       "amount": 10,
       "direction": "debit",
       "status": "completed"
+    },
+    "odds_update": {
+      "trigger": {
+        "bettors_per_step": 5,
+        "odds_step": 0.1
+      },
+      "odds": [
+        {
+          "horse_id": "horse_id",
+          "game_odds": 3.44,
+          "distinct_bettor_count": 5,
+          "adjustment_steps": 1
+        }
+      ]
     }
   }
 }
@@ -3817,7 +3833,7 @@ Output:
 
 ```text
 POST /api/race-results/races/:raceId/publish
-Authorization: Bearer <admin_token>
+Authorization: Bearer <assigned_referee_token>
 ```
 
 Additional output field:

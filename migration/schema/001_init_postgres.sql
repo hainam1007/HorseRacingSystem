@@ -1164,6 +1164,7 @@ CREATE TABLE race_odds_market_odds (
     fair_odds                   NUMERIC(8,2)    NOT NULL CHECK (fair_odds >= 1),
     game_odds                   NUMERIC(8,2)    NOT NULL CHECK (game_odds >= 1),
     generated_game_odds         NUMERIC(8,2)    CHECK (generated_game_odds IS NULL OR generated_game_odds >= 1),
+    opening_game_odds           NUMERIC(8,2)    CHECK (opening_game_odds IS NULL OR opening_game_odds >= 1),
     probability_rank            INTEGER         NOT NULL CHECK (probability_rank >= 1),
     fallbacks_used              TEXT[]          NOT NULL DEFAULT ARRAY[]::TEXT[],
     created_at                  TIMESTAMPTZ     NOT NULL DEFAULT now(),

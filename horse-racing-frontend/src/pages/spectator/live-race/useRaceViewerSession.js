@@ -6,6 +6,7 @@ import { createMockRaceScript, createRaceEngineOrderScript } from "./mockRaceFix
 export function useRaceViewerSession(race, contenders, options = {}) {
   return useMemo(() => {
     const createScript = options.useRaceEngineOrder ? createRaceEngineOrderScript : createMockRaceScript;
+    const engineScript = options.raceScript || null;
 
     if (!race) {
       return {
@@ -22,7 +23,7 @@ export function useRaceViewerSession(race, contenders, options = {}) {
       return {
         connectionState: CONNECTION_STATES.CONNECTED,
         raceResult: null,
-        raceScript: createScript(race.id, startsAt, contenders),
+        raceScript: engineScript || createScript(race.id, startsAt, contenders),
       };
     }
 
@@ -44,7 +45,7 @@ export function useRaceViewerSession(race, contenders, options = {}) {
       return {
         connectionState: CONNECTION_STATES.CONNECTED,
         raceResult: null,
-        raceScript: createScript(race.id, startsAt, contenders),
+        raceScript: engineScript || createScript(race.id, startsAt, contenders),
       };
     }
 
@@ -53,5 +54,5 @@ export function useRaceViewerSession(race, contenders, options = {}) {
       raceResult: null,
       raceScript: null,
     };
-  }, [race, contenders, options.useRaceEngineOrder]);
+  }, [race, contenders, options.raceScript, options.useRaceEngineOrder]);
 }

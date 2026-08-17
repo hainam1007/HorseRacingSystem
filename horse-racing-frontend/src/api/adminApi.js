@@ -171,10 +171,6 @@ export const adminApi = {
     return apiRequest(`/race-results/races/${raceId}/readiness`);
   },
 
-  confirmRaceResults(raceId) {
-    return apiRequest(`/race-results/races/${raceId}/confirm`, { method: "POST" });
-  },
-
   requestRaceResultCorrection(raceId, correctionNote) {
     return apiRequest(`/race-results/races/${raceId}/request-correction`, {
       method: "POST",
@@ -184,10 +180,6 @@ export const adminApi = {
 
   resolveRaceResultCorrection(raceId) {
     return apiRequest(`/race-results/races/${raceId}/resolve-correction`, { method: "POST" });
-  },
-
-  publishRaceResults(raceId) {
-    return apiRequest(`/race-results/races/${raceId}/publish`, { method: "POST" });
   },
 
   configureRacePrizes(raceId, payload) {

@@ -300,10 +300,11 @@ export default function PredictionDetail() {
 
   useEffect(() => {
     let cancelled = false;
+    let refreshTimer;
 
-    async function loadMarket() {
+    async function loadMarket(showLoading = true) {
       if (!race?.id) return;
-      setMarketState((current) => ({ ...current, isLoading: true, error: "" }));
+      if (showLoading) setMarketState((current) => ({ ...current, isLoading: true, error: "" }));
       try {
         const payload = await spectatorApi.getRaceOdds(race.id);
         if (cancelled) return;
@@ -311,6 +312,7 @@ export default function PredictionDetail() {
         setMarketState({ market, isLoading: false, error: "", isPreview: false });
       } catch (error) {
         if (cancelled) return;
+        if (!showLoading) return;
         if (import.meta.env.DEV) {
           setMarketState({
             market: mockFixedOddsMarket,
@@ -324,8 +326,13 @@ export default function PredictionDetail() {
       }
     }
 
-    loadMarket();
-    return () => { cancelled = true; };
+    loadMarket().then(() => {
+      if (!cancelled) refreshTimer = window.setInterval(() => loadMarket(false), 5000);
+    });
+    return () => {
+      cancelled = true;
+      if (refreshTimer) window.clearInterval(refreshTimer);
+    };
   }, [mockFixedOddsMarket, race]);
 
   useEffect(() => {
@@ -450,6 +457,23 @@ export default function PredictionDetail() {
         if (!receiptValidation.isValid) throw new Error(`Invalid backend prediction receipt: ${receiptValidation.errors.join(" ")}`);
         acceptedReceipt = toReceiptFromBet(response.bet, confirmPayload);
         nextBalance = Number(response.wallet?.token_balance ?? walletBalance);
+        if (response.odds_update?.odds?.length) {
+          setMarketState((current) => {
+            if (!current.market) return current;
+            const nextSelections = Object.fromEntries(response.odds_update.odds.map((entry) => [
+              getEntityId(entry.horse_id),
+              Number(entry.game_odds),
+            ]));
+            return {
+              ...current,
+              market: {
+                ...current.market,
+                receivedAt: Date.now(),
+                selections: { ...current.market.selections, win: nextSelections },
+              },
+            };
+          });
+        }
         setMyBetsState((current) => ({
           ...current,
           bets: [acceptedReceipt, ...current.bets.filter((bet) => String(bet.id) !== String(acceptedReceipt.id))],

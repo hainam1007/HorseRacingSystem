@@ -10,7 +10,7 @@ async function createResult(req, res) {
 async function finalizeRace(req, res) {
   const data = await raceResultService.finalizeRace(req, req.params.raceId);
 
-  return sendSuccess(res, 200, 'Penalty-adjusted race summary submitted to Admin successfully', data);
+  return sendSuccess(res, 200, 'Penalty-adjusted race results finalized successfully', data);
 }
 
 async function getRaceParticipants(req, res) {
@@ -50,7 +50,7 @@ async function updateResult(req, res) {
 }
 
 async function confirmRaceResults(req, res) {
-  const data = await raceResultService.confirmRaceResults(req.user._id, req.params.raceId);
+  const data = await raceResultService.confirmRaceResults(req, req.params.raceId);
 
   return sendSuccess(res, 200, 'Race results confirmed successfully', data);
 }
@@ -68,7 +68,7 @@ async function resolveRaceCorrection(req, res) {
 }
 
 async function publishRaceResults(req, res) {
-  const data = await raceResultService.publishRaceResults(req.user._id, req.params.raceId);
+  const data = await raceResultService.publishRaceResults(req, req.params.raceId);
 
   return sendSuccess(res, 200, 'Race results published successfully', data);
 }

@@ -10,6 +10,7 @@ const originalFindById = raceRepository.findById;
 const originalUpdateById = raceRepository.updateById;
 const originalUpdateMany = raceRepository.updateMany;
 const originalFindMarketByRaceId = raceOddsMarketRepository.findByRaceId;
+const originalCaptureOpeningOdds = raceOddsMarketRepository.captureOpeningOdds;
 const originalUpdateMarketByRaceId = raceOddsMarketRepository.updateByRaceId;
 const originalLockRace = raceEngineService.lockRace;
 const originalCollectParticipants = raceEngineService.collectParticipants;
@@ -20,6 +21,7 @@ test.afterEach(function() {
   raceRepository.updateById = originalUpdateById;
   raceRepository.updateMany = originalUpdateMany;
   raceOddsMarketRepository.findByRaceId = originalFindMarketByRaceId;
+  raceOddsMarketRepository.captureOpeningOdds = originalCaptureOpeningOdds;
   raceOddsMarketRepository.updateByRaceId = originalUpdateMarketByRaceId;
   raceEngineService.lockRace = originalLockRace;
   raceEngineService.collectParticipants = originalCollectParticipants;
@@ -156,6 +158,7 @@ test('demo registration mode validates enabled boolean', async function() {
 test('open betting requires generated odds market and stores race betting config', async function() {
   let capturedRaceUpdate;
   let capturedMarketUpdate;
+  let capturedOpeningOddsRaceId;
 
   raceRepository.findById = async function() {
     return {
@@ -178,6 +181,9 @@ test('open betting requires generated odds market and stores race betting config
     capturedMarketUpdate = payload;
     return { _id: 'market-id', race_id: id, ...payload };
   };
+  raceOddsMarketRepository.captureOpeningOdds = async function(id) {
+    capturedOpeningOddsRaceId = id;
+  };
   raceRepository.updateById = async function(id, payload) {
     capturedRaceUpdate = payload;
     return { _id: id, ...payload };
@@ -190,6 +196,7 @@ test('open betting requires generated odds market and stores race betting config
   });
 
   assert.equal(capturedMarketUpdate.status, 'open');
+  assert.equal(capturedOpeningOddsRaceId, 'race-id');
   assert.equal(capturedRaceUpdate.betting_status, 'open');
   assert.equal(capturedRaceUpdate.betting_market.status, 'open');
   assert.equal(capturedRaceUpdate.betting_market.min_stake, 5);

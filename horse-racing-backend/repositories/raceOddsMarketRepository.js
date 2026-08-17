@@ -1,4 +1,5 @@
 const { loadSequelizeModels } = require('../models/sequelize/index.js');
+const { col } = require('sequelize');
 
 function getModels() { return loadSequelizeModels().models; }
 
@@ -48,8 +49,21 @@ async function updateGeneratedByRaceId(raceId, data) {
   return RaceOddsMarket.findOne({ where: { race_id: raceId }, include: baseInclude() });
 }
 
+async function captureOpeningOdds(raceId) {
+  const { RaceOddsMarket, RaceOddsMarketOdd } = getModels();
+  const market = await RaceOddsMarket.findOne({ where: { race_id: raceId, status: 'generated' } });
+  if (!market) return null;
+
+  await RaceOddsMarketOdd.update(
+    { opening_game_odds: col('game_odds') },
+    { where: { odds_market_id: market.id } }
+  );
+  return market;
+}
+
 module.exports = {
   findByRaceId,
+  captureOpeningOdds,
   upsertByRaceId,
   updateGeneratedByRaceId,
   updateByRaceId

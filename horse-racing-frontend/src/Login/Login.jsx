@@ -74,7 +74,7 @@ function Login() {
       <section className="login-page__shell">
         <div className="login-page__panel login-page__panel--form">
           <Link className="login-page__brand brand" to="/" aria-label="Horse racing home">
-            <span className="brand-mark">HR</span>
+            <img className="brand-mark" src="/images/horse-logo.png" alt="" />
             <span className="brand-text">
               <strong>horse</strong>
               <span>racing</span>

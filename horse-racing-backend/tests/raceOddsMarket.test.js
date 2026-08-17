@@ -188,3 +188,58 @@ test('probability engine http wrapper unwraps deployed API response shape', () =
     prediction
   );
 });
+
+test('probability engine http wrapper retries while the deployed engine is starting', async () => {
+  const previousMode = process.env.PROBABILITY_ENGINE_MODE;
+  const previousUrl = process.env.PROBABILITY_ENGINE_URL;
+  const previousAttempts = process.env.PROBABILITY_ENGINE_MAX_ATTEMPTS;
+  const previousDelay = process.env.PROBABILITY_ENGINE_RETRY_DELAY_MS;
+  let requestCount = 0;
+  const server = http.createServer((req, res) => {
+    requestCount += 1;
+    res.setHeader('Content-Type', 'application/json');
+
+    if (requestCount < 3) {
+      res.statusCode = 503;
+      res.end(JSON.stringify({ detail: 'Space is starting' }));
+      return;
+    }
+
+    res.end(JSON.stringify({
+      success: true,
+      data: {
+        horses: [{
+          horse_no: 1,
+          win_probability: 1,
+          fair_odds: 1,
+          game_odds: 1.01,
+          probability_rank: 1
+        }]
+      }
+    }));
+  });
+
+  await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
+  process.env.PROBABILITY_ENGINE_MODE = 'http';
+  process.env.PROBABILITY_ENGINE_URL = `http://127.0.0.1:${server.address().port}/predict`;
+  process.env.PROBABILITY_ENGINE_MAX_ATTEMPTS = '5';
+  process.env.PROBABILITY_ENGINE_RETRY_DELAY_MS = '1';
+
+  try {
+    const prediction = await probabilityEngineService.predictRace({ race_info: {}, horses: [{}] });
+    assert.equal(requestCount, 3);
+    assert.equal(prediction.horses.length, 1);
+  } finally {
+    if (previousMode === undefined) delete process.env.PROBABILITY_ENGINE_MODE;
+    else process.env.PROBABILITY_ENGINE_MODE = previousMode;
+    if (previousUrl === undefined) delete process.env.PROBABILITY_ENGINE_URL;
+    else process.env.PROBABILITY_ENGINE_URL = previousUrl;
+    if (previousAttempts === undefined) delete process.env.PROBABILITY_ENGINE_MAX_ATTEMPTS;
+    else process.env.PROBABILITY_ENGINE_MAX_ATTEMPTS = previousAttempts;
+    if (previousDelay === undefined) delete process.env.PROBABILITY_ENGINE_RETRY_DELAY_MS;
+    else process.env.PROBABILITY_ENGINE_RETRY_DELAY_MS = previousDelay;
+    await new Promise((resolve, reject) => {
+      server.close((error) => (error ? reject(error) : resolve()));
+    });
+  }
+});

@@ -81,14 +81,6 @@ export function useAdminModuleApi(moduleName) {
         await load();
         return true;
       }
-      if (actionLabel === "Publish Result") {
-        if (status === "Draft") {
-          await adminApi.confirmRaceResults(id);
-        }
-        await adminApi.publishRaceResults(id);
-        await load();
-        return true;
-      }
     }
 
     return false;

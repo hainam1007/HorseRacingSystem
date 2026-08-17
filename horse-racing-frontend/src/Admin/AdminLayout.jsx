@@ -54,7 +54,7 @@ function AdminLayout({ title, eyebrow, description, children, actions }) {
         <aside className="admin-sidebar">
           <div className="admin-brand">
             <Link className="admin-brand__link" to="/admin" aria-label="Horse Racing admin overview">
-              <span className="admin-brand__mark" aria-hidden="true">HR</span>
+              <img className="admin-brand__mark" src="/images/horse-logo.png" alt="" aria-hidden="true" />
               <span className="admin-brand__copy">
                 <strong>Race control</strong>
                 <small>Tournament operations</small>

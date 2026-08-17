@@ -42,7 +42,7 @@ router.post(
 );
 router.post(
   '/races/:raceId/confirm',
-  adminOnly,
+  refereeOnly,
   validateObjectIdParam('raceId'),
   asyncHandler(raceResultController.confirmRaceResults)
 );
@@ -61,7 +61,7 @@ router.post(
 );
 router.post(
   '/races/:raceId/publish',
-  adminOnly,
+  refereeOnly,
   validateObjectIdParam('raceId'),
   asyncHandler(raceResultController.publishRaceResults)
 );

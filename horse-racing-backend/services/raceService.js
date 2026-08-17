@@ -496,6 +496,9 @@ async function openBetting(id, payload) {
     }
 
     const bettingMarket = buildBettingMarketPayload(race, market, payload || {});
+    if (market.status === ODDS_MARKET_STATUS.GENERATED) {
+        await raceOddsMarketRepository.captureOpeningOdds(race._id);
+    }
     const updatedMarket = await raceOddsMarketRepository.updateByRaceId(race._id, {
         status: ODDS_MARKET_STATUS.OPEN
     });

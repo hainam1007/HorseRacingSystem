@@ -18,7 +18,7 @@ function OwnerLayout() {
     <main className="owner-page" aria-label="Horse owner workspace">
       <header className="owner-topbar">
         <Link className="brand owner-brand" to="/" aria-label="Horse racing home">
-          <span className="brand-mark">HR</span>
+          <img className="brand-mark" src="/images/horse-logo.png" alt="" />
           <span className="brand-text">
             <strong>horse</strong>
             <span>racing</span>

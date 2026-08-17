@@ -18,7 +18,7 @@ function RefereeLayout({ title, eyebrow, description, children, actions }) {
     <section className="admin-shell referee-shell">
       <aside className="admin-sidebar referee-sidebar">
         <div className="referee-brand-row">
-          <Link className="admin-brand__link brand" to="/" aria-label="Horse racing home"><span className="brand-mark">HR</span><span className="brand-text"><strong>horse</strong><span>racing</span></span></Link>
+          <Link className="admin-brand__link brand" to="/" aria-label="Horse racing home"><img className="brand-mark" src="/images/horse-logo.png" alt="" /><span className="brand-text"><strong>horse</strong><span>racing</span></span></Link>
           <span className="referee-console-tag">OFFICIAL CONSOLE</span>
         </div>
 

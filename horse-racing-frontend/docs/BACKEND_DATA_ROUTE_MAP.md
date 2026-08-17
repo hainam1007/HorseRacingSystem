@@ -90,7 +90,7 @@ Notifications: 18
 | jockey inspection | Eligibility | mock persistence | pending backend contract | API or unavailable state only |
 | violations | Violations | policy/decision endpoints not wired | options, penalty-preview, `GET/POST/PATCH`, confirm, dismiss | Backend policy owns penalties |
 | race report | Reports | remove fallback mutation path | `GET/POST/PATCH/submit /referee-reports` | Draft then submitted/read-only |
-| race result | Results | migrate legacy per-result creation | participants, readiness, finalize, apply penalties, `GET/PATCH /race-results` | Race Engine creates drafts; referee reviews; admin confirms/publishes by race |
+| race result | Results | migrate legacy per-result creation | participants, readiness, finalize, apply penalties, `GET/PATCH /race-results` | Race Engine creates drafts; the assigned referee reviews, confirms, and publishes by race |
 
 ## Mock Removal Priority
 
