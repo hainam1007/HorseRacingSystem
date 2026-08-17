@@ -3,6 +3,7 @@ const { BET_STATUS, ODDS_MARKET_STATUS, RACE_RESULT_STATUS } = require('../const
 const { Op } = require('sequelize');
 const { loadSequelizeModels } = require('../models/sequelize/index.js');
 const betRepository = require('../repositories/betRepository');
+const dynamicOddsService = require('./dynamicOddsService');
 const raceOddsMarketRepository = require('../repositories/raceOddsMarketRepository');
 const raceRepository = require('../repositories/raceRepository');
 const transactionRepository = require('../repositories/transactionRepository');
@@ -16,7 +17,7 @@ const BETTABLE_MARKET_STATUSES = [
 const CLOSED_RACE_STATUSES = ['running', 'completed', 'finished', 'cancelled', 'deleted'];
 
 function getDocumentId(value) {
-  return value && (value._id || value);
+  return value && (value._id || value.id || value);
 }
 
 function sameId(first, second) {
@@ -96,7 +97,7 @@ function assertStakeWithinRaceLimits(race, stakeAmount) {
 
 function buildOddsSnapshot(market, oddsEntry) {
   return {
-    market_id: market._id,
+    market_id: getDocumentId(market),
     model_name: market.model_name,
     model_version: market.model_version,
     generated_at: market.generated_at,
@@ -205,19 +206,31 @@ async function placeBet(req, payload) {
       race_id: payload.race_id,
       predicted_horse_id: payload.predicted_horse_id,
       stake_amount: payload.stake_amount,
-      odds_market_id: market._id,
+      odds_market_id: getDocumentId(market),
       odds_snapshot: buildOddsSnapshot(market, oddsEntry),
       potential_payout: potentialPayout,
       status: BET_STATUS.PENDING,
       submitted_at: new Date()
     });
 
+    const savedBet = await betRepository.findById(bet.id || bet._id);
+    let oddsUpdate = null;
+
+    try {
+      oddsUpdate = await dynamicOddsService.repriceRaceOdds(payload.race_id);
+    } catch (repricingError) {
+      // The bet and its accepted odds snapshot are already valid. A transient
+      // repricing failure must not refund the wallet while leaving that bet open.
+      console.error('[dynamic-odds] failed to reprice race %s: %s', payload.race_id, repricingError.message);
+    }
+
     return {
       // Sequelize models expose `id`; Mongo-style documents expose `_id`.
       // Use either shape so the response lookup never queries with undefined.
-      bet: await betRepository.findById(bet.id || bet._id),
+      bet: savedBet,
       wallet: deduction.wallet,
-      transaction: transaction
+      transaction: transaction,
+      odds_update: oddsUpdate
     };
   } catch (error) {
     await refundFailedBetPlacement(

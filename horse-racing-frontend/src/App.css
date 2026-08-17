@@ -80,12 +80,15 @@
   background: transparent !important;
 }
 .brand-mark {
-  font-family: "Sora", sans-serif;
-  font-size: 2rem;
-  font-weight: 800;
-  line-height: 1;
-  color: var(--accent);
-  letter-spacing: -0.04em;
+  display: block;
+  width: 58px;
+  height: 58px;
+  flex: 0 0 58px;
+  object-fit: contain;
+  object-position: center;
+  border: none;
+  border-radius: 0;
+  background: transparent;
 }
 
 .brand-text {
@@ -98,6 +101,7 @@
 .brand-text strong {
   font-size: 0.88rem;
   font-weight: 700;
+  color: var(--racing-accent);
 }
 
 .brand-text span {
@@ -665,7 +669,9 @@
 }
 
 .login-page__brand .brand-mark {
-  font-size: 2.2rem;
+  width: 68px;
+  height: 68px;
+  flex-basis: 68px;
 }
 
 .login-page__eyebrow {
@@ -1242,7 +1248,9 @@
 }
 
 .signup-page__brand .brand-mark {
-  font-size: 2.2rem;
+  width: 68px;
+  height: 68px;
+  flex-basis: 68px;
 }
 
 .signup-page__eyebrow {
@@ -2574,7 +2582,9 @@ button.admin-logout-btn {
   }
 
   .brand-mark {
-    font-size: 1.65rem;
+    width: 48px;
+    height: 48px;
+    flex-basis: 48px;
   }
 
   .brand-text strong,
@@ -5607,11 +5617,16 @@ button.admin-logout-btn {
 }
 
 .landing-page .brand-mark {
-  font-size: 2.18rem;
-  color: var(--racing-accent-hover);
+  width: 64px;
+  height: 64px;
+  flex-basis: 64px;
 }
 
-.landing-page .brand-text strong,
+.landing-page .brand-text strong {
+  color: var(--racing-accent);
+  font-size: 0.84rem;
+}
+
 .landing-page .brand-text span {
   color: rgba(255, 248, 234, 0.9);
   font-size: 0.84rem;

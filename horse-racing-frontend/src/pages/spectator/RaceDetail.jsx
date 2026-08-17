@@ -263,7 +263,10 @@ export default function RaceDetail() {
 
   contenders.sort((a, b) => a.lane - b.lane);
 
-  const viewer = useRaceViewerSession(effectiveRace, contenders, { useRaceEngineOrder: hasRaceEngineOrder });
+  const viewer = useRaceViewerSession(effectiveRace, contenders, {
+    raceScript: raceLiveState?.engine?.race_script || null,
+    useRaceEngineOrder: hasRaceEngineOrder,
+  });
 
   const isLoading = isLoadingTournament || isLoadingResults;
 

@@ -236,7 +236,7 @@ Referee login
   -> finalize race and generate draft results
   -> review/update result draft
   -> apply confirmed penalties
-  -> admin confirms and publishes result
+  -> assigned referee confirms and publishes result
 ```
 
 ### Routes
@@ -277,7 +277,7 @@ Referee login
 - Production referee pages must not fall back to sample races, participants, checks, incidents, results, or reports.
 - Participant/readiness contracts now exist for referee/admin. Unsupported monitoring or realtime behavior must still render explicit unavailable states and disable unsupported mutations.
 - The desired horse-check identity is `race_id + horse_id + phase`.
-- Referees prepare draft results and submit reports; admin confirms and publishes official results.
+- Referees prepare draft results, submit reports, then confirm and publish official results directly.
 
 ## 6. Admin Flow
 
@@ -291,7 +291,7 @@ Admin login
   -> manage tournaments, rounds, races
   -> approve/reject registrations
   -> manage jockey assignments/referees
-  -> confirm/publish results
+  -> monitor published results (read-only)
   -> manage prediction/betting operations
 ```
 

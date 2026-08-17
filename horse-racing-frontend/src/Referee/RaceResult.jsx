@@ -79,15 +79,25 @@ function RaceResult() {
       setActiveAction(action);
       setMessage("");
       if (action === "finalize") await refereeApi.finalizeRaceResults(raceId);
-      else await refereeApi.applyRaceResultPenalties(raceId);
+      else if (action === "publish") {
+        if (race.resultStatus === RESULT_STATUSES.DRAFT) {
+          await refereeApi.confirmRaceResults(raceId);
+        }
+        await refereeApi.publishRaceResults(raceId);
+      } else await refereeApi.applyRaceResultPenalties(raceId);
       await Promise.all([reload(), loadWorkflow()]);
       setMessage(action === "finalize"
-        ? "Penalty-adjusted final summary was sent to Admin."
-        : "Confirmed penalties were applied. Review the adjusted rankings before sending them to Admin.");
+        ? "Penalty-adjusted results were finalized and are ready for your approval."
+        : action === "publish"
+          ? "The official race results were approved and published."
+          : "Confirmed penalties were applied. Review the adjusted rankings before finalizing them.");
     } catch (apiError) {
+      if (action === "publish") {
+        await Promise.allSettled([reload(), loadWorkflow()]);
+      }
       setMessage(apiError.status === 403
         ? "You are not authorized to manage results for this race."
-        : apiError.message || `Unable to ${action === "finalize" ? "finalize results" : "apply penalties"}.`);
+        : apiError.message || `Unable to ${action === "finalize" ? "finalize results" : action === "publish" ? "publish results" : "apply penalties"}.`);
     } finally {
       setActiveAction("");
     }
@@ -99,9 +109,10 @@ function RaceResult() {
   const hasResults = race.result.length > 0;
   const penaltiesApplied = readiness?.penalties_applied === true ||
     (hasResults && race.result.every((result) => result.penaltyApplied));
-  const submittedToAdmin = readiness?.submitted_to_admin === true ||
+  const resultsFinalized = readiness?.results_finalized === true ||
     (hasResults && race.result.every((result) => result.submittedToAdmin));
-  const lockedResults = submittedToAdmin ||
+  const resultsPublished = race.resultStatus === RESULT_STATUSES.PUBLISHED;
+  const lockedResults = resultsFinalized ||
     [RESULT_STATUSES.CONFIRMED, RESULT_STATUSES.PUBLISHED].includes(race.resultStatus);
   const readinessChecks = readiness ? [
     ["Registration locked", readiness.registration_locked],
@@ -112,24 +123,25 @@ function RaceResult() {
     ["No horse under investigation", readiness.under_investigation_horse_ids?.length === 0],
     ["No unresolved violations", readiness.unresolved_violation_ids?.length === 0],
     ["Confirmed penalties applied", readiness.penalties_applied],
-    ["Final summary sent to Admin", readiness.submitted_to_admin],
+    ["Results finalized", readiness.results_finalized],
   ] : [];
   const sortedResults = [...race.result].sort((a, b) => (a.finalPosition ?? Number.MAX_SAFE_INTEGER) - (b.finalPosition ?? Number.MAX_SAFE_INTEGER));
 
-  return <RefereeLayout title="Race Result" eyebrow={`Authoritative workflow | ${race.name}`} description="Apply confirmed penalties, review the adjusted rankings, then send the final summary to Admin." actions={<Link className="admin-header__button admin-header__button--ghost" to={`/referee/races/${raceId}`}>Back to Race Detail</Link>}>
+  return <RefereeLayout title="Race Result" eyebrow={`Authoritative workflow | ${race.name}`} description="Apply confirmed penalties, review the adjusted rankings, then approve and publish the official result." actions={<Link className="admin-header__button admin-header__button--ghost" to={`/referee/races/${raceId}`}>Back to Race Detail</Link>}>
     {(error || workflowError) && <section className="admin-live-state admin-live-state--warning" role="alert">{error || workflowError} <button type="button" className="admin-header__button admin-header__button--ghost" onClick={loadWorkflow}>Retry</button></section>}
     {message && <section className="admin-live-state" aria-live="polite">{message}</section>}
     {isWorkflowLoading && <LoadingSkeleton ariaLabel="Loading result readiness" rows={3} variant="cards" />}
 
     {!isWorkflowLoading && !workflowError && <>
       <section className="admin-panel">
-        <div className="admin-panel__header"><div><p className="admin-panel__eyebrow">Finalization gate</p><h2>{submittedToAdmin ? "Sent to Admin" : penaltiesApplied ? "Review final summary" : readiness?.ready ? "Apply confirmed penalties" : "Readiness requirements"}</h2></div><span className={`referee-status-badge referee-status-badge--${submittedToAdmin ? "blue" : readiness?.ready ? "green" : "amber"}`}>{submittedToAdmin ? "Pending Admin" : readiness?.ready ? "Ready" : "Blocked"}</span></div>
+        <div className="admin-panel__header"><div><p className="admin-panel__eyebrow">Finalization gate</p><h2>{resultsPublished ? "Official results published" : resultsFinalized ? "Approve and publish" : penaltiesApplied ? "Review final summary" : readiness?.ready ? "Apply confirmed penalties" : "Readiness requirements"}</h2></div><span className={`referee-status-badge referee-status-badge--${resultsPublished ? "green" : resultsFinalized ? "blue" : readiness?.ready ? "green" : "amber"}`}>{resultsPublished ? "Published" : resultsFinalized ? "Awaiting your approval" : readiness?.ready ? "Ready" : "Blocked"}</span></div>
         <div className="referee-checklist">{readinessChecks.map(([label, passed]) => <div className="referee-check-item" key={label}><span className={`referee-insp-badge referee-insp-badge--${passed ? "done" : "pending"}`}>{passed ? "Ready" : "Required"}</span><span>{label}</span></div>)}</div>
         <div className="admin-tool-card__footer">
           <button className={`admin-header__button${penaltiesApplied ? " admin-header__button--ghost" : ""}`} type="button" disabled={!readiness?.ready_to_apply_penalties || penaltiesApplied || lockedResults || Boolean(activeAction)} onClick={() => runAction("penalties")}>{activeAction === "penalties" ? "Applying..." : penaltiesApplied ? "Penalties Applied" : "Apply Confirmed Penalties"}</button>
-          <button className={`admin-header__button${penaltiesApplied && !submittedToAdmin ? "" : " admin-header__button--ghost"}`} type="button" disabled={!readiness?.ready_to_finalize || submittedToAdmin || lockedResults || Boolean(activeAction)} onClick={() => runAction("finalize")}>{activeAction === "finalize" ? "Sending..." : submittedToAdmin ? "Sent to Admin" : "Finalize and Send to Admin"}</button>
+          <button className={`admin-header__button${penaltiesApplied && !resultsFinalized ? "" : " admin-header__button--ghost"}`} type="button" disabled={!readiness?.ready_to_finalize || resultsFinalized || lockedResults || Boolean(activeAction)} onClick={() => runAction("finalize")}>{activeAction === "finalize" ? "Finalizing..." : resultsFinalized ? "Results Finalized" : "Finalize Results"}</button>
+          <button className="admin-header__button" type="button" disabled={!resultsFinalized || resultsPublished || Boolean(activeAction)} onClick={() => runAction("publish")}>{activeAction === "publish" ? "Publishing..." : race.resultStatus === RESULT_STATUSES.CONFIRMED ? "Publish Official Result" : "Approve and Publish"}</button>
         </div>
-        {lockedResults && <p>These results are {formatStatus(race.resultStatus)} and can no longer be changed by a Referee.</p>}
+        {resultsPublished && <p>These results are official and can no longer be changed.</p>}
       </section>
 
       <section className="admin-panel"><div className="admin-panel__header"><div><p className="admin-panel__eyebrow">Participant gate</p><h2>Eligibility returned by result workflow</h2></div><span>{participants.filter((item) => item.eligible).length}/{participants.length} eligible</span></div>

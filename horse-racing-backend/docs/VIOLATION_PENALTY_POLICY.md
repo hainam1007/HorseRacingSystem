@@ -148,7 +148,7 @@ Violation `recorded` va `under_review` phai chan finalization.
    yeu cau Referee chinh lai.
 9. He thong luu suggestion, proposal, final decision va audit nguoi ra quyet dinh.
 10. Khi tinh ket qua, he thong ap dung violation `confirmed` tu `raw_*` sang `final_*`.
-11. Admin kiem tra va publish ket qua.
+11. Trong tai duoc phan cong kiem tra, xac nhan va publish ket qua.
 
 ## 8. Payload FE gui BE
 
@@ -251,5 +251,5 @@ Backend hien tai da ho tro:
 - Referee confirm hoac dismiss moi loai vi pham, bao gom doping, horse abuse,
   track safety va `other`.
 - Khoa violation sau khi ket qua da `confirmed` hoac `published`.
-- Thuc thi suspension va fine mot lan khi admin bulk confirm race.
+- Thuc thi suspension va fine mot lan khi trong tai bulk confirm race.
 - Chan jockey dang suspension nhan assignment hoac tham gia race.

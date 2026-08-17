@@ -292,7 +292,9 @@ async function getRaceReadiness(req, raceId) {
         return [RACE_RESULT_STATUS.CONFIRMED, RACE_RESULT_STATUS.PUBLISHED].includes(result.status);
     });
     const penaltiesApplied = lockedResults || penaltiesMatchCurrentSnapshot(raceResults, confirmedViolations);
-    const submittedToAdmin = lockedResults || (
+    // Keep using the legacy submitted_to_admin_* columns as the finalization
+    // audit marker until the schema is renamed. No Admin action is involved.
+    const resultsFinalized = lockedResults || (
         raceResults.length > 0 && raceResults.every(function(result) {
             return Boolean(result.submitted_to_admin_at);
         })
@@ -315,9 +317,9 @@ async function getRaceReadiness(req, raceId) {
             return result.status === RACE_RESULT_STATUS.DRAFT;
         }).length,
         penalties_applied: penaltiesApplied,
-        submitted_to_admin: submittedToAdmin,
-        ready_to_apply_penalties: ready && !lockedResults && !submittedToAdmin,
-        ready_to_finalize: ready && penaltiesApplied && !submittedToAdmin && !lockedResults,
+        results_finalized: resultsFinalized,
+        ready_to_apply_penalties: ready && !lockedResults && !resultsFinalized,
+        ready_to_finalize: ready && penaltiesApplied && !resultsFinalized && !lockedResults,
         ready: ready
     };
 }
@@ -344,7 +346,7 @@ async function finalizeRace(req, raceId) {
     if (results.some(function(result) {
         return result.status !== RACE_RESULT_STATUS.DRAFT;
     })) {
-        throw new ApiError(409, 'Only draft results can be submitted to Admin');
+        throw new ApiError(409, 'Only draft results can be finalized');
     }
 
     if (!penaltiesMatchCurrentSnapshot(results, confirmedViolations)) {
@@ -374,6 +376,7 @@ async function finalizeRace(req, raceId) {
         race_id: readiness.race_id,
         referee_report_id: readiness.submitted_report_id,
         participant_count: readiness.eligible_participant_count,
+        already_finalized: alreadySubmitted,
         already_submitted: alreadySubmitted,
         results: await raceResultRepository.find({ race_id: raceId })
     };
@@ -494,7 +497,7 @@ async function updateResult(req, id, payload) {
     }
 
     if (result.submitted_to_admin_at) {
-        throw new ApiError(409, 'Results submitted to Admin are locked until a correction is requested');
+        throw new ApiError(409, 'Finalized results are locked until a correction is requested');
     }
 
     if (!hasRole(req, ROLE_NAMES.ADMIN)) {
@@ -831,9 +834,17 @@ async function applyRacePenalties(req, raceId) {
     });
 }
 
-async function confirmRaceResults(adminUserId, raceId) {
+async function confirmRaceResults(req, raceId) {
     const sequelize = getSequelize();
     const { Op } = require('sequelize');
+    const race = await raceRepository.findById(raceId);
+
+    if (!race) {
+        throw new ApiError(404, 'Race not found');
+    }
+
+    await ensureCanFinalizeRace(req, race);
+    const refereeUserId = req.user._id;
 
     await sequelize.transaction(async () => {
         const draftResults = await assertAllRaceResultsStatus(raceId, RACE_RESULT_STATUS.DRAFT, null);
@@ -842,7 +853,7 @@ async function confirmRaceResults(adminUserId, raceId) {
         }));
 
         if (submittedResults.length !== draftResults.length) {
-            throw new ApiError(409, 'Referee must apply confirmed penalties and submit final results before Admin confirmation');
+            throw new ApiError(409, 'Apply confirmed penalties and finalize the results before confirmation');
         }
 
         const confirmedViolations = await loadViolationsWithPenalty({
@@ -851,7 +862,7 @@ async function confirmRaceResults(adminUserId, raceId) {
         });
 
         if (!penaltiesMatchCurrentSnapshot(submittedResults, confirmedViolations)) {
-            throw new ApiError(409, 'Submitted result penalties are stale. Return the results to the Referee for recalculation');
+            throw new ApiError(409, 'Finalized result penalties are stale. Apply the confirmed penalties again');
         }
 
         const pendingCorrections = await loadRaceResultsWithSnapshot(raceId).then((rows) => rows.filter(function(row) {
@@ -866,12 +877,12 @@ async function confirmRaceResults(adminUserId, raceId) {
             });
         }
 
-        await applyDisciplinaryPenalties(adminUserId, raceId, null);
+        await applyDisciplinaryPenalties(refereeUserId, raceId, null);
         await raceResultRepository.updateMany(
             { race_id: raceId, status: RACE_RESULT_STATUS.DRAFT },
             {
                 status: RACE_RESULT_STATUS.CONFIRMED,
-                confirmed_by: adminUserId,
+                confirmed_by: refereeUserId,
                 confirmed_at: new Date()
             },
             { runValidators: true }
@@ -991,11 +1002,19 @@ async function resolveRaceCorrection(adminUserId, raceId) {
     };
 }
 
-async function publishRaceResults(adminUserId, raceId) {
+async function publishRaceResults(req, raceId) {
     const sequelize = getSequelize();
     let prizeAwards = null;
     let betSettlement = null;
     let ratingUpdate = null;
+    const race = await raceRepository.findById(raceId);
+
+    if (!race) {
+        throw new ApiError(404, 'Race not found');
+    }
+
+    await ensureCanFinalizeRace(req, race);
+    const refereeUserId = req.user._id;
 
     await sequelize.transaction(async () => {
         await assertAllRaceResultsStatus(raceId, RACE_RESULT_STATUS.CONFIRMED, null);
@@ -1003,17 +1022,17 @@ async function publishRaceResults(adminUserId, raceId) {
             { race_id: raceId, status: RACE_RESULT_STATUS.CONFIRMED },
             {
                 status: RACE_RESULT_STATUS.PUBLISHED,
-                published_by: adminUserId,
+                published_by: refereeUserId,
                 published_at: new Date()
             },
             { runValidators: true }
         );
-        ratingUpdate = await horseRatingService.applyPublishedRaceRatings(raceId, adminUserId, { session: null });
-        prizeAwards = await prizeService.calculateRacePrizeAwards(raceId, adminUserId, { session: null });
+        ratingUpdate = await horseRatingService.applyPublishedRaceRatings(raceId, refereeUserId, { session: null });
+        prizeAwards = await prizeService.calculateRacePrizeAwards(raceId, refereeUserId, { session: null });
     });
 
     try {
-        betSettlement = await betService.settleRaceBets(raceId, adminUserId);
+        betSettlement = await betService.settleRaceBets(raceId, refereeUserId);
     } catch (error) {
         betSettlement = {
             status: 'failed',

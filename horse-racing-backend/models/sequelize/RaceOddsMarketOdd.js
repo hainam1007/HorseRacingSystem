@@ -24,6 +24,7 @@ module.exports = (sequelize, DataTypes) => {
             fair_odds: { type: DataTypes.DECIMAL(6, 2), allowNull: false, validate: { min: 1 } },
             game_odds: { type: DataTypes.DECIMAL(6, 2), allowNull: false, validate: { min: 1 } },
             generated_game_odds: { type: DataTypes.DECIMAL(6, 2), validate: { min: 1 } },
+            opening_game_odds: { type: DataTypes.DECIMAL(6, 2), validate: { min: 1 } },
             probability_rank: { type: DataTypes.INTEGER, allowNull: false, validate: { min: 1 } },
             fallbacks_used: { type: DataTypes.ARRAY(DataTypes.STRING) }
         },

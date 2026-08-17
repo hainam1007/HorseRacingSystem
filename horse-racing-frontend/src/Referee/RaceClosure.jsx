@@ -125,12 +125,22 @@ function RaceClosure() {
     try {
       setActiveAction(action);
       if (action === "finalize") await refereeApi.finalizeRaceResults(raceId);
-      else await refereeApi.applyRaceResultPenalties(raceId);
+      else if (action === "publish") {
+        if (race.resultStatus === RESULT_STATUSES.DRAFT) {
+          await refereeApi.confirmRaceResults(raceId);
+        }
+        await refereeApi.publishRaceResults(raceId);
+      } else await refereeApi.applyRaceResultPenalties(raceId);
       await Promise.all([reload(), loadWorkflow()]);
       addMsg(action === "finalize"
-        ? "Penalty-adjusted final summary sent to Admin."
-        : "Confirmed penalties applied. Review the adjusted rankings before sending them to Admin.");
+        ? "Penalty-adjusted results finalized and ready for your approval."
+        : action === "publish"
+          ? "Official race results approved and published."
+          : "Confirmed penalties applied. Review the adjusted rankings before finalizing them.");
     } catch (apiError) {
+      if (action === "publish") {
+        await Promise.allSettled([reload(), loadWorkflow()]);
+      }
       addMsg(apiError.message || "Unable to update race results.");
     } finally {
       setActiveAction("");
@@ -225,9 +235,10 @@ function RaceClosure() {
   const hasResults = race.result.length > 0;
   const penaltiesApplied = readiness?.penalties_applied === true ||
     (hasResults && race.result.every((result) => result.penaltyApplied));
-  const submittedToAdmin = readiness?.submitted_to_admin === true ||
+  const resultsFinalized = readiness?.results_finalized === true ||
     (hasResults && race.result.every((result) => result.submittedToAdmin));
-  const lockedResults = submittedToAdmin ||
+  const resultsPublished = race.resultStatus === RESULT_STATUSES.PUBLISHED;
+  const lockedResults = resultsFinalized ||
     [RESULT_STATUSES.CONFIRMED, RESULT_STATUSES.PUBLISHED].includes(race.resultStatus);
   const correctionResult = race.result.find((result) => result.correctionRequested);
   const hasCorrectionRequest = Boolean(correctionResult);
@@ -241,7 +252,7 @@ function RaceClosure() {
     ["No horse under investigation", readiness.under_investigation_horse_ids?.length === 0],
     ["No unresolved violations", readiness.unresolved_violation_ids?.length === 0],
     ["Confirmed penalties applied", readiness.penalties_applied],
-    ["Final summary sent to Admin", readiness.submitted_to_admin],
+    ["Results finalized", readiness.results_finalized],
   ] : [];
   const sortedResults = [...race.result].sort((a, b) => (a.finalPosition ?? Number.MAX_SAFE_INTEGER) - (b.finalPosition ?? Number.MAX_SAFE_INTEGER));
   const sortedDraftResults = [...race.result].sort((a, b) => (a.rawPosition ?? a.position ?? Number.MAX_SAFE_INTEGER) - (b.rawPosition ?? b.position ?? Number.MAX_SAFE_INTEGER));
@@ -250,7 +261,7 @@ function RaceClosure() {
     <RefereeLayout
       title="Race Closure"
       eyebrow={`Official closure | ${race.name}`}
-      description="Apply confirmed penalties, review the adjusted rankings, then send the final summary to Admin."
+      description="Apply confirmed penalties, review the adjusted rankings, then approve and publish the official result."
       actions={<Link className="admin-header__button admin-header__button--ghost" to={`/referee/races/${raceId}`}>Race Detail</Link>}
     >
       {(error || workflowError) && <section className="admin-live-state admin-live-state--warning">{error || workflowError}</section>}
@@ -276,7 +287,7 @@ function RaceClosure() {
           {isWorkflowLoading && <LoadingSkeleton ariaLabel="Loading result readiness" rows={3} variant="cards" />}
           {!isWorkflowLoading && (
             <section className="admin-panel">
-              <div className="admin-panel__header"><div><p className="admin-panel__eyebrow">Finalization gate</p><h2>{submittedToAdmin ? "Sent to Admin" : penaltiesApplied ? "Review final summary" : readiness?.ready ? "Apply confirmed penalties" : "Readiness requirements"}</h2></div><span className={`referee-status-badge referee-status-badge--${submittedToAdmin ? "blue" : readiness?.ready ? "green" : "amber"}`}>{submittedToAdmin ? "Pending Admin" : readiness?.ready ? "Ready" : "Blocked"}</span></div>
+              <div className="admin-panel__header"><div><p className="admin-panel__eyebrow">Finalization gate</p><h2>{resultsPublished ? "Official results published" : resultsFinalized ? "Approve and publish" : penaltiesApplied ? "Review final summary" : readiness?.ready ? "Apply confirmed penalties" : "Readiness requirements"}</h2></div><span className={`referee-status-badge referee-status-badge--${resultsPublished ? "green" : resultsFinalized ? "blue" : readiness?.ready ? "green" : "amber"}`}>{resultsPublished ? "Published" : resultsFinalized ? "Awaiting your approval" : readiness?.ready ? "Ready" : "Blocked"}</span></div>
               <div className="referee-checklist">{readinessChecks.map(([label, passed]) => <div className="referee-check-item" key={label}><span className={`referee-insp-badge referee-insp-badge--${passed ? "done" : "pending"}`}>{passed ? "Ready" : "Required"}</span><span>{label}</span></div>)}</div>
               {readiness?.missing_report && (
                 <section className="admin-live-state admin-live-state--warning">
@@ -286,7 +297,8 @@ function RaceClosure() {
               )}
               <div className="admin-tool-card__footer">
                 <button className={`admin-header__button${penaltiesApplied ? " admin-header__button--ghost" : ""}`} type="button" disabled={!readiness?.ready_to_apply_penalties || penaltiesApplied || lockedResults || Boolean(activeAction)} onClick={() => runAction("penalties")}>{activeAction === "penalties" ? "Applying..." : penaltiesApplied ? "Penalties Applied" : "Apply Confirmed Penalties"}</button>
-                <button className={`admin-header__button${penaltiesApplied && !submittedToAdmin ? "" : " admin-header__button--ghost"}`} type="button" disabled={!readiness?.ready_to_finalize || submittedToAdmin || lockedResults || Boolean(activeAction)} onClick={() => runAction("finalize")}>{activeAction === "finalize" ? "Sending..." : submittedToAdmin ? "Sent to Admin" : "Finalize and Send to Admin"}</button>
+                <button className={`admin-header__button${penaltiesApplied && !resultsFinalized ? "" : " admin-header__button--ghost"}`} type="button" disabled={!readiness?.ready_to_finalize || resultsFinalized || lockedResults || Boolean(activeAction)} onClick={() => runAction("finalize")}>{activeAction === "finalize" ? "Finalizing..." : resultsFinalized ? "Results Finalized" : "Finalize Results"}</button>
+                <button className="admin-header__button" type="button" disabled={!resultsFinalized || resultsPublished || Boolean(activeAction)} onClick={() => runAction("publish")}>{activeAction === "publish" ? "Publishing..." : race.resultStatus === RESULT_STATUSES.CONFIRMED ? "Publish Official Result" : "Approve and Publish"}</button>
               </div>
             </section>
           )}
@@ -304,7 +316,7 @@ function RaceClosure() {
           {hasResults && (
             <section className="admin-panel">
               <div className="admin-panel__header"><div><p className="admin-panel__eyebrow">Referee correction</p><h2>Draft result editor</h2></div><span className={`referee-status-badge referee-status-badge--${lockedResults ? "gray" : "amber"}`}>{lockedResults ? "Locked" : "Draft editable"}</span></div>
-              {lockedResults ? <p>{submittedToAdmin ? "This final summary is pending Admin review." : `These results are ${formatStatus(race.resultStatus)}.`} Admin must request correction before Referee can update draft rows.</p> : (
+              {lockedResults ? <p>{resultsPublished ? "These official results can no longer be edited." : resultsFinalized ? "These results are finalized. Publish them or use the correction workflow before editing." : `These results are ${formatStatus(race.resultStatus)}.`}</p> : (
                 <div className="admin-data-table__wrap">
                   <table className="admin-data-table referee-result-editor">
                     <thead><tr><th>Horse / Jockey</th><th>Position</th><th>Finish time</th><th>Score</th><th>Note</th><th>Action</th></tr></thead>

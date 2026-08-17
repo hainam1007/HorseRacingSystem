@@ -69,6 +69,14 @@ export const refereeApi = {
     return apiRequest(`/race-results/races/${raceId}/finalize`, { method: "POST" });
   },
 
+  confirmRaceResults(raceId) {
+    return apiRequest(`/race-results/races/${raceId}/confirm`, { method: "POST" });
+  },
+
+  publishRaceResults(raceId) {
+    return apiRequest(`/race-results/races/${raceId}/publish`, { method: "POST" });
+  },
+
   applyRaceResultPenalties(raceId) {
     return apiRequest(`/race-results/races/${raceId}/apply-penalties`, { method: "POST" });
   },

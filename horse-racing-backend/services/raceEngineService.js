@@ -10,6 +10,7 @@ const {
 } = require("../constants/statuses");
 const { loadSequelizeModels } = require("../models/sequelize/index.js");
 const raceEngineRunRepository = require("../repositories/raceEngineRunRepository");
+const raceOddsMarketRepository = require("../repositories/raceOddsMarketRepository");
 const raceRepository = require("../repositories/raceRepository");
 const raceRunRepository = require("../repositories/raceRunRepository");
 
@@ -22,6 +23,12 @@ const ENGINE_RUN_STATUS = {
   FAILED: "failed",
 };
 const COMPLETED_RACE_STATUSES = ["completed", "finished"];
+const THREE_SECTION_RACE = Object.freeze({
+  TRACK_LENGTH: 1000,
+  BASE_FINISH_SECONDS: 60,
+  SECTION_DISTANCES: [350, 350, 300],
+  VERSION: 1,
+});
 
 function getModels() {
   return loadSequelizeModels().models;
@@ -146,6 +153,68 @@ function getFinishTime(position, random) {
   const randomFactor = (random || Math.random)() * 0.3;
 
   return Number((baseTime + positionGap + randomFactor).toFixed(3));
+}
+
+function getHorseProbability(oddsByHorse, horseId, fallbackProbability) {
+  const value = Number(oddsByHorse.get(String(horseId)));
+  return Number.isFinite(value) && value >= 0 ? value : fallbackProbability;
+}
+
+function buildThreeSectionPerformance(raceId, participants, odds, options = {}) {
+  const participantCount = Math.max(1, participants.length);
+  const fallbackProbability = 1 / participantCount;
+  const oddsByHorse = new Map((odds || []).map(function(item) {
+    return [String(getDocumentId(item.horse_id)), Number(item.win_probability)];
+  }));
+  const probabilities = participants.map(function(participant) {
+    return getHorseProbability(
+      oddsByHorse,
+      getDocumentId(participant.horse),
+      fallbackProbability,
+    );
+  });
+  const minimumProbability = Math.min(...probabilities);
+  const maximumProbability = Math.max(...probabilities);
+  const probabilityRange = maximumProbability - minimumProbability;
+  const seed = options.seed || (process.env.RACE_ENGINE_RANDOM_SEED
+    ? process.env.RACE_ENGINE_RANDOM_SEED + ':' + raceId
+    : null);
+  const baseSpeed = THREE_SECTION_RACE.TRACK_LENGTH / THREE_SECTION_RACE.BASE_FINISH_SECONDS;
+
+  return participants.map(function(participant, index) {
+    const horseId = getDocumentId(participant.horse);
+    const winProbability = probabilities[index];
+    const normalizedProbability = probabilityRange > 0
+      ? (winProbability - minimumProbability) / probabilityRange
+      : 0.5;
+    const sectionRandom = seed
+      ? createSeededRandom(seed + ':section-2:' + horseId)()
+      : Math.random();
+
+    // Section 1 rewards model probability, section 2 is seeded random,
+    // and section 3 blends 50% fixed pace with 50% probability pace.
+    const speedMultipliers = [
+      0.9 + 0.2 * normalizedProbability,
+      0.8 + 0.4 * sectionRandom,
+      0.5 + 0.5 * (0.8 + 0.4 * normalizedProbability),
+    ];
+    const sectionTimes = THREE_SECTION_RACE.SECTION_DISTANCES.map(function(distance, sectionIndex) {
+      return distance / (baseSpeed * speedMultipliers[sectionIndex]);
+    });
+    const finishTime = sectionTimes.reduce(function(total, time) { return total + time; }, 0);
+
+    return {
+      participant: participant,
+      horse_id: horseId,
+      jockey_id: getDocumentId(participant.jockey),
+      assignment_id: getDocumentId(participant.assignment),
+      win_probability: Number(winProbability.toFixed(5)),
+      normalized_probability: Number(normalizedProbability.toFixed(5)),
+      section_speed_multipliers: speedMultipliers.map(function(value) { return Number(value.toFixed(5)); }),
+      section_times: sectionTimes.map(function(value) { return Number(value.toFixed(3)); }),
+      finish_time: Number(finishTime.toFixed(3)),
+    };
+  });
 }
 
 function shuffle(items, random) {
@@ -371,25 +440,18 @@ async function collectParticipantStatuses(raceId, _options) {
   };
 }
 
-function buildRaceOrder(raceId, participants) {
-  const random = getRaceRandom(raceId);
-  const rankedParticipants = shuffle(participants, random);
-
-  return rankedParticipants.map(function(participant, index) {
-    const position = index + 1;
-    const finishTime = getFinishTime(position, random);
-    const score = getScore(position);
-
-    return {
-      participant: participant,
-      horse_id: getDocumentId(participant.horse),
-      jockey_id: getDocumentId(participant.jockey),
-      assignment_id: getDocumentId(participant.assignment),
-      position: position,
-      finish_time: finishTime,
-      score: score
-    };
-  });
+function buildRaceOrder(raceId, participants, odds, options = {}) {
+  return buildThreeSectionPerformance(raceId, participants, odds, options)
+    .sort(function(first, second) {
+      return first.finish_time - second.finish_time || String(first.horse_id).localeCompare(String(second.horse_id));
+    })
+    .map(function(item, index) {
+      return {
+        ...item,
+        position: index + 1,
+        score: getScore(index + 1),
+      };
+    });
 }
 
 function getLane(participant, fallback) {
@@ -408,13 +470,13 @@ function getLane(participant, fallback) {
   return fallback;
 }
 
-function buildRaceRunPayload(raceId, userId, participants, raceOrder) {
+function buildRaceRunPayload(raceId, userId, participants, raceOrder, seed) {
   return {
     race_id: raceId,
     status: 'generated',
     generated_by: userId,
     generated_at: new Date(),
-    seed: process.env.RACE_ENGINE_RANDOM_SEED || null,
+    seed: seed,
     participants: participants.map(function(participant, index) {
       return {
         horse_id: getDocumentId(participant.horse),
@@ -750,23 +812,17 @@ async function processDueRace(race) {
 }
 
 async function getProvisionalRaceRun(raceId, _options) {
-  const models = getModels();
   const { Op } = require('sequelize');
-  const { RaceRun } = models;
-
-  return RaceRun.findOne({
-    where: {
-      race_id: raceId,
-      status: { [Op.ne]: 'cancelled' }
-    },
-    raw: true
+  return raceRunRepository.findOne({
+    race_id: raceId,
+    status: { [Op.ne]: 'cancelled' }
   });
 }
 
 async function generateProvisionalRaceRun(raceId, userId, participantData) {
   const existingRaceRun = await getProvisionalRaceRun(raceId);
 
-  if (existingRaceRun) {
+  if (existingRaceRun && existingRaceRun.participants?.length && existingRaceRun.finish_order?.length) {
     return {
       race_run: existingRaceRun,
       created: false
@@ -779,10 +835,22 @@ async function generateProvisionalRaceRun(raceId, userId, participantData) {
     throw new ApiError(400, "Race has no eligible participants");
   }
 
-  const raceOrder = buildRaceOrder(raceId, source.participants);
-  const payload = buildRaceRunPayload(raceId, userId, source.participants, raceOrder);
+  const market = await raceOddsMarketRepository.findByRaceId(raceId);
+  const seed = process.env.RACE_ENGINE_RANDOM_SEED
+    ? process.env.RACE_ENGINE_RANDOM_SEED + ':' + raceId
+    : crypto.randomUUID();
+  const raceOrder = buildRaceOrder(raceId, source.participants, market?.odds || [], { seed: seed });
+  const payload = buildRaceRunPayload(raceId, userId, source.participants, raceOrder, seed);
 
   try {
+    if (existingRaceRun) {
+      return {
+        race_run: await raceRunRepository.populateDetails(getDocumentId(existingRaceRun), payload),
+        created: false,
+        repaired: true,
+      };
+    }
+
     const createdRaceRun = await raceRunRepository.create(payload);
 
     return {
@@ -799,6 +867,76 @@ async function generateProvisionalRaceRun(raceId, userId, participantData) {
 
     throw error;
   }
+}
+
+function buildRaceScriptFromRun(raceRun, odds) {
+  if (!raceRun || !Array.isArray(raceRun.participants) || !raceRun.participants.length) {
+    return null;
+  }
+
+  const raceId = getDocumentId(raceRun.race_id);
+  const participants = raceRun.participants.map(function(item) {
+    return {
+      horse: item.horse || item.horse_id,
+      jockey: item.jockey || item.jockey_id,
+      assignment: item.assignment || item.assignment_id,
+      registration: { lane: item.lane },
+    };
+  });
+  const performance = buildThreeSectionPerformance(raceId, participants, odds, {
+    seed: raceRun.seed || String(raceId),
+  });
+  const persistedFinishByHorse = new Map((raceRun.finish_order || []).map(function(item) {
+    return [String(getDocumentId(item.horse || item.horse_id)), Number(item.finish_time)];
+  }));
+  let maximumFinishMs = 0;
+
+  const horses = performance.map(function(item, index) {
+    const participant = raceRun.participants[index];
+    const persistedFinish = persistedFinishByHorse.get(String(item.horse_id));
+    const targetFinishSeconds = Number.isFinite(persistedFinish) && persistedFinish > 0
+      ? persistedFinish
+      : item.finish_time;
+    const scale = targetFinishSeconds / item.finish_time;
+    let cumulativeSeconds = 0;
+    const distances = [0];
+    THREE_SECTION_RACE.SECTION_DISTANCES.reduce(function(total, distance) {
+      const next = total + distance;
+      distances.push(next);
+      return next;
+    }, 0);
+    const checkpoints = [{ time_ms: 0, distance: 0 }];
+
+    item.section_times.forEach(function(sectionTime, sectionIndex) {
+      cumulativeSeconds += sectionTime * scale;
+      checkpoints.push({
+        time_ms: Math.round(cumulativeSeconds * 1000),
+        distance: distances[sectionIndex + 1],
+      });
+    });
+    maximumFinishMs = Math.max(maximumFinishMs, checkpoints[checkpoints.length - 1].time_ms);
+
+    const horse = participant.horse || participant.horse_id || {};
+    return {
+      horse_id: String(item.horse_id),
+      name: horse.name || String(item.horse_id),
+      lane: Number(participant.lane) || index + 1,
+      win_probability: item.win_probability,
+      section_speed_multipliers: item.section_speed_multipliers,
+      checkpoints: checkpoints,
+    };
+  });
+
+  return {
+    race_id: String(raceId),
+    script_version: THREE_SECTION_RACE.VERSION,
+    issued_at: new Date(raceRun.generated_at || Date.now()).toISOString(),
+    starts_at: new Date(raceRun.generated_at || Date.now()).toISOString(),
+    duration_ms: maximumFinishMs + 1000,
+    track_length: THREE_SECTION_RACE.TRACK_LENGTH,
+    horses: horses,
+    source: 'three_section_probability_v1',
+  };
 }
 
 async function cancelProvisionalRaceRun(raceRunId, _options) {
@@ -846,7 +984,9 @@ module.exports = {
   collectParticipants,
   ensureRaceRegistrationIsUnlocked,
   findRacesReadyForLock,
+  buildRaceScriptFromRun,
   buildRaceOrder,
+  buildThreeSectionPerformance,
   generateDraftResults,
   generateProvisionalRaceRun,
   cancelProvisionalRaceRun,

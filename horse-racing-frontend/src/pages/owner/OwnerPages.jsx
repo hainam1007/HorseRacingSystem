@@ -3366,7 +3366,7 @@ function OwnerResults() {
         <aside className="owner-results-hero__panel">
           <span className="owner-badge owner-badge--green"><Trophy size={14} /> Owner share</span>
           <strong>{formatMoney(totalOwnerAmount, featuredAward?.currency || "VND")}</strong>
-          <p>{paidOwnerAmount > 0 ? `${formatMoney(paidOwnerAmount, featuredAward?.currency || "VND")} has been marked paid.` : "Awards appear after admin publishes race results."}</p>
+          <p>{paidOwnerAmount > 0 ? `${formatMoney(paidOwnerAmount, featuredAward?.currency || "VND")} has been marked paid.` : "Awards appear after the assigned referee publishes race results."}</p>
         </aside>
       </section>
 
@@ -3414,7 +3414,7 @@ function OwnerResults() {
           <div className="owner-results-list">
             {awards.length === 0 && (
               <div className="owner-empty" role="status">
-                No published prize awards yet. Awards appear after admin publishes race results.
+                No published prize awards yet. Awards appear after the assigned referee publishes race results.
               </div>
             )}
             {awards.map((award) => (

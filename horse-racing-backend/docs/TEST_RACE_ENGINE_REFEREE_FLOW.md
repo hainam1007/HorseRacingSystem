@@ -45,8 +45,8 @@ Assigned referee completes the race: running -> completed.
 Referee finalizes the race and Race Engine generates draft results.
 Assigned referee reviews and updates draft results.
 Assigned referee applies confirmed penalties to raw results.
-Admin bulk confirms draft results by race.
-Admin bulk publishes confirmed results by race.
+Assigned referee bulk confirms draft results by race.
+Assigned referee bulk publishes confirmed results by race.
 Spectator and jockey can view published results.
 Manual race result creation is disabled to prevent partial results from bypassing Race Engine.
 ```
@@ -57,7 +57,7 @@ Penalty behavior covered by E2E:
 Unresolved violations appear in readiness and block finalization.
 Confirmed penalties change final values while preserving raw values.
 Repeated penalty application is idempotent.
-Admin confirmation recalculates penalties before changing result status.
+Referee confirmation recalculates penalties before changing result status.
 Individual confirm/publish endpoints are removed.
 Publish preserves confirmation audit fields.
 Suspension and fine are enforced once during bulk confirmation.

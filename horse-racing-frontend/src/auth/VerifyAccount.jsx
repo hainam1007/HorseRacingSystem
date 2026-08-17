@@ -99,7 +99,7 @@ function VerifyAccount() {
       <main className="auth-recovery" aria-label="Verify account">
         <section className="auth-recovery__panel auth-recovery__panel--compact">
           <Link className="auth-recovery__brand brand" to="/" aria-label="Horse racing home">
-            <span className="brand-mark">HR</span>
+            <img className="brand-mark" src="/images/horse-logo.png" alt="" />
             <span className="brand-text"><strong>horse</strong><span>racing</span></span>
           </Link>
           <div className="auth-recovery__icon"><MailCheck size={24} /></div>
@@ -116,7 +116,7 @@ function VerifyAccount() {
     <main className="auth-recovery" aria-label="Verify account">
       <section className="auth-recovery__panel auth-recovery__panel--compact">
         <Link className="auth-recovery__brand brand" to="/" aria-label="Horse racing home">
-          <span className="brand-mark">HR</span>
+          <img className="brand-mark" src="/images/horse-logo.png" alt="" />
           <span className="brand-text"><strong>horse</strong><span>racing</span></span>
         </Link>
 

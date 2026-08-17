@@ -33,6 +33,16 @@ function getTimeoutMs() {
   return Number.isFinite(value) && value > 0 ? value : 30000;
 }
 
+function getMaxHttpAttempts() {
+  const value = Number(process.env.PROBABILITY_ENGINE_MAX_ATTEMPTS || 5);
+  return Number.isInteger(value) && value > 0 ? value : 5;
+}
+
+function getRetryDelayMs() {
+  const value = Number(process.env.PROBABILITY_ENGINE_RETRY_DELAY_MS || 2000);
+  return Number.isFinite(value) && value >= 0 ? value : 2000;
+}
+
 function wait(ms) {
   return new Promise(function(resolve) {
     setTimeout(resolve, ms);
@@ -118,17 +128,19 @@ async function predictRaceHttp(payload) {
     throw new ApiError(500, 'PROBABILITY_ENGINE_URL is required when PROBABILITY_ENGINE_MODE=http');
   }
 
+  const maxAttempts = getMaxHttpAttempts();
+  const retryDelayMs = getRetryDelayMs();
   let lastError;
-  for (let attempt = 0; attempt < 3; attempt += 1) {
+  for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
     try {
       return unwrapPredictionResponse(await postJson(engineUrl, payload));
     } catch (error) {
       lastError = error;
       const upstreamStatus = error && error.details && Number(error.details.status_code);
-      if (!(error instanceof ApiError) || ![502, 503].includes(upstreamStatus) || attempt === 2) {
+      if (!(error instanceof ApiError) || ![502, 503].includes(upstreamStatus) || attempt === maxAttempts - 1) {
         break;
       }
-      await wait(1500 * (attempt + 1));
+      await wait(retryDelayMs * (attempt + 1));
     }
   }
 
@@ -206,6 +218,8 @@ module.exports = {
   predictRace,
   _private: {
     getEngineMode,
+    getMaxHttpAttempts,
+    getRetryDelayMs,
     unwrapPredictionResponse
   }
 };

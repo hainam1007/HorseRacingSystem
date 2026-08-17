@@ -75,8 +75,8 @@ The latest backend pull adds or changes these integration-relevant areas:
   - `GET /race-results/races/:raceId/readiness`
   - `POST /race-results/races/:raceId/finalize`
   - `POST /race-results/races/:raceId/apply-penalties`
-  - `POST /race-results/races/:raceId/confirm` (admin)
-  - `POST /race-results/races/:raceId/publish` (admin)
+  - `POST /race-results/races/:raceId/confirm` (assigned referee)
+  - `POST /race-results/races/:raceId/publish` (assigned referee)
 - Violation policy is backend-owned. Frontend can load `/violations/options`, preview `/violations/penalty-preview`, and call `/:id/confirm` or `/:id/dismiss`; it must not calculate or submit referee penalty values itself.
 - Race results now preserve `raw_*` and `final_*` values plus `applied_violation_ids`. UI should distinguish original performance from the penalized official result.
 - Spectator role can read the authenticated `/api/race-results` list. Backend also exposes `/users/spectator/races/:raceId/results` outside the `/api` mount, so the current Vite `/api` proxy and API client do not reach it without a frontend transport adjustment. Participant endpoints are still referee/admin-only.
@@ -112,7 +112,7 @@ Login and Sign Up previously presented too much supporting copy around a simple 
 Design direction:
 
 - Treat auth as a focused utility flow, not a marketing landing page.
-- Keep the existing forest green, beige, and racing-orange identity, Sora typography, HR wordmark, and compact 8px radius system.
+- Keep the existing forest green, beige, and racing-orange identity, Sora typography, horse logo, and compact 8px radius system.
 - Use one dominant form surface and one restrained brand/visual surface on desktop. The secondary surface may contain one short headline, one short sentence, and a simple race-track/horse motif, but no feature list, quote, numbered steps, or stat grid.
 - On tablet/mobile, hide or collapse the secondary brand surface so the form appears first without a long preamble.
 - Shorten the form introduction to one heading and one concise supporting line.
@@ -394,7 +394,7 @@ Race Referee UI is protected and partially connected. The next slice replaces fa
 - [ ] Add violation confirm/dismiss flows and sensitive-review states.
 - [ ] Display readiness blockers before finalize and reload the workspace after every resolving mutation.
 - [ ] Display raw and final result values plus applied violation context.
-- [ ] Add admin race-level confirm/publish actions; remove assumptions about individual result transitions.
+- [x] Add assigned-referee race-level confirm/publish actions; Admin result access remains read-only.
 - [ ] Surface jockey suspension/fine state and backend assignment rejection messages.
 - [ ] Remove spectator result sample fallback now that authenticated published-result reads are available.
 - [ ] Decide a frontend-only transport approach for the backend `/users` mount, or continue using `/api/race-results` until a normalized `/api` route exists.
@@ -478,7 +478,7 @@ Spectator prediction APIs are not documented yet, so this phase focuses on read-
 - [ ] Connect tournament/round/race CRUD to `/tournaments`, `/rounds`, and `/races`.
 - [x] Connect registration approval module to `/registrations`, including approve/reject through `/registrations/:id/approve` and `/registrations/:id/reject`.
 - [ ] Connect admin jockey assignment module to `/jockey-assignments`.
-- [ ] Connect result confirm/publish flows to `/race-results/races/:raceId/confirm` and `/race-results/races/:raceId/publish`.
+- [x] Connect referee result confirm/publish flows to `/race-results/races/:raceId/confirm` and `/race-results/races/:raceId/publish`.
 - [ ] Connect admin referee operation modules to `/violations`, `/horse-checks`, and `/referee-reports`.
 
 ## Implementation Notes

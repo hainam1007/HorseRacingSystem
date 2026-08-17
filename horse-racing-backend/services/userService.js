@@ -4,6 +4,7 @@ const raceRepository = require('../repositories/raceRepository');
 const raceResultRepository = require('../repositories/raceResultRepository');
 const roundRepository = require('../repositories/roundRepository');
 const tournamentRepository = require('../repositories/tournamentRepository');
+const raceOddsMarketRepository = require('../repositories/raceOddsMarketRepository');
 const raceEngineService = require('./raceEngineService');
 
 function mapTournament(tournament) {
@@ -69,13 +70,13 @@ function mapRaceScheduleItem(race) {
 }
 
 function getId(value) {
-  return value && (value._id || value);
+  return value && (value._id || value.id || value);
 }
 
 function mapRunParticipant(participant) {
-  const horse = participant.horse_id || {};
-  const jockey = participant.jockey_id || {};
-  const jockeyUser = jockey.user_id || null;
+  const horse = participant.horse || participant.horse_id || {};
+  const jockey = participant.jockey || participant.jockey_id || {};
+  const jockeyUser = jockey.user || jockey.user_id || null;
 
   return {
     horse_id: getId(horse),
@@ -90,9 +91,9 @@ function mapRunParticipant(participant) {
 }
 
 function mapRunOrder(item) {
-  const horse = item.horse_id || {};
-  const jockey = item.jockey_id || {};
-  const jockeyUser = jockey.user_id || null;
+  const horse = item.horse || item.horse_id || {};
+  const jockey = item.jockey || item.jockey_id || {};
+  const jockeyUser = jockey.user || jockey.user_id || null;
 
   return {
     horse_id: getId(horse),
@@ -137,7 +138,7 @@ function mapParticipantStatus(participant, index) {
   };
 }
 
-function mapRaceRun(raceRun) {
+function mapRaceRun(raceRun, market) {
   if (!raceRun) {
     return null;
   }
@@ -149,7 +150,8 @@ function mapRaceRun(raceRun) {
     generated_at: raceRun.generated_at,
     seed: raceRun.seed,
     participants: Array.isArray(raceRun.participants) ? raceRun.participants.map(mapRunParticipant) : [],
-    finish_order: Array.isArray(raceRun.finish_order) ? raceRun.finish_order.map(mapRunOrder) : []
+    finish_order: Array.isArray(raceRun.finish_order) ? raceRun.finish_order.map(mapRunOrder) : [],
+    race_script: raceEngineService.buildRaceScriptFromRun(raceRun, market?.odds || [])
   };
 }
 
@@ -252,19 +254,20 @@ async function getSpectatorRaceLiveState(raceId) {
     throw new ApiError(404, 'Race not found');
   }
 
-  const [raceRun, participantData, publishedResults] = await Promise.all([
+  const [raceRun, participantData, publishedResults, market] = await Promise.all([
     raceEngineService.getProvisionalRaceRun(race._id),
     raceEngineService.collectParticipantStatuses(race._id),
     raceResultRepository.find({
       race_id: race._id,
       status: 'published'
-    })
+    }),
+    raceOddsMarketRepository.findByRaceId(race._id)
   ]);
 
   return {
     race: mapRaceScheduleItem(race),
     participants: participantData.participants.map(mapParticipantStatus),
-    engine: mapRaceRun(raceRun),
+    engine: mapRaceRun(raceRun, market),
     official_results: publishedResults.sort(function(first, second) {
       return (first.final_position || first.position || Number.MAX_SAFE_INTEGER) - (second.final_position || second.position || Number.MAX_SAFE_INTEGER);
     })

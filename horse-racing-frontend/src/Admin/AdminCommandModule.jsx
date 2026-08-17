@@ -41,8 +41,8 @@ const moduleConfig = {
   },
   results: {
     title: "Official results",
-    eyebrow: "Publication desk",
-    description: "Review, confirm, and publish official race outcomes.",
+    eyebrow: "Result archive",
+    description: "Monitor official race outcomes approved and published by assigned referees.",
     tableLabel: "Result ledger",
     search: "Search race, tournament, leader or status...",
     emptyTitle: "No result records found",
@@ -97,10 +97,7 @@ function actionsFor(moduleName, status, detail) {
   if (moduleName === "users") return status === "Active" ? ["Suspend"] : ["Activate"];
   if (moduleName === "registrations") return [];
   if (moduleName === "results") {
-    if (status === "Published") return [];
-    if (detail?.correctionRequested) return ["Mark Correction Resolved"];
-    if (status === "Draft") return ["Publish Result", "Request Correction"];
-    if (status === "Confirmed") return ["Publish Result", "Request Correction"];
+    return [];
   }
   return [];
 }
@@ -304,7 +301,7 @@ function AdminCommandModule({ moduleName }) {
 
             <footer>
               {availableActions.map((action) => <button key={action} className={["Reject", "Suspend", "Request Correction"].includes(action) ? "admin-command-action admin-command-action--danger" : "admin-command-action"} disabled={Boolean(actionLoading)} type="button" onClick={() => runAction(action)}>{actionLoading === action ? "Processing..." : action}<Check size={15} aria-hidden="true" /></button>)}
-              {!availableActions.length && <div className="admin-command-locked"><CheckCircle2 size={17} aria-hidden="true" /><span><strong>{moduleName === "registrations" ? "Auto-confirmed entry" : "No actions available"}</strong><small>{moduleName === "registrations" ? "Eligibility is decided later by jockey assignment and pre-race inspection." : "This record is complete."}</small></span></div>}
+              {!availableActions.length && <div className="admin-command-locked"><CheckCircle2 size={17} aria-hidden="true" /><span><strong>{moduleName === "registrations" ? "Auto-confirmed entry" : moduleName === "results" ? "Referee-controlled result" : "No actions available"}</strong><small>{moduleName === "registrations" ? "Eligibility is decided later by jockey assignment and pre-race inspection." : moduleName === "results" ? "The assigned referee approves and publishes this result without Admin approval." : "This record is complete."}</small></span></div>}
             </footer>
           </aside>
           </div>

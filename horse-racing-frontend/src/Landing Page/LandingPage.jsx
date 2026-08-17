@@ -101,7 +101,7 @@ function LandingPage() {
 
         <header className="topbar topbar--minimal">
           <Link className="brand" to={homeTarget} aria-label="Horse racing home">
-            <span className="brand-mark">HR</span>
+            <img className="brand-mark" src="/images/horse-logo.png" alt="" />
             <span className="brand-text">
               <strong>horse</strong>
               <span>racing</span>
@@ -303,7 +303,7 @@ function LandingPage() {
         <div className="site-footer__inner">
           <div className="footer-brand">
             <Link className="brand footer-brand__link" to={homeTarget}>
-              <span className="brand-mark">HR</span>
+              <img className="brand-mark" src="/images/horse-logo.png" alt="" />
               <span className="brand-text">
                 <strong>horse</strong>
                 <span>racing</span>
