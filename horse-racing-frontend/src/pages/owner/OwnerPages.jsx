@@ -960,7 +960,8 @@ function OwnerRegistrations() {
     setSaved(false);
     setError("");
     setTermsAccepted(false);
-    setEntry((current) => ({ ...current, tournamentId, raceId: "" }));
+    setEntry((current) => ({ ...current, tournamentId, raceId: "", horseId: "" }));
+    setHorseQuery("");
   };
 
   const isHorseEligible = (horse) => {
@@ -1120,14 +1121,14 @@ function OwnerRegistrations() {
     && termsAccepted
   );
   const submissionBlockReason = (() => {
-    if (!selectedHorse?.id) return "Select an eligible horse to continue.";
-    if (!isHorseEligible(selectedHorse)) return "The selected horse is not active.";
     if (!selectedTournament?.id) return "Choose a tournament to continue.";
     if (racesLoading) return "The race programme is still loading.";
     if (!selectedRace?.id) return "Choose an open race to continue.";
     if (!selectedRaceState?.available) {
       return selectedRaceState?.reason || "The selected race is not accepting entries.";
     }
+    if (!selectedHorse?.id) return "Select an eligible horse to continue.";
+    if (!isHorseEligible(selectedHorse)) return "The selected horse is not active.";
     if (!termsAccepted) return "Accept the entry and pre-race inspection conditions.";
     return "";
   })();
@@ -1170,73 +1171,13 @@ function OwnerRegistrations() {
       <section className="owner-registration-workspace">
         <form className="owner-entry-workspace" onSubmit={handleSubmit}>
           <div className="owner-entry-main">
-          <section className="owner-entry-section" aria-labelledby="choose-horse-heading">
-            <div className="owner-entry-section__header">
-              <span className={`owner-entry-step${selectedHorse ? " is-complete" : ""}`}>1</span>
-              <div>
-                <span className="owner-kicker">Choose horse</span>
-                <h2 id="choose-horse-heading">Select the horse you want to enter</h2>
-                <p className="owner-entry-section__description">Choose one active horse from your stable. The selected profile will be paired with the race below.</p>
-              </div>
-            </div>
-            <div className="owner-entry-horse-toolbar">
-              <label className="owner-entry-search">
-                <Search size={17} aria-hidden="true" />
-                <input
-                  aria-label="Search horses by name"
-                  onChange={(event) => setHorseQuery(event.target.value)}
-                  placeholder="Search by horse name or registration number"
-                  type="search"
-                  value={horseQuery}
-                />
-                {horseQuery && (
-                  <button aria-label="Clear horse search" onClick={() => setHorseQuery("")} type="button">
-                    <X size={15} />
-                  </button>
-                )}
-              </label>
-              <span className="owner-entry-results"><strong>{filteredHorses.length}</strong> of {horses.length} horses</span>
-            </div>
-            <div className="owner-entry-horse-list" role="listbox" aria-label="Eligible horses">
-              {filteredHorses.map((horse) => {
-                const eligible = isHorseEligible(horse);
-                const selected = selectedHorse?.id === horse.id;
-                return (
-                  <button
-                    aria-disabled={!eligible}
-                    aria-selected={selected}
-                    className={`owner-entry-horse${selected ? " is-selected" : ""}${!eligible ? " is-unavailable" : ""}`}
-                    key={horse.id}
-                    onClick={() => eligible && updateEntry("horseId", horse.id)}
-                    role="option"
-                    type="button"
-                  >
-                    <span className="owner-entry-horse__marker" aria-hidden="true">{selected ? <Check size={15} /> : null}</span>
-                    <span className="owner-entry-horse__identity">
-                      <strong>{horse.name}</strong>
-                      <small>{horse.registrationNumber || compactRecordCode("Horse", horse.id)}</small>
-                    </span>
-                    <span className="owner-entry-horse__facts">
-                      {horse.facts.filter((fact) => fact.label !== "Rating").slice(0, 5).map((fact) => (
-                        <span key={fact.label}><small>{fact.label}</small>{fact.value}</span>
-                      ))}
-                    </span>
-                    <span className={`owner-badge ${eligible ? "owner-badge--green" : "owner-badge--muted"}`}>{eligible ? "Eligible" : "Inactive"}</span>
-                  </button>
-                );
-              })}
-              {!horses.length && <div className="owner-empty owner-empty--compact">No horse profiles are available.</div>}
-              {!!horses.length && !filteredHorses.length && <div className="owner-entry-empty-search"><Search size={18} /><strong>No horses found</strong><span>Try a different name or registration number.</span></div>}
-            </div>
-          </section>
-
-          <section className="owner-entry-section owner-tournament-browser" aria-labelledby="choose-race-heading">
+          <section className="owner-entry-section owner-tournament-browser" aria-labelledby="choose-tournament-heading">
             <div className="owner-tournament-browser__header">
               <div>
-                <span className={`owner-entry-step${selectedRace ? " is-complete" : ""}`}>2</span>
-                <span className="owner-kicker">Choose race</span>
-                <h3 id="choose-race-heading">Choose a tournament, then compare its races</h3>
-                <p>Review the race conditions, available places, entry fee and prize before selecting.</p>
+                <span className="owner-entry-step is-complete">1</span>
+                <span className="owner-kicker">Choose tournament</span>
+                <h3 id="choose-tournament-heading">Pick a tournament, then select a race</h3>
+                <p>Browse open tournaments and their race programmes. Select the race you want to enter.</p>
               </div>
               <div className="owner-tournament-browser__tools">
                 <div className="owner-tournament-search__label">
@@ -1361,27 +1302,88 @@ function OwnerRegistrations() {
             )}
           </section>}
 
+          <section className="owner-entry-section" aria-labelledby="choose-horse-heading">
+            <div className="owner-entry-section__header">
+              <span className={`owner-entry-step${selectedHorse ? " is-complete" : ""}`}>2</span>
+              <div>
+                <span className="owner-kicker">Choose horse</span>
+                <h2 id="choose-horse-heading">Select the horse you want to enter</h2>
+                <p className="owner-entry-section__description">Choose one active horse from your stable. The selected profile will be paired with the race you selected above.</p>
+              </div>
+            </div>
+            <div className="owner-entry-horse-toolbar">
+              <label className="owner-entry-search">
+                <Search size={17} aria-hidden="true" />
+                <input
+                  aria-label="Search horses by name"
+                  onChange={(event) => setHorseQuery(event.target.value)}
+                  placeholder="Search by horse name or registration number"
+                  type="search"
+                  value={horseQuery}
+                />
+                {horseQuery && (
+                  <button aria-label="Clear horse search" onClick={() => setHorseQuery("")} type="button">
+                    <X size={15} />
+                  </button>
+                )}
+              </label>
+              <span className="owner-entry-results"><strong>{filteredHorses.length}</strong> of {horses.length} horses</span>
+            </div>
+            <div className="owner-entry-horse-list" role="listbox" aria-label="Eligible horses">
+              {filteredHorses.map((horse) => {
+                const eligible = isHorseEligible(horse);
+                const selected = selectedHorse?.id === horse.id;
+                return (
+                  <button
+                    aria-disabled={!eligible}
+                    aria-selected={selected}
+                    className={`owner-entry-horse${selected ? " is-selected" : ""}${!eligible ? " is-unavailable" : ""}`}
+                    key={horse.id}
+                    onClick={() => eligible && updateEntry("horseId", horse.id)}
+                    role="option"
+                    type="button"
+                  >
+                    <span className="owner-entry-horse__marker" aria-hidden="true">{selected ? <Check size={15} /> : null}</span>
+                    <span className="owner-entry-horse__identity">
+                      <strong>{horse.name}</strong>
+                      <small>{horse.registrationNumber || compactRecordCode("Horse", horse.id)}</small>
+                    </span>
+                    <span className="owner-entry-horse__facts">
+                      {horse.facts.filter((fact) => fact.label !== "Rating").slice(0, 5).map((fact) => (
+                        <span key={fact.label}><small>{fact.label}</small>{fact.value}</span>
+                      ))}
+                    </span>
+                    <span className={`owner-badge ${eligible ? "owner-badge--green" : "owner-badge--muted"}`}>{eligible ? "Eligible" : "Inactive"}</span>
+                  </button>
+                );
+              })}
+              {!horses.length && <div className="owner-empty owner-empty--compact">No horse profiles are available.</div>}
+              {!!horses.length && !filteredHorses.length && <div className="owner-entry-empty-search"><Search size={18} /><strong>No horses found</strong><span>Try a different name or registration number.</span></div>}
+            </div>
+          </section>
+
           </div>
 
           <aside className="owner-entry-review" aria-labelledby="review-entry-heading">
             <div className="owner-entry-review__header">
               <div>
-                <span className="owner-kicker">Step 3</span>
+                <span className="owner-kicker">Step 4</span>
                 <h2 id="review-entry-heading">Review and payment</h2>
               </div>
               <CreditCard size={20} />
             </div>
 
             <ol className="owner-entry-progress">
-              <li className={selectedHorse ? "is-complete" : ""}><span>{selectedHorse ? <Check size={13} /> : "1"}</span> Horse selected</li>
+              <li className={selectedTournament ? "is-complete" : ""}><span>{selectedTournament ? <Check size={13} /> : "1"}</span> Tournament selected</li>
               <li className={selectedRace ? "is-complete" : ""}><span>{selectedRace ? <Check size={13} /> : "2"}</span> Race selected</li>
-              <li className={termsAccepted ? "is-complete" : ""}><span>{termsAccepted ? <Check size={13} /> : "3"}</span> Terms accepted</li>
+              <li className={selectedHorse ? "is-complete" : ""}><span>{selectedHorse ? <Check size={13} /> : "3"}</span> Horse selected</li>
+              <li className={termsAccepted ? "is-complete" : ""}><span>{termsAccepted ? <Check size={13} /> : "4"}</span> Terms accepted</li>
             </ol>
 
             <div className="owner-entry-review__summary">
+              <div><span>Tournament</span><strong>{selectedTournament?.name || "Not selected"}</strong><small>{selectedTournament?.location || "Choose a tournament"}</small></div>
+              <div><span>Race</span><strong>{selectedRace?.name || "Not selected"}</strong><small>{selectedRace ? `${selectedRace.date} / ${selectedRace.clock}` : "Select a race"}</small></div>
               <div><span>Horse</span><strong>{selectedHorse?.name || "Not selected"}</strong><small>{selectedHorse?.registrationNumber || "Choose an eligible horse"}</small></div>
-              <div><span>Race</span><strong>{selectedRace?.name || "Not selected"}</strong><small>{selectedTournament?.name || "Choose a tournament and race"}</small></div>
-              <div><span>Schedule</span><strong>{selectedRace ? `${selectedRace.date} / ${selectedRace.clock}` : "Not selected"}</strong><small>{selectedRace?.location || "Venue pending"}</small></div>
             </div>
 
             <div className="owner-entry-review__total">
