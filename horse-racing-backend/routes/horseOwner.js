@@ -33,6 +33,7 @@ router.get('/profile', asyncHandler(horseOwnerController.getProfile));
 router.patch('/profile', validateUpdateProfile, asyncHandler(horseOwnerController.updateProfile));
 
 router.get('/horses', asyncHandler(horseOwnerController.getHorses));
+router.get('/eligible-horses', asyncHandler(horseOwnerController.getEligibleHorses));
 router.post('/horses', validateCreateHorse, asyncHandler(horseOwnerController.createHorse));
 router.get('/horses/:horseId', validateHorseIdParam, asyncHandler(horseOwnerController.getHorseDetail));
 router.patch('/horses/:horseId', validateHorseIdParam, validateUpdateHorse, asyncHandler(horseOwnerController.updateHorse));

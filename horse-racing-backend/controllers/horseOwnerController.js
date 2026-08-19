@@ -29,6 +29,12 @@ async function getHorses(req, res) {
   return sendSuccess(res, 200, 'Horse list retrieved successfully', data);
 }
 
+async function getEligibleHorses(req, res) {
+  const data = await horseOwnerService.getEligibleHorses(getCurrentUser(req), req.query);
+
+  return sendSuccess(res, 200, 'Lấy danh sách các con ngựa đủ điều kiện tham gia giải/trận đua thành công.', data);
+}
+
 async function createHorse(req, res) {
   const data = await horseOwnerService.createHorse(getCurrentUser(req), req.validatedBody);
 
@@ -121,6 +127,7 @@ module.exports = {
   getProfile,
   updateProfile,
   getHorses,
+  getEligibleHorses,
   createHorse,
   getHorseDetail,
   updateHorse,

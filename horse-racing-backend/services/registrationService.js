@@ -61,10 +61,56 @@ async function createRegistration(req, payload) {
     throw new ApiError(400, 'Only scheduled races accept registrations');
   }
 
+  if (race.registration_locked || race.entries_finalized_at) {
+    throw new ApiError(400, 'Trận đua đã khóa đăng ký hoặc đã chốt danh sách thi đấu.');
+  }
+
   const horse = await getModels().Horse.findByPk(payload.horse_id);
 
   if (!horse) {
     throw new ApiError(404, 'Horse not found');
+  }
+
+  // Check Surface Compatibility
+  const raceSurface = race.surface || 'Turf';
+  const incompatibleSurfaces = Array.isArray(horse.incompatible_surfaces) ? horse.incompatible_surfaces : [];
+  if (incompatibleSurfaces.includes(raceSurface)) {
+    throw new ApiError(400, `Ngựa ${horse.name} không tương thích với mặt sân ${raceSurface} của trận đua này.`);
+  }
+
+  // Check Rule 3: Active Violation Penalty for Horse
+  const activePenalty = await getModels().ViolationPenalty.findOne({
+    where: {
+      horse_id: payload.horse_id,
+      status: 'active'
+    }
+  });
+
+  if (activePenalty) {
+    throw new ApiError(400, 'Ngựa đang bị kỷ luật/cấm thi đấu, không thể đăng ký.');
+  }
+
+  // Check Rule 1: Minimum Rest Time (2 hours before/after race)
+  if (race.starting_at || race.race_date) {
+    const raceTime = new Date(race.starting_at || race.race_date).getTime();
+    const twoHoursMs = 2 * 60 * 60 * 1000;
+
+    const existingRegistrations = await getModels().Registration.findAll({
+      where: {
+        horse_id: payload.horse_id,
+        status: { [require('sequelize').Op.ne]: 'rejected' }
+      },
+      include: [{ model: getModels().Race, as: 'race' }]
+    });
+
+    for (const reg of existingRegistrations) {
+      if (reg.race && reg.race.id !== payload.race_id && (reg.race.starting_at || reg.race.race_date)) {
+        const otherTime = new Date(reg.race.starting_at || reg.race.race_date).getTime();
+        if (Math.abs(raceTime - otherTime) < twoHoursMs) {
+          throw new ApiError(400, `Ngựa đã có lịch thi đấu lúc ${new Date(otherTime).toISOString().substr(11, 5)}, cần tối thiểu 2 giờ nghỉ ngơi.`);
+        }
+      }
+    }
   }
 
   const ownerId = await resolveOwner(req, payload);
@@ -154,8 +200,6 @@ async function listRegistrations(req, query) {
   return {
     registrations
   };
-}
-
 async function getRegistration(id) {
   const registration = await registrationRepository.findById(id);
 
@@ -168,8 +212,41 @@ async function getRegistration(id) {
   };
 }
 
+async function withdrawRegistration(req, id, reason) {
+  const registration = await registrationRepository.findById(id);
+  if (!registration) {
+    throw new ApiError(404, 'Registration not found');
+  }
+
+  const race = await raceRepository.findById(registration.race_id._id || registration.race_id);
+  if (race && (race.entries_finalized_at || race.status === 'running' || race.status === 'completed')) {
+    throw new ApiError(400, 'Trận đua đã chốt danh sách hoặc đã khởi chạy, không thể rút đăng ký.');
+  }
+
+  const models = getModels();
+  const regModel = await models.Registration.findByPk(id);
+  if (!regModel) {
+    throw new ApiError(404, 'Registration record not found');
+  }
+
+  await regModel.update({
+    status: 'withdrawn',
+    note: reason ? `Rút tên: ${reason}` : 'Rút tên thi đấu'
+  });
+
+  if (race) {
+    await registrationSlotService.releaseRaceSlot(race.id || race._id);
+  }
+
+  return {
+    message: 'Đã rút đăng ký ngựa khỏi trận đua thành công.',
+    registration: await registrationRepository.findById(id)
+  };
+}
+
 module.exports = {
   createRegistration,
   listRegistrations,
-  getRegistration
+  getRegistration,
+  withdrawRegistration
 };

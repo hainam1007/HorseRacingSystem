@@ -20,6 +20,7 @@ module.exports = (sequelize, DataTypes) => {
             image_public_id: { type: DataTypes.STRING(255) },
             start_date: { type: DataTypes.DATE },
             end_date: { type: DataTypes.DATE },
+            racetrack_id: { type: DataTypes.UUID },
             status: { type: DataTypes.STRING(32), defaultValue: 'draft' },
             created_by: { type: DataTypes.UUID, allowNull: false }
         },
@@ -27,6 +28,7 @@ module.exports = (sequelize, DataTypes) => {
     );
 
     Tournament.associate = (models) => {
+        Tournament.belongsTo(models.Racetrack, { foreignKey: 'racetrack_id', as: 'racetrack' });
         Tournament.belongsTo(models.User, { foreignKey: 'created_by', as: 'creator' });
         Tournament.hasMany(models.Round, { foreignKey: 'tournament_id', as: 'rounds' });
         Tournament.hasMany(models.Race, { foreignKey: 'tournament_id', as: 'races' });

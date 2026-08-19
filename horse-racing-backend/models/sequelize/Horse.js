@@ -28,6 +28,8 @@ module.exports = (sequelize, DataTypes) => {
             registration_number: { type: DataTypes.STRING(128), allowNull: false, unique: true },
             image_url: { type: DataTypes.STRING(512) },
             image_public_id: { type: DataTypes.STRING(255) },
+            preferred_surface: { type: DataTypes.STRING(32), defaultValue: 'Turf' },
+            incompatible_surfaces: { type: DataTypes.JSONB, defaultValue: [] },
             status: { type: DataTypes.STRING(32), defaultValue: 'active' }
         },
         { tableName: 'horses' }

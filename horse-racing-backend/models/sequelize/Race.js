@@ -20,8 +20,9 @@ module.exports = (sequelize, DataTypes) => {
             image_url: { type: DataTypes.STRING(512) },
             image_public_id: { type: DataTypes.STRING(255) },
             race_no: { type: DataTypes.INTEGER, defaultValue: 1, validate: { min: 1 } },
-            race_date: { type: DataTypes.DATE },
+            racetrack_id: { type: DataTypes.UUID },
             distance: { type: DataTypes.INTEGER },
+            min_participants: { type: DataTypes.INTEGER, defaultValue: 4 },
             max_participants: { type: DataTypes.INTEGER },
             location: { type: DataTypes.STRING(255) },
             venue_code: { type: DataTypes.STRING(64) },
@@ -69,6 +70,7 @@ module.exports = (sequelize, DataTypes) => {
     );
 
     Race.associate = (models) => {
+        Race.belongsTo(models.Racetrack, { foreignKey: 'racetrack_id', as: 'racetrack' });
         Race.belongsTo(models.Tournament, { foreignKey: 'tournament_id', as: 'tournament' });
         Race.belongsTo(models.Round, { foreignKey: 'round_id', as: 'round' });
         Race.belongsTo(models.RaceReferee, { foreignKey: 'referee_id', as: 'referee' });

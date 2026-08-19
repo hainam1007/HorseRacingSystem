@@ -17,6 +17,7 @@ router.use(authenticate);
 router.get('/', ownerOrAdmin, asyncHandler(registrationController.listRegistrations));
 router.post('/', adminOnly, validateRequiredFields(['race_id', 'horse_id', 'owner_id']), asyncHandler(registrationController.createRegistration));
 router.get('/:id', ownerOrAdmin, validateObjectIdParam('id'), asyncHandler(registrationController.getRegistration));
+router.post('/:id/withdraw', ownerOrAdmin, validateObjectIdParam('id'), asyncHandler(registrationController.withdrawRegistration));
 router.patch('/:id/race-entry', adminOnly, validateObjectIdParam('id'), validateAdminRaceEntry, asyncHandler(raceEntryController.updateRaceEntry));
 
 module.exports = router;

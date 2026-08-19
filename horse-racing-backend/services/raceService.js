@@ -32,6 +32,7 @@ const raceOddsMarketRepository = require('../repositories/raceOddsMarketReposito
 const raceRepository = require('../repositories/raceRepository');
 const roundRepository = require('../repositories/roundRepository');
 const tournamentRepository = require('../repositories/tournamentRepository');
+const racetrackRepository = require('../repositories/racetrackRepository');
 const raceEngineService = require('./raceEngineService');
 const cloudinaryService = require('./cloudinaryService');
 const { loadSequelizeModels } = require('../models/sequelize/index.js');
@@ -164,12 +165,55 @@ async function prepareRacePayload(payload) {
     return data;
 }
 
+async function validateRacetrackSchedule(racetrackId, startingAt, raceIdToExclude) {
+    if (!racetrackId || !startingAt) return;
+
+    const racetrack = await racetrackRepository.findById(racetrackId);
+    if (!racetrack) {
+        throw new ApiError(404, 'Không tìm thấy sân đấu.');
+    }
+    if (racetrack.status !== 'active') {
+        throw new ApiError(400, `Sân đấu '${racetrack.name}' đang ở trạng thái ${racetrack.status}, không thể xếp lịch thi đấu.`);
+    }
+
+    const { Op } = require('sequelize');
+    const newStart = new Date(startingAt).getTime();
+    const windowMs = 30 * 60 * 1000; // 30-min window
+    const windowStart = new Date(newStart - windowMs);
+    const windowEnd = new Date(newStart + windowMs);
+
+    const where = {
+        racetrack_id: racetrackId,
+        status: { [Op.ne]: 'cancelled' },
+        starting_at: {
+            [Op.between]: [windowStart, windowEnd]
+        }
+    };
+
+    if (raceIdToExclude) {
+        where.id = { [Op.ne]: raceIdToExclude };
+    }
+
+    const models = getModels();
+    const conflictingRace = await models.Race.findOne({ where });
+
+    if (conflictingRace) {
+        const conflictTime = new Date(conflictingRace.starting_at).toISOString().substr(11, 5);
+        throw new ApiError(400, `Sân đấu ${racetrack.name} đã có trận đua '${conflictingRace.name}' diễn ra vào lúc ${conflictTime}. Vui lòng chọn khung giờ khác.`);
+    }
+}
+
 async function validateRaceLinks(payload) {
     if (payload.tournament_id) {
         const tournament = await tournamentRepository.findById(payload.tournament_id);
 
         if (!tournament) {
             throw new ApiError(404, 'Tournament not found');
+        }
+
+        // Inherit default racetrack from tournament if missing
+        if (!payload.racetrack_id && tournament.racetrack_id) {
+            payload.racetrack_id = tournament.racetrack_id;
         }
     }
 
@@ -186,6 +230,30 @@ async function validateRaceLinks(payload) {
 
         if (!referee) {
             throw new ApiError(404, 'Race referee not found');
+        }
+    }
+
+    if (payload.racetrack_id) {
+        const racetrack = await racetrackRepository.findById(payload.racetrack_id);
+        if (!racetrack) {
+            throw new ApiError(404, 'Không tìm thấy sân đấu.');
+        }
+
+        if (payload.distance && Number(payload.distance) > Number(racetrack.length_m || 4000)) {
+            throw new ApiError(400, `Cự ly trận đua (${payload.distance}m) vượt quá chiều dài tiêu chuẩn của sân (${racetrack.length_m}m).`);
+        }
+
+        // Autofill defaults from racetrack if missing
+        if (!payload.location) payload.location = racetrack.location || racetrack.name;
+        if (!payload.venue_code) payload.venue_code = racetrack.code;
+        if (!payload.surface) payload.surface = racetrack.surface;
+        if (!payload.max_participants) payload.max_participants = racetrack.max_horses;
+        else payload.max_participants = Math.min(Number(payload.max_participants), Number(racetrack.max_horses));
+
+        // Check Schedule Conflict
+        const timeToCheck = payload.starting_at || payload.race_date;
+        if (timeToCheck) {
+            await validateRacetrackSchedule(payload.racetrack_id, timeToCheck, payload.id || payload._id);
         }
     }
 }
@@ -668,6 +736,247 @@ async function completeRace(req, id) {
     };
 }
 
+async function rescheduleRace(req, id, newStartingAt) {
+    const race = await raceRepository.findById(id);
+    if (!race) {
+        throw new ApiError(404, 'Không tìm thấy trận đua.');
+    }
+
+    if (['completed', 'cancelled'].includes(race.status)) {
+        throw new ApiError(400, 'Không thể đổi giờ cho trận đua đã kết thúc hoặc bị hủy.');
+    }
+
+    if (!newStartingAt) {
+        throw new ApiError(400, 'Vui lòng chọn thời gian bắt đầu mới.');
+    }
+
+    if (race.racetrack_id) {
+        await validateRacetrackSchedule(race.racetrack_id, newStartingAt, id);
+    }
+
+    const updated = await raceRepository.updateById(id, {
+        starting_at: new Date(newStartingAt),
+        race_date: new Date(newStartingAt),
+        registration_lock_at: new Date(new Date(newStartingAt).getTime() - LOCK_OFFSET_MS)
+    });
+
+    return { race: updated };
+}
+
+async function changeRaceTrack(req, id, newRacetrackId) {
+    const race = await raceRepository.findById(id);
+    if (!race) {
+        throw new ApiError(404, 'Không tìm thấy trận đua.');
+    }
+
+    if (['in_progress', 'running', 'completed', 'cancelled'].includes(race.status)) {
+        throw new ApiError(400, 'Không thể đổi sân đấu cho trận đua đang diễn ra hoặc đã kết thúc.');
+    }
+
+    const racetrack = await racetrackRepository.findById(newRacetrackId);
+    if (!racetrack) {
+        throw new ApiError(404, 'Không tìm thấy sân đấu mới.');
+    }
+
+    if (racetrack.status !== 'active') {
+        throw new ApiError(400, `Sân đấu '${racetrack.name}' đang ở trạng thái ${racetrack.status}, không thể xếp lịch.`);
+    }
+
+    if (race.distance && Number(race.distance) > Number(racetrack.length_m || 4000)) {
+        throw new ApiError(400, `Cự ly trận đua (${race.distance}m) vượt quá chiều dài sân (${racetrack.length_m}m).`);
+    }
+
+    if (race.starting_at) {
+        await validateRacetrackSchedule(newRacetrackId, race.starting_at, id);
+    }
+
+    const updated = await raceRepository.updateById(id, {
+        racetrack_id: newRacetrackId,
+        location: racetrack.location || racetrack.name,
+        venue_code: racetrack.code,
+        surface: racetrack.surface,
+        max_participants: Math.min(Number(race.max_participants || racetrack.max_horses), Number(racetrack.max_horses))
+    });
+
+    return { race: updated };
+}
+
+async function finalizeRaceEntries(req, id) {
+    const race = await raceRepository.findById(id);
+    if (!race) {
+        throw new ApiError(404, 'Không tìm thấy trận đua.');
+    }
+
+    if (race.entries_finalized_at) {
+        throw new ApiError(400, 'Danh sách thi đấu của trận đua này đã được chốt trước đó.');
+    }
+
+    const models = getModels();
+    const approvedRegistrations = await models.Registration.findAll({
+        where: {
+            race_id: id,
+            status: REGISTRATION_STATUS.APPROVED
+        },
+        order: [['registered_at', 'ASC']]
+    });
+
+    const minParticipants = Number(race.min_participants || 4);
+    if (approvedRegistrations.length < minParticipants) {
+        throw new ApiError(400, `Trận đua chỉ có ${approvedRegistrations.length}/${minParticipants} ngựa đăng ký. Không đủ số lượng tối thiểu để chốt danh sách.`);
+    }
+
+    // Assign gate numbers (draw 1..N) sequentially
+    const sequelize = getSequelize();
+    await sequelize.transaction(async (t) => {
+        let drawNum = 1;
+        for (const reg of approvedRegistrations) {
+            await reg.update({
+                horse_no: drawNum,
+                draw: drawNum,
+                entry_finalized_at: new Date(),
+                entry_finalized_by: req.user ? req.user._id : null
+            }, { transaction: t });
+            drawNum++;
+        }
+
+        await race.update({
+            registration_locked: true,
+            entries_finalized_at: new Date(),
+            entries_finalized_by: req.user ? req.user._id : null
+        }, { transaction: t });
+    });
+
+    return {
+        message: 'Đã chốt danh sách thi đấu và phân cổng xuất phát thành công.',
+        finalized_count: approvedRegistrations.length
+    };
+}
+
+async function mergeUnderfilledRaces(req, sourceRaceId, targetRaceId) {
+    const sourceRace = await raceRepository.findById(sourceRaceId);
+    const targetRace = await raceRepository.findById(targetRaceId);
+
+    if (!sourceRace || !targetRace) {
+        throw new ApiError(404, 'Không tìm thấy trận đua nguồn hoặc trận đua đích.');
+    }
+
+    const models = getModels();
+    const sourceRegs = await models.Registration.findAll({
+        where: { race_id: sourceRaceId, status: REGISTRATION_STATUS.APPROVED }
+    });
+
+    const targetRegs = await models.Registration.findAll({
+        where: { race_id: targetRaceId, status: REGISTRATION_STATUS.APPROVED }
+    });
+
+    const maxParticipants = Number(targetRace.max_participants || 12);
+    if (sourceRegs.length + targetRegs.length > maxParticipants) {
+        throw new ApiError(400, `Tổng số ngựa (${sourceRegs.length + targetRegs.length}) vượt quá sức chứa tối đa của trận đua đích (${maxParticipants}).`);
+    }
+
+    const sequelize = getSequelize();
+    await sequelize.transaction(async (t) => {
+        for (const reg of sourceRegs) {
+            await reg.update({ race_id: targetRaceId }, { transaction: t });
+        }
+        await sourceRace.update({ status: 'cancelled', note: `Đã gộp ngựa sang trận đua ${targetRace.name}` }, { transaction: t });
+    });
+
+    return {
+        message: `Đã gộp ${sourceRegs.length} ngựa từ trận đua '${sourceRace.name}' sang trận đua '${targetRace.name}' thành công.`
+    };
+}
+
+async function autoGroupPoolToRaces(req, tournamentId, roundId) {
+    const tournament = await tournamentRepository.findById(tournamentId);
+    if (!tournament) {
+        throw new ApiError(404, 'Không tìm thấy giải đấu.');
+    }
+
+    const models = getModels();
+    // Get all approved registrations in this tournament that are not yet finalized in a race
+    const pendingRegs = await models.Registration.findAll({
+        where: {
+            tournament_id: tournamentId,
+            status: REGISTRATION_STATUS.APPROVED
+        },
+        include: [{ model: models.Horse, as: 'horse' }]
+    });
+
+    if (!pendingRegs.length) {
+        throw new ApiError(400, 'Không có ngựa nào trong danh sách đăng ký giải để tự động phân trận.');
+    }
+
+    // Group horses by rating class: Class 1 (80+), Class 2 (60-79), Class 3 (40-59), Class 4 (20-39), Class 5 (0-19)
+    const classGroups = { '1': [], '2': [], '3': [], '4': [], '5': [] };
+    pendingRegs.forEach((reg) => {
+        const rating = (reg.horse && reg.horse.rating) || reg.rating_snapshot || 50;
+        let c = '5';
+        if (rating >= 80) c = '1';
+        else if (rating >= 60) c = '2';
+        else if (rating >= 40) c = '3';
+        else if (rating >= 20) c = '4';
+        classGroups[c].push(reg);
+    });
+
+    // Fetch active racetracks
+    const racetracks = await racetrackRepository.find({ status: 'active' });
+    if (!racetracks.length) {
+        throw new ApiError(400, 'Không có sân đấu nào đang hoạt động để phân lịch.');
+    }
+
+    let createdRaceCount = 0;
+    let trackIndex = 0;
+    let baseTime = new Date();
+    baseTime.setHours(baseTime.getHours() + 2, 0, 0, 0); // Start 2 hours from now
+
+    for (const [raceClass, regs] of Object.entries(classGroups)) {
+        if (!regs.length) continue;
+
+        // Split into chunks of max 12 horses
+        const chunkSize = 12;
+        for (let i = 0; i < regs.length; i += chunkSize) {
+            const chunk = regs.slice(i, i + chunkSize);
+            if (chunk.length < 2) continue; // Skip single orphan horse
+
+            const track = racetracks[trackIndex % racetracks.length];
+            trackIndex++;
+
+            const raceTime = new Date(baseTime.getTime() + createdRaceCount * 40 * 60 * 1000); // 40 mins apart
+
+            const newRace = await raceRepository.create({
+                tournament_id: tournamentId,
+                round_id: roundId || tournament.rounds?.[0]?.id,
+                name: `Trận Đua Class ${raceClass} - ${track.name} (Tự động)`,
+                race_no: createdRaceCount + 1,
+                racetrack_id: track.id,
+                location: track.location || track.name,
+                venue_code: track.code,
+                surface: track.surface,
+                race_class: raceClass,
+                distance: Math.min(1400, track.length_m),
+                min_participants: 4,
+                max_participants: track.max_horses,
+                starting_at: raceTime,
+                race_date: raceTime,
+                status: 'scheduled'
+            });
+
+            // Update registration race_id
+            for (const reg of chunk) {
+                await reg.update({ race_id: newRace.id });
+            }
+
+            createdRaceCount++;
+        }
+    }
+
+    return {
+        message: `Đã tự động tạo ${createdRaceCount} trận đua từ danh sách đăng ký giải đấu.`,
+        created_race_count: createdRaceCount
+    };
+}
+
 module.exports = {
     createRace,
     completeRace,
@@ -681,8 +990,14 @@ module.exports = {
     getRaceParticipants,
     updateRace,
     deleteRace,
+    rescheduleRace,
+    changeRaceTrack,
+    finalizeRaceEntries,
+    mergeUnderfilledRaces,
+    autoGroupPoolToRaces,
     _private: {
         buildBettingMarketPayload,
         closeRaceBetting
     }
 };
+

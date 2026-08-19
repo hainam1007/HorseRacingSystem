@@ -19,8 +19,15 @@ async function getRegistration(req, res) {
   return sendSuccess(res, 200, 'Registration retrieved successfully', data);
 }
 
+async function withdrawRegistration(req, res) {
+  const data = await registrationService.withdrawRegistration(req, req.params.id, req.body.reason);
+
+  return sendSuccess(res, 200, 'Đã rút tên đăng ký ngựa thành công.', data);
+}
+
 module.exports = {
   createRegistration,
   listRegistrations,
-  getRegistration
+  getRegistration,
+  withdrawRegistration
 };

@@ -37,6 +37,10 @@ router.post('/:id/betting/close', adminOnly, validateObjectIdParam('id'), asyncH
 router.post('/:id/start', refereeOrAdmin, validateObjectIdParam('id'), asyncHandler(raceController.startRace));
 router.post('/:id/complete', refereeOrAdmin, validateObjectIdParam('id'), asyncHandler(raceController.completeRace));
 router.get('/:id/participants', refereeOrAdmin, validateObjectIdParam('id'), asyncHandler(raceController.getRaceParticipants));
+router.patch('/:id/reschedule', adminOnly, validateObjectIdParam('id'), asyncHandler(raceController.rescheduleRace));
+router.patch('/:id/change-track', adminOnly, validateObjectIdParam('id'), asyncHandler(raceController.changeRaceTrack));
+router.post('/:id/finalize-entries-v2', adminOnly, validateObjectIdParam('id'), asyncHandler(raceController.finalizeRaceEntries));
+router.post('/:id/merge', adminOnly, validateObjectIdParam('id'), asyncHandler(raceController.mergeUnderfilledRaces));
 router.get('/:id', validateObjectIdParam('id'), asyncHandler(raceController.getRace));
 router.patch('/:id', adminOnly, validateObjectIdParam('id'), validateUpdateRace, asyncHandler(raceController.updateRace));
 router.delete('/:id', adminOnly, validateObjectIdParam('id'), asyncHandler(raceController.deleteRace));

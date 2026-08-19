@@ -73,6 +73,31 @@ async function completeRace(req, res) {
   return sendSuccess(res, 200, 'Race completed successfully', data);
 }
 
+async function rescheduleRace(req, res) {
+  const data = await raceService.rescheduleRace(req, req.params.id, req.body.starting_at);
+  return sendSuccess(res, 200, 'Đã điều chỉnh lịch thi đấu thành công.', data);
+}
+
+async function changeRaceTrack(req, res) {
+  const data = await raceService.changeRaceTrack(req, req.params.id, req.body.racetrack_id);
+  return sendSuccess(res, 200, 'Đã thay đổi sân thi đấu thành công.', data);
+}
+
+async function finalizeRaceEntries(req, res) {
+  const data = await raceService.finalizeRaceEntries(req, req.params.id);
+  return sendSuccess(res, 200, 'Đã chốt danh sách thi đấu và phân vị trí cổng xuất phát thành công.', data);
+}
+
+async function mergeUnderfilledRaces(req, res) {
+  const data = await raceService.mergeUnderfilledRaces(req, req.params.id, req.body.target_race_id);
+  return sendSuccess(res, 200, 'Đã gộp hai trận đua thành công.', data);
+}
+
+async function autoGroupPoolToRaces(req, res) {
+  const data = await raceService.autoGroupPoolToRaces(req, req.params.tournament_id, req.body.round_id);
+  return sendSuccess(res, 201, 'Đã tự động tạo các trận đua từ danh sách đăng ký thành công.', data);
+}
+
 module.exports = {
   createRace,
   completeRace,
@@ -85,5 +110,10 @@ module.exports = {
   startRace,
   getRaceParticipants,
   updateRace,
-  deleteRace
+  deleteRace,
+  rescheduleRace,
+  changeRaceTrack,
+  finalizeRaceEntries,
+  mergeUnderfilledRaces,
+  autoGroupPoolToRaces
 };

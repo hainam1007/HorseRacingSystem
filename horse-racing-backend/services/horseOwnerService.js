@@ -1019,10 +1019,128 @@ async function updateRaceEntryDetails(user, registrationId, payload) {
     };
 }
 
+async function getEligibleHorses(user, query = {}) {
+    assertHorseOwnerRole(user.roles);
+    const owner = await horseOwnerRepository.findProfileByUserId(user._id);
+    if (!owner) {
+        throw new ApiError(404, 'Horse owner profile not found');
+    }
+
+    const models = getModels();
+    const horses = await models.Horse.findAll({
+        where: {
+            owner_id: owner._id,
+            status: 'active'
+        }
+    });
+
+    const raceId = query.race_id;
+    const tournamentId = query.tournament_id;
+
+    let targetRace = null;
+    let targetRacetrack = null;
+    let targetSurface = 'Turf';
+    let targetRaceClass = null;
+
+    if (raceId) {
+        targetRace = await models.Race.findByPk(raceId, {
+            include: [
+                { model: models.Racetrack, as: 'racetrack' },
+                { model: models.Tournament, as: 'tournament' }
+            ]
+        });
+        if (targetRace) {
+            targetRacetrack = targetRace.racetrack;
+            targetSurface = targetRacetrack ? targetRacetrack.surface : (targetRace.surface || 'Turf');
+            targetRaceClass = targetRace.race_class;
+        }
+    } else if (tournamentId) {
+        const tournament = await models.Tournament.findByPk(tournamentId, {
+            include: [{ model: models.Racetrack, as: 'racetrack' }]
+        });
+        if (tournament && tournament.racetrack) {
+            targetRacetrack = tournament.racetrack;
+            targetSurface = targetRacetrack.surface;
+        }
+    }
+
+    const evaluatedHorses = await Promise.all(horses.map(async (h) => {
+        const horse = toPlain(h);
+        const rating = Number(horse.current_rating || 50);
+        let eligible = true;
+        let reason = 'Đủ điều kiện đăng ký';
+
+        const incompatibleSurfaces = Array.isArray(horse.incompatible_surfaces) ? horse.incompatible_surfaces : [];
+        if (incompatibleSurfaces.includes(targetSurface)) {
+            eligible = false;
+            reason = `Không tương thích với mặt sân ${targetSurface}`;
+        }
+
+        if (eligible && targetRaceClass) {
+            let classMatched = false;
+            if (targetRaceClass === '1' && rating >= 80) classMatched = true;
+            else if (targetRaceClass === '2' && rating >= 60 && rating < 80) classMatched = true;
+            else if (targetRaceClass === '3' && rating >= 40 && rating < 60) classMatched = true;
+            else if (targetRaceClass === '4' && rating >= 20 && rating < 40) classMatched = true;
+            else if (targetRaceClass === '5' && rating < 20) classMatched = true;
+
+            if (!classMatched) {
+                eligible = false;
+                reason = `Rating (${rating}) không phù hợp với Hạng đua Class ${targetRaceClass}`;
+            }
+        }
+
+        if (eligible) {
+            const activePenalty = await models.ViolationPenalty.findOne({
+                where: { horse_id: horse.id, status: 'active' }
+            });
+            if (activePenalty) {
+                eligible = false;
+                reason = 'Ngựa đang bị kỷ luật cấm thi đấu';
+            }
+        }
+
+        if (eligible && targetRace && targetRace.starting_at) {
+            const raceTime = new Date(targetRace.starting_at).getTime();
+            const twoHoursMs = 2 * 60 * 60 * 1000;
+
+            const existingRegs = await models.Registration.findAll({
+                where: { horse_id: horse.id, status: { [require('sequelize').Op.ne]: 'rejected' } },
+                include: [{ model: models.Race, as: 'race' }]
+            });
+
+            for (const reg of existingRegs) {
+                if (reg.race && reg.race.id !== targetRace.id && reg.race.starting_at) {
+                    const otherTime = new Date(reg.race.starting_at).getTime();
+                    if (Math.abs(raceTime - otherTime) < twoHoursMs) {
+                        eligible = false;
+                        reason = 'Trùng lịch thi đấu trong vòng 2 giờ';
+                        break;
+                    }
+                }
+            }
+        }
+
+        return {
+            ...horse,
+            eligible,
+            eligibility_reason: reason
+        };
+    }));
+
+    return {
+        target_surface: targetSurface,
+        target_class: targetRaceClass,
+        horses: evaluatedHorses,
+        eligible_horses: evaluatedHorses.filter((h) => h.eligible)
+    };
+}
+
 module.exports = {
     getProfile,
     updateProfile,
     getHorses,
+    getEligibleHorses,
     createHorse,
     getHorseDetail,
     updateHorse,
