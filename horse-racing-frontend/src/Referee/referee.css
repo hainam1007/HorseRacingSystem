@@ -2155,6 +2155,67 @@
 }
 
 /* New incident form — separate layout from the detail review modal */
+.referee-card-form-grid input,
+.referee-ballast-panel input {
+  background: var(--racing-green);
+  color: var(--referee-ink);
+  border: 1px solid var(--referee-line);
+  border-radius: 6px;
+  padding: 6px 10px;
+  height: 34px;
+  outline: none;
+}
+
+.referee-card-form-grid input:focus,
+.referee-ballast-panel input:focus {
+  border-color: var(--racing-accent);
+}
+
+.referee-ballast-panel {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 14px;
+  padding: 12px;
+  border: 1px solid rgba(var(--racing-accent-rgb), 0.28);
+  border-radius: 6px;
+  background: rgba(var(--racing-accent-rgb), 0.06);
+}
+
+.referee-ballast-panel > div {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-size: 0.82rem;
+}
+
+.referee-ballast-panel .referee-info-label {
+  color: var(--referee-muted);
+  font-size: 0.72rem;
+}
+
+.referee-ballast-panel__action {
+  grid-column: 1 / -1;
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: end;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.referee-ballast-panel__action .admin-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+@media (max-width: 640px) {
+  .referee-ballast-panel {
+    grid-template-columns: 1fr;
+  }
+}
+
 .referee-page .referee-violation-modal--form {
   display: block;
   width: min(58rem, calc(100vw - 32px));

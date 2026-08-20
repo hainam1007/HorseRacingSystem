@@ -1,5 +1,5 @@
 import "./App.css";
-import { Navigate, Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes, useSearchParams } from "react-router-dom";
 import AdminDashboard from "./Admin/AdminDashboard";
 import AdminModulePage from "./Admin/AdminModulePage";
 import LandingPage from "./Landing Page/LandingPage";
@@ -21,6 +21,7 @@ import RoleApplications from "./pages/applications/RoleApplications";
 import OwnerDashboard from "./pages/owner/OwnerDashboard";
 import OwnerLayout from "./pages/owner/OwnerLayout";
 import OwnerDepositHistory from "./pages/owner/OwnerDepositHistory";
+import OwnerPaymentReturn from "./pages/owner/OwnerPaymentReturn";
 import JockeyAssignments from "./pages/jockey/JockeyAssignments";
 import JockeyDashboard from "./pages/jockey/JockeyDashboard";
 import JockeyInvitations from "./pages/jockey/JockeyInvitations";
@@ -52,6 +53,15 @@ import RaceClosure from "./Referee/RaceClosure";
 import AuthRecovery from "./auth/AuthRecovery";
 import VerifyAccount from "./auth/VerifyAccount";
 
+function LegacyPaymentReturn() {
+  const [searchParams] = useSearchParams();
+  const orderId = searchParams.get("order_id") || searchParams.get("vnp_TxnRef") || searchParams.get("orderId") || "";
+  const target = orderId.startsWith("REG-") ? "/owner/payment-success" : "/spectator/payment-success";
+  const search = searchParams.toString();
+
+  return <Navigate replace to={`${target}${search ? `?${search}` : ""}`} />;
+}
+
 function App() {
   return (
     <Routes>
@@ -75,6 +85,7 @@ function App() {
         <Route path="horses/:horseId/edit" element={<OwnerHorseForm mode="edit" />} />
         <Route path="registrations" element={<OwnerRegistrations />} />
         <Route path="deposit-history" element={<OwnerDepositHistory />} />
+        <Route path="payment-success" element={<OwnerPaymentReturn />} />
         <Route path="tournaments/:tournamentId/races/:raceId" element={<OwnerRaceDetail />} />
         <Route path="jockeys" element={<OwnerJockeys />} />
         <Route path="schedule" element={<OwnerSchedule />} />
@@ -117,9 +128,7 @@ function App() {
         <Route path="/spectator/role-applications" element={<RoleApplications />} />
       </Route>
 
-      <Route element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>
-        <Route path="/payment-success" element={<PaymentReturn />} />
-      </Route>
+      <Route path="/payment-success" element={<ProtectedRoute><LegacyPaymentReturn /></ProtectedRoute>} />
 
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

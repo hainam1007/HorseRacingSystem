@@ -65,6 +65,7 @@ function initialRows(race, phase, fields) {
         {
           status: saved?.status || "",
           note: saved?.note || "",
+          weight: saved?.weight ?? participant.weight ?? "",
           checklist: Object.fromEntries(fields.map((field) => [field, Boolean(saved?.checklist?.[field])])),
           saved
         }
@@ -83,7 +84,8 @@ function isRowDirty(row, fields) {
 
   const savedStatus = row.saved?.status || "";
   const savedNote = row.saved?.note || "";
-  if (row.status !== savedStatus || row.note !== savedNote) return true;
+  const savedWeight = row.saved?.weight ?? "";
+  if (row.status !== savedStatus || row.note !== savedNote || String(row.weight ?? "") !== String(savedWeight)) return true;
 
   return fields.some(
     (field) => Boolean(row.checklist?.[field]) !== Boolean(row.saved?.checklist?.[field])
@@ -103,6 +105,20 @@ function statusTone(status) {
   return "gray";
 }
 
+function getWeightEligibilityRule(race) {
+  let snapshot = race?.raw?.eligibility_rule_snapshot;
+
+  if (typeof snapshot === "string") {
+    try {
+      snapshot = JSON.parse(snapshot);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  return snapshot?.rule?.type === "horse_weight_range" ? snapshot.rule : null;
+}
+
 function HorseInspection() {
   const { raceId } = useParams();
   const [searchParams] = useSearchParams();
@@ -119,11 +135,15 @@ function HorseInspection() {
   const [isSavingAll, setIsSavingAll] = useState(false);
   const [message, setMessage] = useState("");
   const [bulkIssues, setBulkIssues] = useState([]);
+  const [ballastInputs, setBallastInputs] = useState({});
+  const [confirmingBallastId, setConfirmingBallastId] = useState("");
   const [selectedHorseId, setSelectedHorseId] = useState("");
   const [showPassAllConfirmation, setShowPassAllConfirmation] = useState(false);
   const passAllConfirmationRef = useRef(null);
   const editable = race?.phase === phase;
   const participantsUnavailable = Boolean(isUnavailable || race?.participantsUnavailable);
+  const weightRule = getWeightEligibilityRule(race);
+  const usesWeightRule = phase === RACE_PHASES.PRE_RACE && Boolean(weightRule);
 
   useEffect(() => {
     setRows(initialRows(race, phase, fields));
@@ -215,6 +235,15 @@ function HorseInspection() {
       const requiresNote = NOTE_REQUIRED_STATUSES.includes(row.status);
       const note = row.note.trim();
       const requiresCompleteChecklist = ["passed", "normal"].includes(row.status);
+      const measuredWeight = Number(row.weight);
+      if (usesWeightRule && (!Number.isFinite(measuredWeight) || measuredWeight < 0)) {
+        validationIssues.push({
+          horseId: participant.horseId,
+          horseName: participant.horseName,
+          reason: "A non-negative actual measured weight is required for this race."
+        });
+        continue;
+      }
       if (requiresCompleteChecklist && checklistProgress(row, fields).completed !== fields.length) {
         validationIssues.push({
           horseId: participant.horseId,
@@ -238,8 +267,7 @@ function HorseInspection() {
         status: row.status,
         checklist: row.checklist,
         check_note: note,
-        weight: participant.weight ?? undefined,
-        is_eligible: phase === RACE_PHASES.PRE_RACE ? row.status === "passed" : undefined
+        weight: usesWeightRule ? measuredWeight : undefined
       });
     }
 
@@ -284,6 +312,7 @@ function HorseInspection() {
   const save = async (participant) => {
     const row = rows[participant.horseId];
     const requiresNote = NOTE_REQUIRED_STATUSES.includes(row.status);
+    const measuredWeight = Number(row.weight);
     if (!row.status) {
       setBulkIssues([{ horseId: participant.horseId, horseName: participant.horseName, reason: "Status is required." }]);
       return setMessage("Select a check status before saving.");
@@ -304,6 +333,14 @@ function HorseInspection() {
       }]);
       return setMessage("This status requires a note or issue description.");
     }
+    if (usesWeightRule && (!Number.isFinite(measuredWeight) || measuredWeight < 0)) {
+      setBulkIssues([{
+        horseId: participant.horseId,
+        horseName: participant.horseName,
+        reason: "A non-negative actual measured weight is required for this race."
+      }]);
+      return setMessage("Record the actual measured weight before saving the pre-race check.");
+    }
 
     try {
       setSavingId(participant.horseId);
@@ -316,8 +353,7 @@ function HorseInspection() {
         status: row.status,
         checklist: row.checklist,
         check_note: row.note,
-        weight: participant.weight ?? undefined,
-        is_eligible: phase === RACE_PHASES.PRE_RACE ? row.status === "passed" : undefined
+        weight: usesWeightRule ? measuredWeight : undefined
       };
 
       if (row.saved?.id) await refereeApi.updateHorseCheck(row.saved.id, payload);
@@ -338,6 +374,41 @@ function HorseInspection() {
   const selectedRow = selectedParticipant ? rows[selectedParticipant.horseId] : null;
   const selectedSaveState = rowSaveState(selectedRow, fields);
   const passAllLabel = phase === RACE_PHASES.PRE_RACE ? "Mark All Passed" : "Mark All Normal";
+  const selectedEligibility = selectedRow?.saved?.eligibilityResult;
+  const selectedEligibilityRule = selectedEligibility?.rule;
+  const actualMeasuredWeight = Number(selectedEligibility?.measured_weight_kg ?? selectedRow?.saved?.weight);
+  const minimumWeight = Number(selectedEligibilityRule?.min_kg);
+  const missingWeight = Number(selectedEligibility?.required_ballast_kg ?? selectedRow?.saved?.ballastRequiredKg);
+  const canConfirmBallast = editable &&
+    phase === RACE_PHASES.PRE_RACE &&
+    selectedEligibilityRule?.type === "horse_weight_range" &&
+    selectedEligibilityRule?.ballast_allowed === true &&
+    Number.isFinite(actualMeasuredWeight) &&
+    Number.isFinite(minimumWeight) &&
+    actualMeasuredWeight < minimumWeight &&
+    !selectedRow?.saved?.ballastConfirmed;
+
+  const confirmBallast = async () => {
+    const checkId = selectedRow?.saved?.id;
+    const ballastAddedKg = Number(ballastInputs[checkId] ?? missingWeight);
+
+    if (!checkId || !Number.isFinite(ballastAddedKg) || ballastAddedKg < 0) {
+      setMessage("Enter a non-negative ballast amount before confirming.");
+      return;
+    }
+
+    try {
+      setConfirmingBallastId(checkId);
+      setMessage("");
+      await refereeApi.confirmHorseCheckBallast(checkId, { ballast_added_kg: ballastAddedKg });
+      await reload();
+      setMessage(`${selectedParticipant.horseName}: ballast confirmed.`);
+    } catch (apiError) {
+      setMessage(apiError.message || "Unable to confirm ballast.");
+    } finally {
+      setConfirmingBallastId("");
+    }
+  };
 
   return (
     <RefereeLayout
@@ -585,7 +656,7 @@ function HorseInspection() {
                   <span>{selectedParticipant.jockeyName || "Not assigned"}</span>
                 </div>
                 <div>
-                  <span className="referee-info-label">Horse weight</span>
+                  <span className="referee-info-label">Registered weight</span>
                   <span>{selectedParticipant.weight ?? "Not recorded"}</span>
                 </div>
                 <div>
@@ -621,6 +692,20 @@ function HorseInspection() {
               </div>
 
               <div className="referee-card-form-grid">
+                {usesWeightRule && (
+                  <label className="admin-field">
+                    <span>Actual measured weight (kg)</span>
+                    <input
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      required
+                      disabled={!editable}
+                      value={selectedRow.weight}
+                      onChange={(event) => update(selectedParticipant.horseId, { weight: event.target.value })}
+                    />
+                  </label>
+                )}
                 <label className="admin-field">
                   <span>Status</span>
                   <select
@@ -658,6 +743,55 @@ function HorseInspection() {
                   )}
                 </label>
               </div>
+
+              {selectedEligibilityRule?.type === "horse_weight_range" && Number.isFinite(actualMeasuredWeight) && (
+                <section className="referee-ballast-panel" aria-label="Ballast eligibility">
+                  <div>
+                    <span className="referee-info-label">Actual measured</span>
+                    <strong>{actualMeasuredWeight} kg</strong>
+                  </div>
+                  <div>
+                    <span className="referee-info-label">Minimum</span>
+                    <strong>{minimumWeight} kg</strong>
+                  </div>
+                  <div>
+                    <span className="referee-info-label">Missing</span>
+                    <strong>{Number.isFinite(missingWeight) ? `${missingWeight} kg` : "—"}</strong>
+                  </div>
+                  {selectedRow.saved?.ballastConfirmed && (
+                    <div>
+                      <span className="referee-info-label">Confirmed ballast</span>
+                      <strong>{selectedRow.saved.ballastAddedKg ?? 0} kg</strong>
+                    </div>
+                  )}
+                  {canConfirmBallast && (
+                    <div className="referee-ballast-panel__action">
+                      <label className="admin-field">
+                        <span>Ballast added (kg)</span>
+                        <input
+                          type="number"
+                          min={Math.max(0, missingWeight || 0)}
+                          step="0.01"
+                          value={ballastInputs[selectedRow.saved.id] ?? String(missingWeight)}
+                          onChange={(event) => setBallastInputs((current) => ({
+                            ...current,
+                            [selectedRow.saved.id]: event.target.value
+                          }))}
+                        />
+                      </label>
+                      <button
+                        type="button"
+                        className="referee-save-btn"
+                        disabled={confirmingBallastId === selectedRow.saved.id || participantsUnavailable}
+                        onClick={confirmBallast}
+                      >
+                        <Check aria-hidden="true" size={13} />
+                        {confirmingBallastId === selectedRow.saved.id ? "Confirming..." : "Confirm ballast"}
+                      </button>
+                    </div>
+                  )}
+                </section>
+              )}
 
               {editable && (
                 <div className="referee-card-footer">

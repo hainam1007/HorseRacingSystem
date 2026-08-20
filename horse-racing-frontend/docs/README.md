@@ -13,6 +13,7 @@
 - [Owner, race registration, and jockey invitation flow](OWNER_RACE_JOCKEY_FLOW_PLAN.md)
 - [Referee three-phase frontend plan](REFEREE_THREE_PHASE_FRONTEND_PLAN.md)
 - [Spectator realtime betting and 2D race plan](SPECTATOR_REALTIME_BETTING_PLAN.md)
+- [Reusable three-section 2D race renderer](THREE_SECTION_2D_RACE_RENDERER.md)
 - [Spectator tournament and race redesign plan](SPECTATOR_TOURNAMENT_RACE_REDESIGN_PLAN.md)
 
 ## Design and assets

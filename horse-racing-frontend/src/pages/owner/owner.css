@@ -2416,6 +2416,11 @@
   background: rgba(76, 154, 98, 0.16);
 }
 
+.owner-entry-horse.is-conditional {
+  border-color: rgba(224, 165, 94, 0.48);
+  background: rgba(224, 165, 94, 0.07);
+}
+
 .owner-entry-horse.is-unavailable {
   cursor: not-allowed;
   opacity: 0.6;
@@ -2457,6 +2462,48 @@
   color: var(--owner-text-muted);
   font-size: 0.78rem;
   font-weight: 750;
+}
+
+.owner-entry-horse__ballast {
+  color: var(--racing-accent-soft);
+  font-size: 0.7rem;
+  font-weight: 850;
+  line-height: 1.35;
+}
+
+.owner-entry-eligibility {
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr);
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid rgba(118, 207, 143, 0.32);
+  border-left: 3px solid #77c889;
+  color: #b7f2c3;
+  background: rgba(76, 154, 98, 0.1);
+}
+
+.owner-entry-eligibility > div {
+  display: grid;
+  gap: 3px;
+}
+
+.owner-entry-eligibility span,
+.owner-entry-eligibility small {
+  color: var(--owner-text-muted);
+  font-size: 0.73rem;
+  line-height: 1.4;
+}
+
+.owner-entry-eligibility strong {
+  color: var(--owner-text-strong);
+  font-size: 0.85rem;
+}
+
+.owner-entry-eligibility--error {
+  border-color: rgba(218, 104, 94, 0.45);
+  border-left-color: var(--racing-danger);
+  color: var(--racing-danger-soft);
+  background: rgba(218, 104, 94, 0.1);
 }
 
 .owner-entry-horse__facts {
@@ -8838,5 +8885,547 @@
   .owner-schedule-slot__status small {
     max-width: none;
     text-align: left;
+  }
+}
+
+/* Owner payment return: confirms a race entry, not a spectator wallet deposit. */
+.owner-payment-return {
+  display: grid;
+  gap: 18px;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding-bottom: 28px;
+}
+
+.owner-payment-return__back {
+  display: inline-flex;
+  align-items: center;
+  justify-self: start;
+  gap: 8px;
+  min-height: 42px;
+  padding: 0 14px;
+  border: 1px solid rgba(var(--racing-contrast-rgb), 0.2);
+  border-radius: 6px;
+  color: var(--owner-text-soft);
+  background: rgba(var(--racing-contrast-rgb), 0.06);
+  font-size: 0.86rem;
+  font-weight: 850;
+  text-decoration: none;
+  transition: color 160ms ease, border-color 160ms ease, background 160ms ease, transform 160ms ease;
+}
+
+.owner-payment-return__back svg {
+  color: var(--racing-accent);
+  transition: transform 160ms ease;
+}
+
+.owner-payment-return__back:hover {
+  border-color: rgba(var(--racing-accent-rgb), 0.52);
+  color: var(--owner-text-strong);
+  background: rgba(var(--racing-accent-rgb), 0.12);
+  transform: translateX(-2px);
+}
+
+.owner-payment-return__back:hover svg {
+  transform: translateX(-2px);
+}
+
+.owner-payment-return__hero {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(270px, 350px);
+  gap: clamp(20px, 4vw, 56px);
+  min-height: 355px;
+  padding: clamp(25px, 4vw, 46px);
+  overflow: hidden;
+  border: 1px solid rgba(var(--racing-contrast-rgb), 0.22);
+  border-radius: 12px;
+  background:
+    linear-gradient(120deg, rgba(255, 255, 255, 0.08), transparent 56%),
+    rgba(18, 41, 30, 0.9);
+  box-shadow: 0 26px 64px rgba(4, 15, 9, 0.24), inset 0 1px 0 rgba(255, 255, 255, 0.07);
+}
+
+.owner-payment-return__hero::before {
+  position: absolute;
+  z-index: -1;
+  right: -16%;
+  bottom: -68%;
+  width: min(700px, 64vw);
+  aspect-ratio: 1;
+  border: 1px solid rgba(var(--racing-accent-rgb), 0.18);
+  border-radius: 50%;
+  box-shadow: 0 0 0 54px rgba(var(--racing-accent-rgb), 0.035), 0 0 0 108px rgba(var(--racing-accent-rgb), 0.025);
+  content: "";
+}
+
+.owner-payment-return__hero--success::after {
+  position: absolute;
+  z-index: -1;
+  right: 22%;
+  bottom: -106px;
+  width: 300px;
+  height: 220px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(var(--racing-success-rgb), 0.17), transparent 68%);
+  content: "";
+}
+
+.owner-payment-return__hero--error::after {
+  position: absolute;
+  z-index: -1;
+  right: 22%;
+  bottom: -106px;
+  width: 300px;
+  height: 220px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(var(--racing-danger-rgb), 0.13), transparent 68%);
+  content: "";
+}
+
+.owner-payment-return__copy,
+.owner-payment-return__amount,
+.owner-payment-return__card {
+  position: relative;
+  z-index: 1;
+}
+
+.owner-payment-return__copy {
+  display: grid;
+  align-content: center;
+  justify-items: start;
+  gap: 13px;
+}
+
+.owner-payment-return__mark {
+  display: inline-grid;
+  width: 60px;
+  height: 60px;
+  place-items: center;
+  border: 1px solid rgba(var(--racing-success-rgb), 0.52);
+  border-radius: 12px;
+  color: var(--racing-success-soft);
+  background: rgba(var(--racing-success-rgb), 0.12);
+}
+
+.owner-payment-return__hero--pending .owner-payment-return__mark {
+  border-color: rgba(var(--racing-accent-rgb), 0.52);
+  color: var(--racing-accent-soft);
+  background: rgba(var(--racing-accent-rgb), 0.13);
+}
+
+.owner-payment-return__hero--error .owner-payment-return__mark {
+  border-color: rgba(var(--racing-danger-rgb), 0.52);
+  color: var(--racing-danger-soft);
+  background: rgba(var(--racing-danger-rgb), 0.12);
+}
+
+.owner-payment-return__copy .owner-kicker {
+  margin: 4px 0 0;
+}
+
+.owner-payment-return__copy h1 {
+  max-width: 13ch;
+  margin: 0;
+  color: var(--owner-text-strong);
+  font-family: "Sora", sans-serif;
+  font-size: clamp(2.75rem, 6vw, 5.6rem);
+  line-height: 0.92;
+  letter-spacing: -0.075em;
+}
+
+.owner-payment-return__copy > p {
+  max-width: 570px;
+  margin: 0;
+  color: var(--owner-text-soft);
+  font-size: clamp(1rem, 1.4vw, 1.16rem);
+  line-height: 1.58;
+}
+
+.owner-payment-return__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.owner-payment-return__actions .owner-button {
+  min-height: 46px;
+  white-space: nowrap;
+}
+
+.owner-payment-return__refresh {
+  background: rgba(var(--racing-contrast-rgb), 0.08);
+}
+
+.owner-payment-return__refresh:disabled {
+  cursor: wait;
+  opacity: 0.68;
+}
+
+.owner-payment-return__spin {
+  animation: owner-payment-return-spin 850ms linear infinite;
+}
+
+@keyframes owner-payment-return-spin {
+  to { transform: rotate(360deg); }
+}
+
+.owner-payment-return__amount {
+  display: grid;
+  align-content: center;
+  align-self: center;
+  gap: 10px;
+  min-width: 0;
+  padding: 22px;
+  border: 1px solid rgba(var(--racing-contrast-rgb), 0.22);
+  border-radius: 10px;
+  background:
+    linear-gradient(145deg, rgba(var(--racing-accent-rgb), 0.16), rgba(var(--racing-contrast-rgb), 0.07)),
+    rgba(11, 27, 19, 0.54);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.owner-payment-return__amount > span,
+.owner-payment-return__card-heading > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--owner-text-soft);
+  font-size: 0.9rem;
+  font-weight: 900;
+}
+
+.owner-payment-return__amount > strong {
+  min-width: 0;
+  color: var(--racing-accent-soft);
+  font-family: "Sora", sans-serif;
+  font-size: clamp(2.1rem, 4.1vw, 3.3rem);
+  line-height: 1;
+  letter-spacing: -0.065em;
+  overflow-wrap: anywhere;
+}
+
+.owner-payment-return__amount > small {
+  color: var(--owner-text-muted);
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.owner-payment-return__amount > div {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+  margin-top: 6px;
+  padding-top: 13px;
+  border-top: 1px solid rgba(var(--racing-contrast-rgb), 0.14);
+}
+
+.owner-payment-return__amount > div span {
+  color: var(--owner-text-muted);
+  font-size: 0.7rem;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.owner-payment-return__amount code {
+  min-width: 0;
+  color: var(--owner-text-strong);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.78rem;
+  overflow-wrap: anywhere;
+}
+
+.owner-payment-return__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.08fr) minmax(320px, 0.92fr);
+  gap: 18px;
+}
+
+.owner-payment-return__card {
+  display: grid;
+  align-content: start;
+  gap: 20px;
+  min-width: 0;
+  padding: clamp(20px, 3vw, 28px);
+  border: 1px solid rgba(var(--racing-contrast-rgb), 0.2);
+  border-radius: 12px;
+  background:
+    linear-gradient(135deg, rgba(var(--racing-contrast-rgb), 0.09), rgba(var(--racing-contrast-rgb), 0.035)),
+    rgba(18, 41, 30, 0.72);
+  box-shadow: 0 18px 46px rgba(4, 15, 9, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.owner-payment-return__card-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.owner-payment-return__card-heading > strong {
+  color: var(--racing-success-soft);
+  font-size: 0.78rem;
+  font-weight: 900;
+  text-align: right;
+}
+
+.owner-payment-return__entry-name {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid rgba(var(--racing-contrast-rgb), 0.13);
+  color: var(--racing-accent-soft);
+}
+
+.owner-payment-return__entry-name > div {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+}
+
+.owner-payment-return__entry-name small {
+  color: var(--owner-text-muted);
+  font-size: 0.74rem;
+  font-weight: 800;
+}
+
+.owner-payment-return__entry-name strong {
+  color: var(--owner-text-strong);
+  font-family: "Sora", sans-serif;
+  font-size: clamp(1.18rem, 2vw, 1.52rem);
+  overflow-wrap: anywhere;
+}
+
+.owner-payment-return__entry-facts,
+.owner-payment-return__payment-facts {
+  display: grid;
+  gap: 11px;
+  margin: 0;
+}
+
+.owner-payment-return__entry-facts {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.owner-payment-return__entry-facts > div,
+.owner-payment-return__payment-facts > div {
+  display: grid;
+  gap: 7px;
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid rgba(var(--racing-contrast-rgb), 0.12);
+  border-radius: 8px;
+  background: rgba(var(--racing-contrast-rgb), 0.055);
+}
+
+.owner-payment-return__entry-facts dt {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.owner-payment-return__entry-facts dt,
+.owner-payment-return__payment-facts dt {
+  color: var(--owner-text-muted);
+  font-size: 0.73rem;
+  font-weight: 850;
+}
+
+.owner-payment-return__entry-facts dd,
+.owner-payment-return__payment-facts dd {
+  margin: 0;
+  color: var(--owner-text-strong);
+  font-size: 0.86rem;
+  font-weight: 800;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.owner-payment-return__payment-facts {
+  gap: 0;
+  border-top: 1px solid rgba(var(--racing-contrast-rgb), 0.13);
+  border-bottom: 1px solid rgba(var(--racing-contrast-rgb), 0.13);
+}
+
+.owner-payment-return__payment-facts > div {
+  grid-template-columns: minmax(120px, 0.75fr) minmax(0, 1.25fr);
+  align-items: baseline;
+  padding: 13px 0;
+  border: 0;
+  border-bottom: 1px solid rgba(var(--racing-contrast-rgb), 0.1);
+  border-radius: 0;
+  background: transparent;
+}
+
+.owner-payment-return__payment-facts > div:last-child {
+  border-bottom: 0;
+}
+
+.owner-payment-return__payment-facts dd {
+  color: var(--owner-text-soft);
+  text-align: right;
+}
+
+.owner-payment-return__steps {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.owner-payment-return__steps li {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  min-height: 54px;
+  padding: 10px;
+  border: 1px solid rgba(var(--racing-contrast-rgb), 0.12);
+  border-radius: 8px;
+  color: var(--owner-text-muted);
+  background: rgba(var(--racing-contrast-rgb), 0.055);
+}
+
+.owner-payment-return__steps li > svg {
+  width: 34px;
+  height: 34px;
+  padding: 8px;
+  border: 1px solid currentColor;
+  border-radius: 8px;
+}
+
+.owner-payment-return__steps span {
+  color: var(--owner-text-strong);
+  font-size: 0.86rem;
+  font-weight: 850;
+}
+
+.owner-payment-return__steps strong {
+  color: currentColor;
+  font-size: 0.76rem;
+  font-weight: 900;
+  text-align: right;
+}
+
+.owner-payment-return__steps .is-complete {
+  border-color: rgba(var(--racing-success-rgb), 0.3);
+  color: var(--racing-success-soft);
+  background: rgba(var(--racing-success-rgb), 0.1);
+}
+
+.owner-payment-return__steps .is-active {
+  border-color: rgba(var(--racing-accent-rgb), 0.34);
+  color: var(--racing-accent-soft);
+  background: rgba(var(--racing-accent-rgb), 0.1);
+}
+
+.owner-payment-return__steps .is-error {
+  border-color: rgba(var(--racing-danger-rgb), 0.35);
+  color: var(--racing-danger-soft);
+  background: rgba(var(--racing-danger-rgb), 0.1);
+}
+
+.owner-payment-return__error {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 18px;
+  border: 1px solid rgba(var(--racing-danger-rgb), 0.38);
+  border-radius: 10px;
+  color: var(--racing-danger-soft);
+  background: rgba(var(--racing-danger-rgb), 0.11);
+}
+
+.owner-payment-return__error > div {
+  display: grid;
+  gap: 4px;
+}
+
+.owner-payment-return__error strong {
+  color: var(--owner-text-strong);
+}
+
+.owner-payment-return__error span {
+  color: var(--owner-text-soft);
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+@media (max-width: 920px) {
+  .owner-payment-return__hero,
+  .owner-payment-return__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .owner-payment-return__hero {
+    min-height: 0;
+  }
+
+  .owner-payment-return__amount {
+    max-width: 520px;
+    width: 100%;
+  }
+}
+
+@media (max-width: 620px) {
+  .owner-payment-return {
+    gap: 14px;
+    padding-bottom: 20px;
+  }
+
+  .owner-payment-return__hero,
+  .owner-payment-return__card {
+    padding: 20px;
+    border-radius: 10px;
+  }
+
+  .owner-payment-return__copy h1 {
+    max-width: 10ch;
+    font-size: clamp(2.8rem, 15vw, 4.2rem);
+  }
+
+  .owner-payment-return__actions {
+    display: grid;
+    width: 100%;
+  }
+
+  .owner-payment-return__actions .owner-button {
+    width: 100%;
+  }
+
+  .owner-payment-return__amount {
+    padding: 18px;
+  }
+
+  .owner-payment-return__entry-facts {
+    grid-template-columns: 1fr;
+  }
+
+  .owner-payment-return__payment-facts > div,
+  .owner-payment-return__steps li {
+    grid-template-columns: 1fr;
+  }
+
+  .owner-payment-return__payment-facts dd,
+  .owner-payment-return__steps strong {
+    text-align: left;
+  }
+
+  .owner-payment-return__steps li {
+    justify-items: start;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .owner-payment-return__back,
+  .owner-payment-return__back svg,
+  .owner-payment-return__spin {
+    animation: none;
+    transition: none;
   }
 }

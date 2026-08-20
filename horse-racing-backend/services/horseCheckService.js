@@ -14,6 +14,10 @@ const profileRepository = require('../repositories/profileRepository');
 const raceRepository = require('../repositories/raceRepository');
 const raceResultRepository = require('../repositories/raceResultRepository');
 const violationRepository = require('../repositories/violationRepository');
+const {
+  ELIGIBILITY_STATUS,
+  evaluatePreRaceEligibility
+} = require('./racetrackEligibilityService');
 
 function getModels() { return loadSequelizeModels().models; }
 
@@ -33,6 +37,82 @@ function idString(value) {
   const id = getDocumentId(value);
 
   return id ? id.toString() : '';
+}
+
+function getField(value, field) {
+  if (!value) return undefined;
+  if (typeof value.get === 'function') return value.get(field);
+  return value[field];
+}
+
+function sameNumber(first, second) {
+  if (first === undefined || first === null || first === '') {
+    return second === undefined || second === null || second === '';
+  }
+
+  if (second === undefined || second === null || second === '') {
+    return false;
+  }
+
+  return Number(first) === Number(second);
+}
+
+function hasEligibilityRuleSnapshot(race) {
+  return Boolean(race && race.eligibility_rule_snapshot);
+}
+
+function getPreRaceEligibilityData(race, horse, horseCheck, status) {
+  const eligibility = evaluatePreRaceEligibility(race, horse, horseCheck);
+
+  return {
+    ballast_required_kg: eligibility.required_ballast_kg || 0,
+    eligibility_result: eligibility,
+    is_eligible: status === HORSE_CHECK_STATUS.PASSED &&
+      eligibility.status === ELIGIBILITY_STATUS.ELIGIBLE
+  };
+}
+
+function buildPreRaceCheckData(race, horse, payload, existingCheck) {
+  const weightChanged = existingCheck && payload.weight !== undefined &&
+    !sameNumber(payload.weight, getField(existingCheck, 'weight'));
+  const horseCheck = {
+    weight: payload.weight !== undefined ? payload.weight : getField(existingCheck, 'weight'),
+    ballast_added_kg: weightChanged ? undefined : getField(existingCheck, 'ballast_added_kg'),
+    ballast_confirmed: weightChanged ? false : Boolean(getField(existingCheck, 'ballast_confirmed'))
+  };
+  const eligibilityData = getPreRaceEligibilityData(
+    race,
+    horse,
+    horseCheck,
+    payload.status
+  );
+
+  return Object.assign({}, eligibilityData, {
+    ballast_added_kg: horseCheck.ballast_added_kg,
+    ballast_confirmed: horseCheck.ballast_confirmed,
+    ballast_confirmed_by: weightChanged ? null : getField(existingCheck, 'ballast_confirmed_by'),
+    ballast_confirmed_at: weightChanged ? null : getField(existingCheck, 'ballast_confirmed_at')
+  });
+}
+
+function isPassedAndEligiblePreRaceCheck(race, horse, horseCheck) {
+  if (!horseCheck || getField(horseCheck, 'status') !== HORSE_CHECK_STATUS.PASSED) {
+    return false;
+  }
+
+  // Older races created before racetrack eligibility snapshots keep their
+  // historic pre-race behaviour. Every race with a snapshot is evaluated
+  // server-side below, rather than trusting this stored flag.
+  if (!hasEligibilityRuleSnapshot(race)) {
+    return getField(horseCheck, 'is_eligible') === true;
+  }
+
+  return getPreRaceEligibilityData(
+    race,
+    horse,
+    horseCheck,
+    getField(horseCheck, 'status')
+  ).is_eligible;
 }
 
 function canUpdateExistingCheck(req, race, refereeId, horseCheck) {
@@ -89,11 +169,7 @@ async function ensurePassedPreRaceCheck(race, horse, phase) {
     phase: HORSE_CHECK_PHASE.PRE_RACE
   });
 
-  if (
-    !preRaceCheck ||
-    preRaceCheck.status !== HORSE_CHECK_STATUS.PASSED ||
-    preRaceCheck.is_eligible !== true
-  ) {
+  if (!isPassedAndEligiblePreRaceCheck(race, horse, preRaceCheck)) {
     throw new ApiError(409, 'Horse must pass pre-race check before during-race or post-race checks');
   }
 }
@@ -148,7 +224,13 @@ async function createHorseCheck(req, payload) {
 
       const updatedHorseCheck = await horseCheckRepository.updateById(
         existingCheck._id,
-        buildHorseCheckData(race, refereeId, Object.assign({}, payload, { phase: phase }))
+        buildHorseCheckData(
+          race,
+          refereeId,
+          Object.assign({}, payload, { phase: phase }),
+          horse,
+          existingCheck
+        )
       );
 
       return {
@@ -157,28 +239,9 @@ async function createHorseCheck(req, payload) {
     }
   }
 
-  const horseCheck = await horseCheckRepository.create({
-    race_id: race._id,
-    horse_id: horse._id,
-    jockey_id: payload.jockey_id,
-    referee_id: refereeId,
-    phase: payload.phase || HORSE_CHECK_PHASE.PRE_RACE,
-    status: payload.status,
-    checklist: payload.checklist || {},
-    issues: payload.issues || [],
-    event_type: payload.event_type,
-    severity: payload.severity,
-    time_marker: payload.time_marker,
-    description: payload.description,
-    evidence_urls: payload.evidence_urls || [],
-    requires_violation: payload.requires_violation || false,
-    auto_confirm_violation: payload.auto_confirm_violation || false,
-    health_status: payload.health_status,
-    weight: payload.weight,
-    check_note: payload.check_note,
-    is_eligible: payload.is_eligible === undefined ? payload.status === HORSE_CHECK_STATUS.PASSED : payload.is_eligible,
-    checked_at: new Date()
-  });
+  const horseCheck = await horseCheckRepository.create(
+    buildHorseCheckData(race, refereeId, payload, horse)
+  );
 
   if (
     horseCheck.phase === HORSE_CHECK_PHASE.DURING_RACE &&
@@ -225,12 +288,11 @@ async function createHorseCheck(req, payload) {
   };
 }
 
-function buildHorseCheckData(race, refereeId, payload) {
+function buildHorseCheckData(race, refereeId, payload, horse, existingCheck) {
   const defaultEligibility = payload.phase === HORSE_CHECK_PHASE.PRE_RACE
     ? payload.status === HORSE_CHECK_STATUS.PASSED
     : true;
-
-  return {
+  const checkData = {
     race_id: race._id,
     horse_id: payload.horse_id,
     jockey_id: payload.jockey_id,
@@ -249,9 +311,26 @@ function buildHorseCheckData(race, refereeId, payload) {
     health_status: payload.health_status,
     weight: payload.weight,
     check_note: payload.check_note,
-    is_eligible: payload.is_eligible === undefined ? defaultEligibility : payload.is_eligible,
+    // Pre-race eligibility is always calculated on the server. Do not accept a
+    // client-supplied is_eligible flag because it could bypass racetrack rules.
+    is_eligible: payload.phase === HORSE_CHECK_PHASE.PRE_RACE
+      ? false
+      : (payload.is_eligible === undefined ? defaultEligibility : payload.is_eligible),
     checked_at: new Date()
   };
+
+  if (payload.phase === HORSE_CHECK_PHASE.PRE_RACE) {
+    if (!horse) {
+      throw new ApiError(500, 'Horse is required to evaluate the pre-race check');
+    }
+
+    return Object.assign(
+      checkData,
+      buildPreRaceCheckData(race, horse, payload, existingCheck)
+    );
+  }
+
+  return checkData;
 }
 
 async function ensureBulkPostRaceIsOpen(raceId, phase) {
@@ -332,17 +411,13 @@ async function bulkSaveHorseChecks(req, payload) {
       if (payload.phase === HORSE_CHECK_PHASE.POST_RACE) {
         const preRaceCheck = preCheckByHorse.get(horseId);
 
-        if (
-          !preRaceCheck ||
-          preRaceCheck.status !== HORSE_CHECK_STATUS.PASSED ||
-          preRaceCheck.is_eligible !== true
-        ) {
+        if (!isPassedAndEligiblePreRaceCheck(race, horse, preRaceCheck)) {
           throw new ApiError(409, 'Horse must pass pre-race check before post-race check');
         }
       }
 
       const existingCheck = existingByHorse.get(horseId);
-      const checkData = buildHorseCheckData(race, refereeId, checkPayload);
+      const checkData = buildHorseCheckData(race, refereeId, checkPayload, horse, existingCheck);
 
       if (existingCheck) {
         if (!canUpdateExistingCheck(req, race, refereeId, existingCheck)) {
@@ -435,7 +510,125 @@ async function updateHorseCheck(req, id, payload) {
 
   await ensureCanAccessHorseCheck(req, horseCheck);
 
-  const updatedHorseCheck = await horseCheckRepository.updateById(id, Object.assign({}, payload, {
+  const updateData = Object.assign({}, payload, {
+    checked_at: new Date()
+  });
+
+  if (horseCheck.phase === HORSE_CHECK_PHASE.PRE_RACE) {
+    const { Horse } = getModels();
+    const [race, horse] = await Promise.all([
+      raceRepository.findById(horseCheck.race_id),
+      Horse.findByPk(horseCheck.horse_id)
+    ]);
+
+    if (!race || !horse) {
+      throw new ApiError(404, race ? 'Horse not found' : 'Race not found');
+    }
+
+    const mergedPayload = Object.assign({}, horseCheck.toJSON ? horseCheck.toJSON() : horseCheck, payload, {
+      phase: HORSE_CHECK_PHASE.PRE_RACE,
+      status: payload.status === undefined ? horseCheck.status : payload.status
+    });
+    Object.assign(updateData, buildPreRaceCheckData(race, horse, mergedPayload, horseCheck));
+    delete updateData.is_eligible;
+    Object.assign(updateData, getPreRaceEligibilityData(race, horse, {
+      weight: mergedPayload.weight,
+      ballast_added_kg: updateData.ballast_added_kg,
+      ballast_confirmed: updateData.ballast_confirmed
+    }, mergedPayload.status));
+  }
+
+  const updatedHorseCheck = await horseCheckRepository.updateById(id, updateData);
+
+  return {
+    horse_check: updatedHorseCheck
+  };
+}
+
+async function confirmBallast(req, id, payload) {
+  const { Horse } = getModels();
+  const horseCheck = await horseCheckRepository.findById(id);
+
+  if (!horseCheck) {
+    throw new ApiError(404, 'Horse check not found');
+  }
+
+  if (horseCheck.phase !== HORSE_CHECK_PHASE.PRE_RACE) {
+    throw new ApiError(409, 'Ballast can only be confirmed for a pre-race check');
+  }
+
+  const [race, horse] = await Promise.all([
+    raceRepository.findById(horseCheck.race_id),
+    Horse.findByPk(horseCheck.horse_id)
+  ]);
+
+  if (!race || !horse) {
+    throw new ApiError(404, race ? 'Horse not found' : 'Race not found');
+  }
+
+  // A referee must be the one currently assigned to this race. Admins retain
+  // their existing supervision permission for referee workflows.
+  if (!hasRole(req, ROLE_NAMES.ADMIN)) {
+    const referee = await getCurrentReferee(req);
+    const assignedRefereeId = getDocumentId(race.referee_id);
+
+    if (!assignedRefereeId || !sameId(assignedRefereeId, referee._id)) {
+      throw new ApiError(403, 'Only the referee assigned to this race can confirm ballast');
+    }
+  }
+
+  const baseline = evaluatePreRaceEligibility(race, horse, horseCheck);
+  const rule = baseline.rule || {};
+  const measuredWeight = horseCheck.weight === undefined || horseCheck.weight === null || horseCheck.weight === ''
+    ? NaN
+    : Number(horseCheck.weight);
+  const minKg = Number(rule.min_kg);
+  const maxKg = Number(rule.max_kg);
+  const ballastAddedKg = Number(payload.ballast_added_kg);
+
+  if (rule.type !== 'horse_weight_range') {
+    throw new ApiError(409, 'This race does not use a horse weight eligibility rule');
+  }
+
+  if (rule.ballast_allowed !== true) {
+    throw new ApiError(409, 'This race does not allow ballast confirmation');
+  }
+
+  if (!Number.isFinite(measuredWeight) || measuredWeight >= minKg) {
+    throw new ApiError(409, 'Ballast confirmation is only available below the minimum measured weight');
+  }
+
+  const requiredBallastKg = minKg - measuredWeight;
+  if (ballastAddedKg < requiredBallastKg) {
+    throw new ApiError(422, 'Ballast added is below the required amount', {
+      required_ballast_kg: requiredBallastKg,
+      ballast_added_kg: ballastAddedKg
+    });
+  }
+
+  if (measuredWeight + ballastAddedKg > maxKg) {
+    throw new ApiError(422, 'Effective weight exceeds the maximum allowed weight', {
+      effective_weight_kg: measuredWeight + ballastAddedKg,
+      max_kg: maxKg
+    });
+  }
+
+  const evaluationCheck = Object.assign({}, horseCheck.toJSON ? horseCheck.toJSON() : horseCheck, {
+    ballast_added_kg: ballastAddedKg,
+    ballast_confirmed: true
+  });
+  const eligibilityData = getPreRaceEligibilityData(
+    race,
+    horse,
+    evaluationCheck,
+    horseCheck.status
+  );
+  const updatedHorseCheck = await horseCheckRepository.updateById(id, Object.assign({}, eligibilityData, {
+    ballast_required_kg: requiredBallastKg,
+    ballast_added_kg: ballastAddedKg,
+    ballast_confirmed: true,
+    ballast_confirmed_by: req.user._id,
+    ballast_confirmed_at: new Date(),
     checked_at: new Date()
   }));
 
@@ -446,6 +639,7 @@ async function updateHorseCheck(req, id, payload) {
 
 module.exports = {
   bulkSaveHorseChecks,
+  confirmBallast,
   createHorseCheck,
   getHorseCheck,
   listHorseChecks,

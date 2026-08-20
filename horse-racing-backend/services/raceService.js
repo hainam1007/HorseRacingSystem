@@ -30,6 +30,8 @@ const { ROLE_NAMES } = require('../constants/roles');
 const profileRepository = require('../repositories/profileRepository');
 const raceOddsMarketRepository = require('../repositories/raceOddsMarketRepository');
 const raceRepository = require('../repositories/raceRepository');
+const racetrackRepository = require('../repositories/racetrackRepository');
+const registrationRepository = require('../repositories/registrationRepository');
 const roundRepository = require('../repositories/roundRepository');
 const tournamentRepository = require('../repositories/tournamentRepository');
 const raceEngineService = require('./raceEngineService');
@@ -57,7 +59,7 @@ function sameId(first, second) {
 }
 
 function getDocumentId(value) {
-    return value && (value._id || value);
+    return value && (value._id || value.id || value);
 }
 
 function toPlainRace(race) {
@@ -190,14 +192,86 @@ async function validateRaceLinks(payload) {
     }
 }
 
+async function getActiveRacetrack(racetrackId) {
+    const racetrack = await racetrackRepository.findById(racetrackId);
+
+    if (!racetrack) {
+        throw new ApiError(404, 'Racetrack not found');
+    }
+
+    if (racetrack.status !== 'active') {
+        throw new ApiError(422, 'Only active racetracks can be used for a race');
+    }
+
+    return racetrack;
+}
+
+function buildEligibilityRuleSnapshot(racetrack) {
+    return {
+        racetrack_id: getDocumentId(racetrack),
+        racetrack_code: racetrack.code,
+        rule_version: racetrack.rule_version,
+        rule: racetrack.eligibility_rule
+    };
+}
+
+function applyRacetrackToRacePayload(payload, racetrack) {
+    return {
+        ...payload,
+        racetrack_id: getDocumentId(racetrack),
+        location: racetrack.name,
+        venue_code: racetrack.code,
+        eligibility_rule_snapshot: buildEligibilityRuleSnapshot(racetrack)
+    };
+}
+
+function attachRacetrack(race, racetrack) {
+    if (!race) return race;
+    return Object.assign({}, race, { racetrack: racetrack || race.racetrack || null });
+}
+
+async function assertRacetrackCanChange(existingRace) {
+    const blockers = [];
+    const raceId = getDocumentId(existingRace);
+
+    if (existingRace.entries_finalized_at || existingRace.entries_finalized_by || existingRace.status === 'entries_finalized') {
+        blockers.push('ENTRIES_FINALIZED');
+    }
+    if (existingRace.betting_status === 'open') {
+        blockers.push('BETTING_OPEN');
+    }
+    if (existingRace.started_at || ['starting', 'running', 'completed'].includes(existingRace.status)) {
+        blockers.push('RACE_ALREADY_STARTED_OR_COMPLETED');
+    }
+
+    const [hasUncancelledRegistration, hasPendingOrPaidPayment, hasReservedSlot, oddsMarket] = await Promise.all([
+        registrationRepository.hasUncancelledRegistrationForRace(raceId),
+        registrationRepository.hasPendingOrPaidPaymentForRace(raceId),
+        registrationRepository.hasReservedSlotForRace(raceId),
+        raceOddsMarketRepository.findByRaceId(raceId)
+    ]);
+
+    if (hasUncancelledRegistration) blockers.push('UNCANCELLED_REGISTRATION');
+    if (hasPendingOrPaidPayment) blockers.push('PAYMENT_PENDING_OR_PAID');
+    if (hasReservedSlot) blockers.push('REGISTRATION_SLOT_RESERVED');
+    if (oddsMarket) blockers.push('ODDS_MARKET_CREATED');
+
+    if (blockers.length) {
+        throw new ApiError(409, 'Racetrack cannot be changed after race activity has begun', { blockers });
+    }
+}
+
 async function createRace(payload) {
     const racePayload = await prepareRacePayload(payload);
     await validateRaceLinks(racePayload);
+    const racetrack = await getActiveRacetrack(racePayload.racetrack_id);
 
-    const race = await raceRepository.create(applyRegistrationLockAt(racePayload));
+    const race = await raceRepository.create(
+        applyRegistrationLockAt(applyRacetrackToRacePayload(racePayload, racetrack))
+    );
 
     return {
-        race: race
+        race: attachRacetrack(race, racetrack)
     };
 }
 
@@ -353,14 +427,24 @@ async function updateRace(id, payload) {
 
     await validateRaceLinks(racePayload);
 
-    const race = await raceRepository.updateById(id, applyRegistrationLockAt(racePayload));
+    let racetrack = null;
+    if (racePayload.racetrack_id && !sameId(racePayload.racetrack_id, existingRace.racetrack_id)) {
+        await assertRacetrackCanChange(existingRace);
+        racetrack = await getActiveRacetrack(racePayload.racetrack_id);
+    }
+
+    const payloadWithRacetrack = racetrack
+        ? applyRacetrackToRacePayload(racePayload, racetrack)
+        : racePayload;
+
+    const race = await raceRepository.updateById(id, applyRegistrationLockAt(payloadWithRacetrack));
 
     if (!race) {
         throw new ApiError(404, 'Race not found');
     }
 
     return {
-        race: race
+        race: attachRacetrack(race, racetrack)
     };
 }
 
@@ -587,6 +671,21 @@ async function startRace(req, id) {
 
     try {
         const participantData = await raceEngineService.collectParticipants(race._id);
+
+        const ineligibleParticipants = (participantData.participant_statuses || []).filter(function(participant) {
+            return !participant.eligible;
+        });
+
+        if (ineligibleParticipants.length) {
+            throw new ApiError(409, 'Race cannot start until every approved participant passes pre-race readiness', {
+                blocked_participants: ineligibleParticipants.map(function(participant) {
+                    return {
+                        horse_id: getDocumentId(participant.horse),
+                        blockers: participant.blockers
+                    };
+                })
+            });
+        }
 
         if (!participantData.participants.length) {
             throw new ApiError(400, 'Race has no eligible participants');

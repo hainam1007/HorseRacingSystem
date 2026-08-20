@@ -58,6 +58,11 @@ router.get(
   validateTournamentIdParam,
   asyncHandler(horseOwnerController.getRacesByTournamentId)
 );
+router.get(
+  '/races/:raceId/eligible-horses',
+  validateRaceIdParam,
+  asyncHandler(horseOwnerController.getEligibleHorsesForRace)
+);
 router.get('/races/:raceId/rounds', validateRaceIdParam, asyncHandler(horseOwnerController.getRoundsByRaceId));
 
 router.post('/race-registrations', validateRaceRegistration, asyncHandler(horseOwnerController.registerHorseForRace));

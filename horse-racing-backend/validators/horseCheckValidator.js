@@ -527,6 +527,28 @@ function validateUpdateHorseCheck(req, res, next) {
   return next();
 }
 
+function validateConfirmBallast(req, res, next) {
+  const errors = [];
+  const payload = {};
+  const ballastAddedKg = getOptionalNumber(req.body || {}, 'ballast_added_kg', errors);
+
+  if (ballastAddedKg === undefined) {
+    errors.push({ field: 'ballast_added_kg', message: 'ballast_added_kg is required' });
+  } else if (!Number.isFinite(ballastAddedKg) || ballastAddedKg < 0) {
+    errors.push({ field: 'ballast_added_kg', message: 'ballast_added_kg must be a non-negative number' });
+  } else {
+    payload.ballast_added_kg = ballastAddedKg;
+  }
+
+  if (errors.length) {
+    return next(new ApiError(400, 'Validation failed', errors));
+  }
+
+  req.validatedBody = payload;
+
+  return next();
+}
+
 module.exports = {
   validateBulkPostRaceHorseChecks,
   validateBulkPreRaceHorseChecks,
@@ -534,6 +556,7 @@ module.exports = {
   validateCreatePreRaceHorseCheck,
   validateCreateDuringRaceHorseCheck,
   validateCreatePostRaceHorseCheck,
+  validateConfirmBallast,
   validateListHorseChecks,
   validateUpdateHorseCheck
 };

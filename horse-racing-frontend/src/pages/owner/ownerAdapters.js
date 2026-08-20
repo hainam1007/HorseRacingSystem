@@ -87,6 +87,19 @@ export function toOwnerHorse(apiHorse) {
   };
 }
 
+export function toOwnerEligibleHorse(apiEntry) {
+  const horse = toOwnerHorse(apiEntry?.horse || {});
+  const eligibilityStatus = String(apiEntry?.eligibility_status || "eligible").toLowerCase();
+
+  return {
+    ...horse,
+    eligibilityStatus,
+    requiredBallastKg: Number(apiEntry?.required_ballast_kg || 0),
+    eligibilityReasons: Array.isArray(apiEntry?.reasons) ? apiEntry.reasons : [],
+    eligibilityRaw: apiEntry,
+  };
+}
+
 export function toOwnerProfile(apiProfile, user) {
   return {
     name: user?.full_name || user?.email || "Horse Owner",

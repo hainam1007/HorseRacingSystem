@@ -95,6 +95,12 @@ async function getRoundsByRaceId(req, res) {
   return sendSuccess(res, 200, 'Round list retrieved successfully', data);
 }
 
+async function getEligibleHorsesForRace(req, res) {
+  const data = await horseOwnerService.getEligibleHorsesForRace(getCurrentUser(req), req.params.raceId);
+
+  return sendSuccess(res, 200, 'Eligible horses retrieved successfully', data);
+}
+
 async function registerHorseForRace(req, res) {
   const data = await horseOwnerService.registerHorseForRace(getCurrentUser(req), req.validatedBody);
 
@@ -132,6 +138,7 @@ module.exports = {
   getTournaments,
   getRacesByTournamentId,
   getRoundsByRaceId,
+  getEligibleHorsesForRace,
   registerHorseForRace,
   getRegistrationPayment,
   updateRaceEntryDetails

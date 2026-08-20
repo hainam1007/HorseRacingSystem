@@ -8,6 +8,7 @@ const registrationRepository = require('../repositories/registrationRepository')
 const emailService = require('./emailService');
 const raceEngineService = require('./raceEngineService');
 const registrationSlotService = require('./registrationSlotService');
+const racetrackEligibilityService = require('./racetrackEligibilityService');
 
 function getModels() { return loadSequelizeModels().models; }
 
@@ -73,6 +74,15 @@ async function createRegistration(req, payload) {
     throw new ApiError(403, 'Horse does not belong to this owner');
   }
 
+  // Admin-created registrations use the same race snapshot evaluator as the
+  // owner flow, so this endpoint cannot bypass racetrack eligibility.
+  const eligibility = racetrackEligibilityService.assertHorseCanRegister(race, horse);
+  const eligibilityPayload = {
+    eligibility_status: eligibility.status,
+    eligibility_snapshot: eligibility,
+    eligibility_checked_at: new Date()
+  };
+
   const duplicateCount = await registrationRepository.count({
     race_id: payload.race_id,
     horse_id: payload.horse_id
@@ -97,7 +107,8 @@ async function createRegistration(req, payload) {
       slot_reserved_at: new Date(),
       status: REGISTRATION_STATUS.APPROVED,
       approved_by: req.user._id,
-      approved_at: new Date()
+      approved_at: new Date(),
+      ...eligibilityPayload
     });
   } catch (error) {
     await registrationSlotService.releaseRaceSlot(payload.race_id);

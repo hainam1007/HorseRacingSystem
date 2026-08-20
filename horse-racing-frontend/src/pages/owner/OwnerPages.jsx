@@ -37,7 +37,7 @@ import LoadingSkeleton from "../../components/LoadingSkeleton.jsx";
 import { ownerApi } from "../../api/ownerApi";
 import { readFileAsDataUri } from "../../utils/fileData";
 import { canRequestRegistrationCancellation, findAcceptedPrimaryAssignment, findPrimaryAssignmentForRegistration, toHorsePayload, toOwnerJockey, toOwnerProfilePayload, toOwnerRaceOption, toOwnerScheduleEntry } from "./ownerAdapters";
-import { useOwnerCancellationTickets, useOwnerHorse, useOwnerHorseApprovalStatus, useOwnerHorses, useOwnerJockeyAssignments, useOwnerJockeys, useOwnerPrizeAwards, useOwnerProfile, useOwnerRegistrations, useOwnerTournaments } from "./useOwnerData";
+import { useOwnerCancellationTickets, useOwnerEligibleHorses, useOwnerHorse, useOwnerHorseApprovalStatus, useOwnerHorses, useOwnerJockeyAssignments, useOwnerJockeys, useOwnerPrizeAwards, useOwnerProfile, useOwnerRegistrations, useOwnerTournaments } from "./useOwnerData";
 
 const statusClass = (status) => {
   if (["Ready", "Available", "Approved", "Assigned", "Accepted", "Standby confirmed", "Confirmed", "Published", "Won", "Verified", "Paid"].includes(status)) {
@@ -849,7 +849,6 @@ function OwnerRegistrations() {
     error: cancellationTicketsError,
     reload: reloadCancellationTickets,
   } = useOwnerCancellationTickets();
-  const horses = liveHorses;
   const tournaments = liveTournaments;
   const registrations = liveRegistrations;
   const approvedCount = registrations.filter((item) => item.status === "Approved").length;
@@ -874,9 +873,14 @@ function OwnerRegistrations() {
     raceId: "",
     note: "",
   });
-  const selectedHorse = horses.find((horse) => horse.id === entry.horseId) ?? null;
+  const eligibleHorseData = useOwnerEligibleHorses(entry.raceId);
   const selectedTournament = tournaments.find((tournament) => tournament.id === entry.tournamentId) ?? null;
   const selectedRace = races.find((race) => race.id === entry.raceId) ?? null;
+  const eligibilityDataMatchesRace = Boolean(selectedRace?.id) && eligibleHorseData.raceId === selectedRace.id;
+  const horses = eligibilityDataMatchesRace ? eligibleHorseData.horses : [];
+  const selectedHorse = horses.find((horse) => horse.id === entry.horseId) ?? null;
+  const eligibilityLoading = Boolean(selectedRace?.id) && (!eligibilityDataMatchesRace || eligibleHorseData.isLoading);
+  const eligibilityError = eligibilityDataMatchesRace ? eligibleHorseData.error : "";
   const filteredHorses = horses.filter((horse) => (
     `${horse.name} ${horse.registrationNumber} ${horse.breed} ${horse.gender} ${horse.color} ${horse.status}`
       .toLowerCase()
@@ -953,7 +957,10 @@ function OwnerRegistrations() {
     if (["horseId", "tournamentId", "raceId"].includes(field)) {
       setTermsAccepted(false);
     }
-    setEntry((current) => ({ ...current, [field]: value }));
+    setEntry((current) => field === "raceId"
+      ? { ...current, raceId: value, horseId: "" }
+      : { ...current, [field]: value });
+    if (field === "raceId") setHorseQuery("");
   };
 
   const selectTournament = (tournamentId) => {
@@ -965,8 +972,7 @@ function OwnerRegistrations() {
   };
 
   const isHorseEligible = (horse) => {
-    const sourceStatus = String(horse?.raw?.status || "").toLowerCase();
-    return sourceStatus ? sourceStatus === "active" : horse?.status === "Ready";
+    return ["eligible", "conditional_ballast"].includes(String(horse?.eligibilityStatus || "").toLowerCase());
   };
 
   const getRaceEntryState = (race) => {
@@ -1001,6 +1007,11 @@ function OwnerRegistrations() {
 
     if (!selectedHorse?.id) {
       setError("Select a horse before submitting.");
+      return;
+    }
+
+    if (!isHorseEligible(selectedHorse)) {
+      setError("The selected horse is not eligible for this race.");
       return;
     }
 
@@ -1127,8 +1138,11 @@ function OwnerRegistrations() {
     if (!selectedRaceState?.available) {
       return selectedRaceState?.reason || "The selected race is not accepting entries.";
     }
+    if (eligibilityLoading) return "Checking horse eligibility for this race.";
+    if (eligibilityError) return eligibilityError;
+    if (!horses.length) return "No horse in your stable meets this race's eligibility rule.";
     if (!selectedHorse?.id) return "Select an eligible horse to continue.";
-    if (!isHorseEligible(selectedHorse)) return "The selected horse is not active.";
+    if (!isHorseEligible(selectedHorse)) return "The selected horse is not eligible for this race.";
     if (!termsAccepted) return "Accept the entry and pre-race inspection conditions.";
     return "";
   })();
@@ -1141,9 +1155,9 @@ function OwnerRegistrations() {
         </section>
       )}
 
-      {!horsesError && !tournamentsError && !registrationsError && (!horses.length || !tournaments.length) && (
+      {!horsesError && !tournamentsError && !registrationsError && (!liveHorses.length || !tournaments.length) && (
         <section className="admin-live-state" aria-live="polite">
-          {!horses.length
+          {!liveHorses.length
             ? "Add an active horse profile before submitting a race registration."
             : "No tournaments are currently available for registration."}
         </section>
@@ -1308,9 +1322,13 @@ function OwnerRegistrations() {
               <div>
                 <span className="owner-kicker">Choose horse</span>
                 <h2 id="choose-horse-heading">Select the horse you want to enter</h2>
-                <p className="owner-entry-section__description">Choose one active horse from your stable. The selected profile will be paired with the race you selected above.</p>
+                <p className="owner-entry-section__description">Choose a horse that meets the selected racetrack rule. Horses that need approved ballast remain available with a clear warning.</p>
               </div>
             </div>
+            {!selectedRace && <div className="owner-entry-guidance"><ShieldCheck size={18} /> Select a race to check which horses are eligible.</div>}
+            {eligibilityLoading && <LoadingSkeleton ariaLabel="Checking horse eligibility" variant="inline" />}
+            {selectedRace && !eligibilityLoading && eligibilityError && <div className="owner-entry-eligibility owner-entry-eligibility--error"><Info size={18} /><div><strong>Eligibility could not be checked</strong><span>{eligibilityError}</span></div></div>}
+            {selectedRace && !eligibilityLoading && !eligibilityError && eligibleHorseData.condition && <div className="owner-entry-eligibility"><ShieldCheck size={18} /><div><span>Racetrack condition{eligibleHorseData.racetrack?.name ? ` · ${eligibleHorseData.racetrack.name}` : ""}</span><strong>{eligibleHorseData.condition.label}</strong><small>Rule v{eligibleHorseData.condition.rule_version || 1} · {eligibleHorseData.excludedCount} horse{eligibleHorseData.excludedCount === 1 ? "" : "s"} excluded from this race.</small></div></div>}
             <div className="owner-entry-horse-toolbar">
               <label className="owner-entry-search">
                 <Search size={17} aria-hidden="true" />
@@ -1327,17 +1345,18 @@ function OwnerRegistrations() {
                   </button>
                 )}
               </label>
-              <span className="owner-entry-results"><strong>{filteredHorses.length}</strong> of {horses.length} horses</span>
+              <span className="owner-entry-results"><strong>{filteredHorses.length}</strong> eligible horse{filteredHorses.length === 1 ? "" : "s"}</span>
             </div>
             <div className="owner-entry-horse-list" role="listbox" aria-label="Eligible horses">
-              {filteredHorses.map((horse) => {
+              {selectedRace && !eligibilityLoading && !eligibilityError && filteredHorses.map((horse) => {
                 const eligible = isHorseEligible(horse);
+                const conditionalBallast = horse.eligibilityStatus === "conditional_ballast";
                 const selected = selectedHorse?.id === horse.id;
                 return (
                   <button
                     aria-disabled={!eligible}
                     aria-selected={selected}
-                    className={`owner-entry-horse${selected ? " is-selected" : ""}${!eligible ? " is-unavailable" : ""}`}
+                    className={`owner-entry-horse${selected ? " is-selected" : ""}${conditionalBallast ? " is-conditional" : ""}${!eligible ? " is-unavailable" : ""}`}
                     key={horse.id}
                     onClick={() => eligible && updateEntry("horseId", horse.id)}
                     role="option"
@@ -1347,18 +1366,19 @@ function OwnerRegistrations() {
                     <span className="owner-entry-horse__identity">
                       <strong>{horse.name}</strong>
                       <small>{horse.registrationNumber || compactRecordCode("Horse", horse.id)}</small>
+                      {conditionalBallast && <span className="owner-entry-horse__ballast">Requires {horse.requiredBallastKg} kg approved ballast before race</span>}
                     </span>
                     <span className="owner-entry-horse__facts">
                       {horse.facts.filter((fact) => fact.label !== "Rating").slice(0, 5).map((fact) => (
                         <span key={fact.label}><small>{fact.label}</small>{fact.value}</span>
                       ))}
                     </span>
-                    <span className={`owner-badge ${eligible ? "owner-badge--green" : "owner-badge--muted"}`}>{eligible ? "Eligible" : "Inactive"}</span>
+                    <span className={`owner-badge ${conditionalBallast ? "owner-badge--amber" : eligible ? "owner-badge--green" : "owner-badge--muted"}`}>{conditionalBallast ? "Ballast required" : eligible ? "Eligible" : "Unavailable"}</span>
                   </button>
                 );
               })}
-              {!horses.length && <div className="owner-empty owner-empty--compact">No horse profiles are available.</div>}
-              {!!horses.length && !filteredHorses.length && <div className="owner-entry-empty-search"><Search size={18} /><strong>No horses found</strong><span>Try a different name or registration number.</span></div>}
+              {selectedRace && !eligibilityLoading && !eligibilityError && !horses.length && <div className="owner-empty owner-empty--compact">No horse in your stable meets this race's eligibility rule.</div>}
+              {selectedRace && !eligibilityLoading && !eligibilityError && !!horses.length && !filteredHorses.length && <div className="owner-entry-empty-search"><Search size={18} /><strong>No eligible horses found</strong><span>Try a different name or registration number.</span></div>}
             </div>
           </section>
 
@@ -1399,7 +1419,7 @@ function OwnerRegistrations() {
 
             <div className="owner-entry-notice">
               <Info size={17} />
-              <p>The entry fee is non-refundable if the horse fails or misses the pre-race inspection. An eligible primary jockey is still required before race start.</p>
+              <p>{selectedHorse?.eligibilityStatus === "conditional_ballast" ? `${selectedHorse.name} requires ${selectedHorse.requiredBallastKg} kg approved ballast at pre-race inspection. ` : ""}The entry fee is non-refundable if the horse fails or misses the pre-race inspection. An eligible primary jockey is still required before race start.</p>
             </div>
 
             <label className="owner-registration-terms">

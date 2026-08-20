@@ -58,6 +58,9 @@ module.exports = (sequelize, DataTypes) => {
         User.hasMany(models.RedemptionHistory, { foreignKey: 'user_id', as: 'redemption_histories' });
         User.hasMany(models.Tournament, { foreignKey: 'created_by', as: 'created_tournaments' });
         User.hasMany(models.Horse, { foreignKey: 'rating_updated_by', as: 'rating_updates' });
+        User.hasMany(models.Racetrack, { foreignKey: 'created_by', as: 'created_racetracks' });
+        User.hasMany(models.Racetrack, { foreignKey: 'updated_by', as: 'updated_racetracks' });
+        User.hasMany(models.HorseCheck, { foreignKey: 'ballast_confirmed_by', as: 'ballast_confirmations' });
     };
 
     return User;

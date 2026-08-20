@@ -275,6 +275,26 @@ export const adminApi = {
     return apiRequest(withQuery("/races", params));
   },
 
+  listRacetracks(params = {}) {
+    return apiRequest(withQuery("/racetracks", params));
+  },
+
+  getRacetrack(id) {
+    return apiRequest(`/racetracks/${id}`);
+  },
+
+  createRacetrack(payload) {
+    return apiRequest("/racetracks", { method: "POST", body: payload });
+  },
+
+  updateRacetrack(id, payload) {
+    return apiRequest(`/racetracks/${id}`, { method: "PATCH", body: payload });
+  },
+
+  archiveRacetrack(id) {
+    return apiRequest(`/racetracks/${id}/archive`, { method: "POST" });
+  },
+
   getRace(id) {
     return apiRequest(`/races/${id}`);
   },

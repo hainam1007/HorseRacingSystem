@@ -3,8 +3,33 @@ const { loadSequelizeModels } = require('../models/sequelize/index.js');
 function getModels() { return loadSequelizeModels().models; }
 
 function defaultInclude() {
-  const { Race, Tournament, Round, RaceReferee, User, Horse, HorseOwner, Jockey } = getModels();
+  const {
+    Race,
+    Tournament,
+    Round,
+    RaceReferee,
+    User,
+    Horse,
+    HorseOwner,
+    Jockey,
+    JockeyAssignmentMeeting,
+    JockeyAssignmentTerm,
+    JockeyAssignmentStandbyTerm,
+    JockeyAssignmentContract,
+    JockeyAssignmentStandbyContract,
+    JockeyAssignmentCancellationRequest,
+    JockeyAssignmentWithdrawal,
+    JockeyAssignmentPromotion
+  } = getModels();
   return [
+    { model: JockeyAssignmentMeeting, as: 'meeting', required: false },
+    { model: JockeyAssignmentTerm, as: 'terms', required: false },
+    { model: JockeyAssignmentStandbyTerm, as: 'standby_terms', required: false },
+    { model: JockeyAssignmentContract, as: 'contract', required: false },
+    { model: JockeyAssignmentStandbyContract, as: 'standby_contract', required: false },
+    { model: JockeyAssignmentCancellationRequest, as: 'cancellation_request', required: false },
+    { model: JockeyAssignmentWithdrawal, as: 'withdrawal', required: false },
+    { model: JockeyAssignmentPromotion, as: 'promotion', required: false },
     {
       model: Race,
       as: 'race',

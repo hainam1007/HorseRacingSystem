@@ -47,11 +47,16 @@ function addEnum(body, payload, field, values, errors) {
 function buildRacePayload(body, errors) {
   const payload = {};
 
-  ['tournament_id', 'round_id', 'referee_id'].forEach(function(field) {
+  ['tournament_id', 'round_id', 'referee_id', 'racetrack_id'].forEach(function(field) {
     addObjectId(body, payload, field, errors);
   });
-  ['name', 'location', 'status', 'entry_fee_currency', 'prize_currency'].forEach(function(field) {
+  ['name', 'status', 'entry_fee_currency', 'prize_currency'].forEach(function(field) {
     if (body[field] !== undefined) payload[field] = stringValue(body[field]);
+  });
+  ['location', 'venue_code'].forEach(function(field) {
+    if (body[field] !== undefined) {
+      errors.push({ field: field, message: field + ' is derived from racetrack and cannot be set directly' });
+    }
   });
   if (body.image_file_data !== undefined) {
     const imageFileData = stringValue(body.image_file_data);
@@ -61,7 +66,6 @@ function buildRacePayload(body, errors) {
       payload.image_file_data = imageFileData;
     }
   }
-  if (body.venue_code !== undefined) payload.venue_code = stringValue(body.venue_code).toUpperCase();
   if (body.race_date !== undefined && body.race_date !== null && body.race_date !== '') {
     const raceDate = new Date(body.race_date);
     if (Number.isNaN(raceDate.getTime())) errors.push({ field: 'race_date', message: 'race_date must be a valid date' });
@@ -88,7 +92,7 @@ function buildRacePayload(body, errors) {
 function validateCreateRace(req, res, next) {
   const errors = [];
   const payload = buildRacePayload(req.body || {}, errors);
-  ['tournament_id', 'round_id', 'name'].forEach(function(field) {
+  ['tournament_id', 'round_id', 'racetrack_id', 'name'].forEach(function(field) {
     if (!payload[field]) errors.push({ field: field, message: field + ' is required' });
   });
   if (errors.length) return next(new ApiError(400, 'Validation failed', errors));

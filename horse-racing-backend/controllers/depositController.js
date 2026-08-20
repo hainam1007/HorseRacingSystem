@@ -33,6 +33,13 @@ function buildPaymentReturnUrl(req, data) {
   const url = new URL(baseUrl);
   const orderId = data?.order?.order_id || req.query.vnp_TxnRef || req.query.orderId || req.query.order_id || '';
 
+  // Registration payments belong to the horse-owner workspace. Wallet deposits
+  // continue to the spectator workspace, even when the configured base URL is
+  // the legacy generic payment-success route.
+  url.pathname = String(orderId).startsWith('REG-')
+    ? '/owner/payment-success'
+    : '/spectator/payment-success';
+
   if (orderId) url.searchParams.set('order_id', orderId);
   if (req.query.vnp_ResponseCode) url.searchParams.set('vnp_ResponseCode', req.query.vnp_ResponseCode);
   if (req.query.resultCode !== undefined) url.searchParams.set('resultCode', req.query.resultCode);

@@ -111,6 +111,10 @@ function adaptCheck(check) {
     weight: check.weight ?? null,
     note: check.check_note || "",
     isEligible: check.is_eligible,
+    ballastRequiredKg: check.ballast_required_kg ?? null,
+    ballastAddedKg: check.ballast_added_kg ?? null,
+    ballastConfirmed: check.ballast_confirmed === true,
+    eligibilityResult: check.eligibility_result || null,
     checkedAt: check.checked_at || null,
   };
 }

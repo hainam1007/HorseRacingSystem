@@ -16,9 +16,9 @@ test('race validator accepts supported probability model fields', () => {
   const result = runValidator(validateCreateRace, {
     tournament_id: '507f1f77-bcf8-4cd7-9943-901100000001',
     round_id: '507f1f77-bcf8-4cd7-9943-901100000002',
+    racetrack_id: '507f1f77-bcf8-4cd7-9943-901100000003',
     name: 'Race 1',
     race_no: 1,
-    venue_code: 'st',
     course: 'B+2',
     race_class: '5',
     going: 'Good',
@@ -26,7 +26,7 @@ test('race validator accepts supported probability model fields', () => {
   });
 
   assert.equal(result.error, undefined);
-  assert.equal(result.payload.venue_code, 'ST');
+  assert.equal(result.payload.racetrack_id, '507f1f77-bcf8-4cd7-9943-901100000003');
   assert.equal(result.payload.race_class, '5');
 });
 
@@ -34,6 +34,7 @@ test('race validator rejects the unsupported restricted class label', () => {
   const result = runValidator(validateCreateRace, {
     tournament_id: '507f1f77-bcf8-4cd7-9943-901100000001',
     round_id: '507f1f77-bcf8-4cd7-9943-901100000002',
+    racetrack_id: '507f1f77-bcf8-4cd7-9943-901100000003',
     name: 'Restricted Race',
     race_class: '4 (Restricted)'
   });
@@ -46,12 +47,14 @@ test('race validator accepts an uploaded image data URI and rejects non-image da
   const valid = runValidator(validateCreateRace, {
     tournament_id: '507f1f77-bcf8-4cd7-9943-901100000001',
     round_id: '507f1f77-bcf8-4cd7-9943-901100000002',
+    racetrack_id: '507f1f77-bcf8-4cd7-9943-901100000003',
     name: 'Image race',
     image_file_data: 'data:image/png;base64,aGVsbG8='
   });
   const invalid = runValidator(validateCreateRace, {
     tournament_id: '507f1f77-bcf8-4cd7-9943-901100000001',
     round_id: '507f1f77-bcf8-4cd7-9943-901100000002',
+    racetrack_id: '507f1f77-bcf8-4cd7-9943-901100000003',
     name: 'Invalid image race',
     image_file_data: 'data:text/plain;base64,aGVsbG8='
   });
@@ -60,6 +63,28 @@ test('race validator accepts an uploaded image data URI and rejects non-image da
   assert.equal(valid.payload.image_file_data, 'data:image/png;base64,aGVsbG8=');
   assert.equal(invalid.error.statusCode, 400);
   assert.ok(invalid.error.details.some(function(item) { return item.field === 'image_file_data'; }));
+});
+
+test('race validator requires a racetrack and rejects client-controlled venue fields', () => {
+  const missingTrack = runValidator(validateCreateRace, {
+    tournament_id: '507f1f77-bcf8-4cd7-9943-901100000001',
+    round_id: '507f1f77-bcf8-4cd7-9943-901100000002',
+    name: 'Race without track'
+  });
+  assert.equal(missingTrack.error.statusCode, 400);
+  assert.ok(missingTrack.error.details.some(function(item) { return item.field === 'racetrack_id'; }));
+
+  const directVenue = runValidator(validateCreateRace, {
+    tournament_id: '507f1f77-bcf8-4cd7-9943-901100000001',
+    round_id: '507f1f77-bcf8-4cd7-9943-901100000002',
+    racetrack_id: '507f1f77-bcf8-4cd7-9943-901100000003',
+    name: 'Race with direct venue',
+    location: 'Client location',
+    venue_code: 'CLIENT'
+  });
+  assert.equal(directVenue.error.statusCode, 400);
+  assert.ok(directVenue.error.details.some(function(item) { return item.field === 'location'; }));
+  assert.ok(directVenue.error.details.some(function(item) { return item.field === 'venue_code'; }));
 });
 
 test('race entry validator rejects unknown gear codes and unsafe carried weight', () => {

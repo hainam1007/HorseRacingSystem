@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { ownerApi } from "../../api/ownerApi";
 import { useAuth } from "../../auth/AuthContext";
-import { toHorseApprovalStatus, toOwnerHorse, toOwnerJockey, toOwnerPrizeAward, toOwnerProfile, toOwnerRegistration, toOwnerTournament } from "./ownerAdapters";
+import { toHorseApprovalStatus, toOwnerEligibleHorse, toOwnerHorse, toOwnerJockey, toOwnerPrizeAward, toOwnerProfile, toOwnerRegistration, toOwnerTournament } from "./ownerAdapters";
 
 export function useOwnerHorses() {
   const [horses, setHorses] = useState([]);
@@ -28,6 +28,46 @@ export function useOwnerHorses() {
   }, [loadHorses]);
 
   return { horses, isLoading, error, reload: loadHorses };
+}
+
+export function useOwnerEligibleHorses(raceId) {
+  const [state, setState] = useState({ raceId: "", horses: [], condition: null, racetrack: null, excludedCount: 0, isLoading: false, error: "" });
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadEligibleHorses() {
+      if (!raceId) {
+        setState({ raceId: "", horses: [], condition: null, racetrack: null, excludedCount: 0, isLoading: false, error: "" });
+        return;
+      }
+
+      setState({ raceId, horses: [], condition: null, racetrack: null, excludedCount: 0, isLoading: true, error: "" });
+      try {
+        const data = await ownerApi.getEligibleHorses(raceId);
+        if (!cancelled) {
+          setState({
+            raceId,
+            horses: (data.horses || []).map(toOwnerEligibleHorse),
+            condition: data.condition || null,
+            racetrack: data.racetrack || null,
+            excludedCount: Number(data.excluded_count || 0),
+            isLoading: false,
+            error: "",
+          });
+        }
+      } catch (apiError) {
+        if (!cancelled) {
+          setState({ raceId, horses: [], condition: null, racetrack: null, excludedCount: 0, isLoading: false, error: apiError.message || "Unable to check horse eligibility for this race." });
+        }
+      }
+    }
+
+    loadEligibleHorses();
+    return () => { cancelled = true; };
+  }, [raceId]);
+
+  return state;
 }
 
 export function useOwnerHorse(horseId) {

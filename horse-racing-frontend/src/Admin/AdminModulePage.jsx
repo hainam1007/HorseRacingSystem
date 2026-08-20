@@ -6,6 +6,7 @@ import AdminDepositModule from "./AdminDepositModule";
 import AdminLayout from "./AdminLayout";
 import AdminRoleApplicationsModule from "./AdminRoleApplicationsModule";
 import AdminRegistryModule from "./AdminRegistryModule";
+import AdminRacetrackModule from "./AdminRacetrackModule";
 import AdminRewardsModule from "./AdminRewardsModule";
 
 const commandModules = new Set(["users", "results"]);
@@ -19,6 +20,7 @@ function AdminModulePage() {
   if (moduleName === "deposits") return <AdminDepositModule />;
   if (moduleName === "rewards") return <AdminRewardsModule />;
   if (moduleName === "role-applications") return <AdminRoleApplicationsModule />;
+  if (moduleName === "racetracks") return <AdminRacetrackModule />;
   if (commandModules.has(moduleName)) return <AdminCommandModule moduleName={moduleName} />;
   if (competitionModules.has(moduleName)) return <AdminCompetitionModule moduleName={moduleName} />;
   if (registryModules.has(moduleName)) return <AdminRegistryModule moduleName={moduleName} />;
