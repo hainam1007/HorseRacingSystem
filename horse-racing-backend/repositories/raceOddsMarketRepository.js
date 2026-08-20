@@ -23,29 +23,62 @@ async function findByRaceId(raceId) {
 }
 
 async function upsertByRaceId(raceId, data) {
-  const { RaceOddsMarket } = getModels();
+  const { RaceOddsMarket, RaceOddsMarketOdd } = getModels();
   let instance = await RaceOddsMarket.findOne({ where: { race_id: raceId } });
+  const { odds, ...marketFields } = data;
   if (instance) {
-    await instance.update(data);
+    await instance.update(marketFields);
   } else {
-    instance = await RaceOddsMarket.create({ ...data, race_id: raceId });
+    instance = await RaceOddsMarket.create({ ...marketFields, race_id: raceId });
+  }
+  if (Array.isArray(odds)) {
+    await RaceOddsMarketOdd.destroy({ where: { odds_market_id: instance.id } });
+    if (odds.length) {
+      await RaceOddsMarketOdd.bulkCreate(
+        odds.map(function(odd) {
+          return { ...odd, odds_market_id: instance.id };
+        })
+      );
+    }
   }
   return RaceOddsMarket.findOne({ where: { race_id: raceId }, include: baseInclude() });
 }
 
 async function updateByRaceId(raceId, data) {
-  const { RaceOddsMarket } = getModels();
+  const { RaceOddsMarket, RaceOddsMarketOdd } = getModels();
   const instance = await RaceOddsMarket.findOne({ where: { race_id: raceId } });
   if (!instance) return null;
-  await instance.update(data);
+  const { odds, ...marketFields } = data;
+  await instance.update(marketFields);
+  if (Array.isArray(odds)) {
+    await RaceOddsMarketOdd.destroy({ where: { odds_market_id: instance.id } });
+    if (odds.length) {
+      await RaceOddsMarketOdd.bulkCreate(
+        odds.map(function(odd) {
+          return { ...odd, odds_market_id: instance.id };
+        })
+      );
+    }
+  }
   return RaceOddsMarket.findOne({ where: { race_id: raceId }, include: baseInclude() });
 }
 
 async function updateGeneratedByRaceId(raceId, data) {
-  const { RaceOddsMarket } = getModels();
+  const { RaceOddsMarket, RaceOddsMarketOdd } = getModels();
   const instance = await RaceOddsMarket.findOne({ where: { race_id: raceId, status: 'generated' } });
   if (!instance) return null;
-  await instance.update(data);
+  const { odds, ...marketFields } = data;
+  await instance.update(marketFields);
+  if (Array.isArray(odds)) {
+    await RaceOddsMarketOdd.destroy({ where: { odds_market_id: instance.id } });
+    if (odds.length) {
+      await RaceOddsMarketOdd.bulkCreate(
+        odds.map(function(odd) {
+          return { ...odd, odds_market_id: instance.id };
+        })
+      );
+    }
+  }
   return RaceOddsMarket.findOne({ where: { race_id: raceId }, include: baseInclude() });
 }
 

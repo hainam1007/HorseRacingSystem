@@ -50,6 +50,23 @@ function toDraft(pkg) {
   };
 }
 
+function formatApiError(error, fallback) {
+  if (!error) return fallback || "";
+  const details = Array.isArray(error.details) ? error.details.filter(Boolean) : [];
+  if (details.length) {
+    const messages = details
+      .map(function(detail) {
+        const field = detail.field ? `${detail.field}: ` : "";
+        return `${field}${detail.message || ""}`.trim();
+      })
+      .filter(Boolean);
+    if (messages.length) {
+      return [error.message, ...messages].filter(Boolean).join(" — ");
+    }
+  }
+  return error.message || fallback || "";
+}
+
 function newestPackageSort(first, second) {
   const firstTime = new Date(first?.created_at || first?.updated_at || 0).getTime() || 0;
   const secondTime = new Date(second?.created_at || second?.updated_at || 0).getTime() || 0;
@@ -97,7 +114,7 @@ export default function AdminDepositModule() {
         if (nextSelected) setDraft(toDraft(nextSelected));
       }
     } catch (apiError) {
-      setError(apiError.message || "Unable to load deposit packages.");
+      setError(formatApiError(apiError, "Unable to load deposit packages."));
     } finally {
       setIsLoading(false);
     }
@@ -201,7 +218,7 @@ export default function AdminDepositModule() {
         setDraft(toDraft(savedPackage));
       }
     } catch (apiError) {
-      setError(apiError.message || "Unable to save deposit package.");
+      setError(formatApiError(apiError, "Unable to save deposit package."));
     } finally {
       setIsSaving(false);
     }
@@ -220,7 +237,7 @@ export default function AdminDepositModule() {
         setDraft(toDraft({ ...pkg, is_active: false }));
       }
     } catch (apiError) {
-      setError(apiError.message || "Unable to deactivate deposit package.");
+      setError(formatApiError(apiError, "Unable to deactivate deposit package."));
     } finally {
       setIsSaving(false);
     }

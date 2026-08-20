@@ -49,7 +49,8 @@ function defaultInclude() {
       model: Jockey,
       as: 'jockey',
       include: [{ model: User, as: 'user', attributes: ['full_name', 'email'] }]
-    }
+    },
+    { model: JockeyAssignmentMeeting, as: 'meeting' }
   ];
 }
 

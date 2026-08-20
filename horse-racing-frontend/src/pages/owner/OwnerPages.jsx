@@ -1173,10 +1173,10 @@ function OwnerRegistrations() {
       </section>
 
       <div className="owner-entry-tabs" role="tablist" aria-label="Race registration views">
-        <button aria-selected={activeTab === "register"} className={activeTab === "register" ? "is-active" : ""} onClick={() => setActiveTab("register")} role="tab" type="button">
+        <button aria-selected={activeTab === "register"} className={activeTab === "register" ? "is-active" : ""} key="register" onClick={() => setActiveTab("register")} role="tab" type="button">
           Register for a race
         </button>
-        <button aria-selected={activeTab === "entries"} className={activeTab === "entries" ? "is-active" : ""} onClick={() => setActiveTab("entries")} role="tab" type="button">
+        <button aria-selected={activeTab === "entries"} className={activeTab === "entries" ? "is-active" : ""} key="entries" onClick={() => setActiveTab("entries")} role="tab" type="button">
           My entries <span>{registrations.length}</span>
         </button>
       </div>
