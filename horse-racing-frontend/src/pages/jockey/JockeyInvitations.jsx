@@ -297,7 +297,7 @@ function JockeyInvitations() {
                   <div><span>Role</span><strong>{invite.assignmentTypeLabel}{invite.backupPriority ? ` #${invite.backupPriority}` : ""}</strong></div>
                   <div><span><Clock3 size={13} /> Appointment</span><strong>{invite.meetingTime || "Pending"}</strong></div>
                   <div><span><MapPin size={13} /> Location</span><strong>{invite.locationName || invite.venue || "Pending"}</strong></div>
-                  {!invite.isBackup && <div><span><FileText size={13} /> Contract</span><strong>{invite.contractFileName || "Contract pending"}</strong></div>}
+                  {!invite.isBackup && <div><span><FileText size={13} /> Contract</span><strong>{invite.contractFileName || (invite.rawStatus === "contract_uploaded" ? "Contract sent" : "Contract pending")}</strong></div>}
                 </div>
 
                 <div className="jockey-invitation-review">
@@ -308,14 +308,15 @@ function JockeyInvitations() {
                     {(invite.contactName || invite.contactPhone) && <small>{[invite.contactName, invite.contactPhone].filter(Boolean).join(" / ")}</small>}
                   </div>
                   {!invite.isBackup && <div>
-                    <span><FileText size={13} /> Contract</span>
-                    {invite.contractUrl ? <a href={invite.contractUrl} rel="noreferrer" target="_blank">{invite.contractFileName || invite.contractUrl}</a> : <strong>{invite.contractFileName || "Contract link pending"}</strong>}
+                    <span><FileText size={13} /> Contract from owner</span>
+                    {invite.contractUrl ? <a href={invite.contractUrl} download={invite.contractFileName || undefined} rel="noreferrer" target="_blank">{invite.contractFileName || "Open sent contract"}</a> : <strong>{invite.contractFileName || (invite.rawStatus === "contract_uploaded" ? "Contract sent" : "Contract link pending")}</strong>}
+                    {invite.contractNote && <small>{invite.contractNote}</small>}
                   </div>}
                 </div>
 
                 {invite.terms && (
                   <div className="jockey-invitation-terms">
-                    <span><FileText size={14} /> Agreed terms</span>
+                    <span><FileText size={14} /> Terms from owner</span>
                     <p>{invite.terms}</p>
                     {invite.meetingNote && <small>{invite.meetingNote}</small>}
                   </div>

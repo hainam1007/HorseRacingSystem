@@ -49,7 +49,13 @@ module.exports = (sequelize, DataTypes) => {
             slot_released_at: { type: DataTypes.DATE },
             registered_at: { type: DataTypes.DATE, defaultValue: DataTypes.NOW },
             approved_by: { type: DataTypes.UUID },
-            approved_at: { type: DataTypes.DATE }
+            approved_at: { type: DataTypes.DATE },
+            eligibility_status: {
+                type: DataTypes.STRING(32),
+                validate: { isIn: [['eligible', 'conditional_ballast', 'ineligible']] }
+            },
+            eligibility_snapshot: { type: DataTypes.JSONB },
+            eligibility_checked_at: { type: DataTypes.DATE }
         },
         {
             tableName: 'registrations',

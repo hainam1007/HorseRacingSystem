@@ -42,6 +42,15 @@ function mapRaceScheduleItem(race) {
     distance: race.distance,
     max_participants: race.max_participants,
     location: race.location,
+    racetrack: race.racetrack
+      ? {
+          _id: getId(race.racetrack),
+          code: race.racetrack.code,
+          name: race.racetrack.name,
+          province: race.racetrack.province,
+          status: race.racetrack.status
+        }
+      : null,
     status: race.status,
     tournament: race.tournament_id
       ? {

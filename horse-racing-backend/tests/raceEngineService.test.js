@@ -201,6 +201,8 @@ test('three-section performance applies probability, seeded random, and the 50/5
   assert.equal(outsider.section_speed_multipliers[0], 0.9);
   assert.equal(favorite.section_speed_multipliers[2], 1.1);
   assert.equal(outsider.section_speed_multipliers[2], 0.9);
+  assert.ok(favorite.section_speed_multipliers[1] >= 0.7 && favorite.section_speed_multipliers[1] < 1.5);
+  assert.ok(outsider.section_speed_multipliers[1] >= 0.7 && outsider.section_speed_multipliers[1] < 1.5);
   assert.notEqual(favorite.section_speed_multipliers[1], outsider.section_speed_multipliers[1]);
   assert.deepEqual(
     performance,

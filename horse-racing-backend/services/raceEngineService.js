@@ -13,6 +13,10 @@ const raceEngineRunRepository = require("../repositories/raceEngineRunRepository
 const raceOddsMarketRepository = require("../repositories/raceOddsMarketRepository");
 const raceRepository = require("../repositories/raceRepository");
 const raceRunRepository = require("../repositories/raceRunRepository");
+const {
+  ELIGIBILITY_STATUS,
+  evaluatePreRaceEligibility
+} = require('./racetrackEligibilityService');
 
 const LOCK_OFFSET_MS = 3 * 60 * 60 * 1000;
 const DEMO_BYPASS_TIME_VALIDATIONS = String(process.env.DEMO_BYPASS_TIME_VALIDATIONS || '').toLowerCase() === 'true';
@@ -195,7 +199,7 @@ function buildThreeSectionPerformance(raceId, participants, odds, options = {}) 
     // and section 3 blends 50% fixed pace with 50% probability pace.
     const speedMultipliers = [
       0.9 + 0.2 * normalizedProbability,
-      0.8 + 0.4 * sectionRandom,
+      0.7 + 0.8 * sectionRandom,
       0.5 + 0.5 * (0.8 + 0.4 * normalizedProbability),
     ];
     const sectionTimes = THREE_SECTION_RACE.SECTION_DISTANCES.map(function(distance, sectionIndex) {
@@ -414,13 +418,7 @@ async function collectParticipantStatuses(raceId, _options) {
       blockers.push("jockey_suspension_active");
     }
 
-    if (
-      !preRaceCheck ||
-      preRaceCheck.status !== HORSE_CHECK_STATUS.PASSED ||
-      preRaceCheck.is_eligible !== true
-    ) {
-      blockers.push("passed_pre_race_check_required");
-    }
+    blockers.push(...getPreRaceEligibilityBlockers(race, horse, preRaceCheck));
 
     return {
       registration: registration,
@@ -452,6 +450,29 @@ function buildRaceOrder(raceId, participants, odds, options = {}) {
         score: getScore(index + 1),
       };
     });
+}
+
+function getPreRaceEligibilityBlockers(race, horse, horseCheck) {
+  if (!horseCheck || horseCheck.status !== HORSE_CHECK_STATUS.PASSED) {
+    return ['passed_pre_race_check_required'];
+  }
+
+  // Preserve historical races that predate eligibility snapshots. New races
+  // always have a snapshot and are evaluated below instead of trusting this
+  // persisted boolean.
+  if (!race || !race.eligibility_rule_snapshot) {
+    return horseCheck.is_eligible === true ? [] : ['passed_pre_race_check_required'];
+  }
+
+  const eligibility = evaluatePreRaceEligibility(race, horse, horseCheck);
+  if (eligibility.status === ELIGIBILITY_STATUS.ELIGIBLE) {
+    return [];
+  }
+
+  const reasonCode = eligibility.reasons && eligibility.reasons[0] && eligibility.reasons[0].code;
+  return [reasonCode
+    ? `pre_race_eligibility_${String(reasonCode).toLowerCase()}`
+    : 'pre_race_eligibility_required'];
 }
 
 function getLane(participant, fallback) {
@@ -520,6 +541,7 @@ async function collectParticipants(raceId, _options) {
   return {
     race: participantData.race,
     participants: participants,
+    participant_statuses: participantData.participants,
   };
 }
 
@@ -978,6 +1000,7 @@ module.exports = {
   ENGINE_RUN_STATUS,
   RUNNING_STALE_MS,
   addLatestHorseCheck,
+  getPreRaceEligibilityBlockers,
   assertRegistrationOpen,
   calculateRegistrationLockAt,
   collectParticipantStatuses,

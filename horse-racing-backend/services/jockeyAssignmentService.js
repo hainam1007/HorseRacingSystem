@@ -783,6 +783,7 @@ async function mutateAssignmentAndTermsWhileRaceOpen(
 
             const { JockeyAssignmentTerm } = getModels();
             await JockeyAssignmentTerm.upsert(termsFields);
+            updatedAssignment = await findAssignmentById(assignment._id || assignment.id);
         });
     } catch (error) {
         if (error && (error.code === '23505' || error.original?.code === '23505') && error.keyPattern && error.keyPattern.jockey_id) {
@@ -999,20 +1000,21 @@ async function updateTerms(req, id, payload) {
     const pendingStatus = assignment.assignment_type === ASSIGNMENT_TYPE.BACKUP
         ? ASSIGNMENT_STATUS.STANDBY_TERMS_PENDING_CONFIRMATION
         : ASSIGNMENT_STATUS.TERMS_PENDING_CONFIRMATION;
-    const updatedAssignment = await mutateAssignmentWhileRaceOpen(assignment, {
+    const updatedAssignment = await mutateAssignmentAndTermsWhileRaceOpen(assignment, {
         _id: id,
         status: assignment.status
     }, {
-        $set: {
-            status: pendingStatus,
-            terms: {
-                agreed_terms: payload.agreed_terms,
-                meeting_note: payload.meeting_note,
-                agreed_at: payload.agreed_at || new Date(),
-                sent_at: new Date(),
-                updated_by: req.user._id
-            }
-        }
+        status: pendingStatus
+    }, {
+        assignment_id: id,
+        agreed_terms: payload.agreed_terms,
+        meeting_note: payload.meeting_note,
+        agreed_at: payload.agreed_at || new Date(),
+        sent_at: new Date(),
+        confirmed_at: null,
+        rejected_at: null,
+        response_message: null,
+        updated_by: req.user._id
     }, 'The assignment changed before the terms were saved');
 
     return {

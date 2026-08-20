@@ -16,7 +16,7 @@ module.exports = (sequelize, DataTypes) => {
             assignment_id: { type: DataTypes.UUID, allowNull: false, unique: true },
             contract_number: { type: DataTypes.STRING(128) },
             title: { type: DataTypes.STRING(255) },
-            file_url: { type: DataTypes.STRING(512) },
+            file_url: { type: DataTypes.TEXT },
             file_public_id: { type: DataTypes.STRING(255) },
             file_type: { type: DataTypes.STRING(64) },
             file_name: { type: DataTypes.STRING(255) },

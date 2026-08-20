@@ -13,6 +13,7 @@ const {
   validateCreatePostRaceHorseCheck,
   validateBulkPreRaceHorseChecks,
   validateBulkPostRaceHorseChecks,
+  validateConfirmBallast,
   validateListHorseChecks,
   validateUpdateHorseCheck
 } = require('../validators/horseCheckValidator');
@@ -30,6 +31,12 @@ router.post('/pre-race', validateCreatePreRaceHorseCheck, asyncHandler(horseChec
 router.post('/during-race', validateCreateDuringRaceHorseCheck, asyncHandler(horseCheckController.createHorseCheck));
 router.post('/post-race', validateCreatePostRaceHorseCheck, asyncHandler(horseCheckController.createHorseCheck));
 router.post('/', validateCreateHorseCheck, asyncHandler(horseCheckController.createHorseCheck));
+router.post(
+  '/:id/confirm-ballast',
+  validateObjectIdParam('id'),
+  validateConfirmBallast,
+  asyncHandler(horseCheckController.confirmBallast)
+);
 router.get('/:id', validateObjectIdParam('id'), asyncHandler(horseCheckController.getHorseCheck));
 router.patch(
   '/:id',

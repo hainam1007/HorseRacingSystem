@@ -25,6 +25,8 @@ module.exports = (sequelize, DataTypes) => {
             max_participants: { type: DataTypes.INTEGER },
             location: { type: DataTypes.STRING(255) },
             venue_code: { type: DataTypes.STRING(64) },
+            racetrack_id: { type: DataTypes.UUID },
+            eligibility_rule_snapshot: { type: DataTypes.JSONB },
             course: {
                 type: DataTypes.STRING(8),
                 defaultValue: 'B+2',
@@ -71,6 +73,7 @@ module.exports = (sequelize, DataTypes) => {
     Race.associate = (models) => {
         Race.belongsTo(models.Tournament, { foreignKey: 'tournament_id', as: 'tournament' });
         Race.belongsTo(models.Round, { foreignKey: 'round_id', as: 'round' });
+        Race.belongsTo(models.Racetrack, { foreignKey: 'racetrack_id', as: 'racetrack' });
         Race.belongsTo(models.RaceReferee, { foreignKey: 'referee_id', as: 'referee' });
         Race.belongsTo(models.User, { foreignKey: 'entries_finalized_by', as: 'entries_finalizer' });
         Race.hasMany(models.RacePrizeDistributionItem, { foreignKey: 'race_id', as: 'prize_distribution' });

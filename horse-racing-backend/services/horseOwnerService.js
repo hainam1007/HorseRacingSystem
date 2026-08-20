@@ -45,6 +45,7 @@ const paymentGatewayService = require('./paymentGatewayService');
 const raceEngineService = require('./raceEngineService');
 const raceRepository = require('../repositories/raceRepository');
 const registrationSlotService = require('./registrationSlotService');
+const racetrackEligibilityService = require('./racetrackEligibilityService');
 const { loadSequelizeModels } = require('../models/sequelize/index.js');
 const { toPlain, projectUpdate } = require('../repositories/sequelize/adapter');
 
@@ -427,14 +428,65 @@ async function getHorseApprovalStatus(user, horseId) {
  * `Race.findById(...).lean()` path.
  */
 async function findRaceById(raceId) {
-    const { Race, Round } = getModels();
+    const { Race, Round, Racetrack } = getModels();
     const row = await Race.findOne({
         where: { id: raceId },
         include: [
-            { model: Round, as: 'round', required: false }
+            { model: Round, as: 'round', required: false },
+            { model: Racetrack, as: 'racetrack', required: false }
         ]
     });
     return toPlain(row);
+}
+
+function readRaceRuleSnapshot(race) {
+    let snapshot = race && race.eligibility_rule_snapshot;
+    if (typeof snapshot === 'string') {
+        try {
+            snapshot = JSON.parse(snapshot);
+        } catch (_) {
+            throw new ApiError(500, 'Race eligibility rule snapshot is invalid');
+        }
+    }
+
+    if (!snapshot || typeof snapshot !== 'object' || Array.isArray(snapshot) || !snapshot.rule) {
+        throw new ApiError(422, 'Race eligibility rule snapshot is required');
+    }
+
+    return snapshot;
+}
+
+function describeRaceEligibilityRule(rule) {
+    if (rule.type === 'horse_weight_range') {
+        return {
+            type: rule.type,
+            label: `Horses from ${rule.min_kg} to ${rule.max_kg} kg${rule.ballast_allowed ? '; approved ballast is allowed below the minimum' : ''}`
+        };
+    }
+    if (rule.type === 'horse_age_range') {
+        return {
+            type: rule.type,
+            label: `Horses from ${rule.min_years} to ${rule.max_years} years old`
+        };
+    }
+    if (rule.type === 'horse_breed') {
+        return {
+            type: rule.type,
+            label: `Eligible breeds: ${(rule.allowed_values || []).join(', ')}`
+        };
+    }
+
+    throw new ApiError(500, 'Race eligibility rule snapshot is invalid');
+}
+
+function compactRacetrackFromRace(race, snapshot) {
+    if (race.racetrack) return race.racetrack;
+
+    return {
+        id: snapshot.racetrack_id || race.racetrack_id || null,
+        code: snapshot.racetrack_code || race.venue_code || null,
+        name: race.location || null
+    };
 }
 
 async function findRacesByTournamentId(tournamentId) {
@@ -665,6 +717,52 @@ async function getRoundsByRaceId(user, raceId) {
     };
 }
 
+async function getEligibleHorsesForRace(user, raceId) {
+    const owner = await getCurrentOwner(user);
+    const [race, horses] = await Promise.all([
+        findRaceById(raceId),
+        horseOwnerRepository.findHorsesByOwnerId(owner._id)
+    ]);
+
+    if (!race) {
+        throw new ApiError(404, 'Race not found');
+    }
+
+    const snapshot = readRaceRuleSnapshot(race);
+    const condition = {
+        ...describeRaceEligibilityRule(snapshot.rule),
+        rule_version: snapshot.rule_version || null,
+        rule: snapshot.rule
+    };
+    const evaluations = horses.map(function(horse) {
+        return {
+            horse,
+            eligibility: racetrackEligibilityService.evaluateHorseForRace(race, horse)
+        };
+    });
+    const eligibleHorses = evaluations
+        .filter(function(item) {
+            return item.eligibility.status === racetrackEligibilityService.ELIGIBILITY_STATUS.ELIGIBLE
+                || item.eligibility.status === racetrackEligibilityService.ELIGIBILITY_STATUS.CONDITIONAL_BALLAST;
+        })
+        .map(function(item) {
+            return {
+                horse: item.horse,
+                eligibility_status: item.eligibility.status,
+                required_ballast_kg: item.eligibility.required_ballast_kg,
+                reasons: item.eligibility.reasons
+            };
+        });
+
+    return {
+        race,
+        racetrack: compactRacetrackFromRace(race, snapshot),
+        condition,
+        horses: eligibleHorses,
+        excluded_count: evaluations.length - eligibleHorses.length
+    };
+}
+
 async function createRegistrationInternal(user, owner, horseId, tournamentId, raceId, note, gears) {
     const [horse, tournament, race] = await Promise.all([
         horseOwnerRepository.findHorseById(horseId),
@@ -690,6 +788,15 @@ async function createRegistrationInternal(user, owner, horseId, tournamentId, ra
         throw new ApiError(400, 'Only active horses can be registered');
     }
 
+    // Re-evaluate from the race snapshot after the owner/horse check, before
+    // any slot or payment work. This is the authoritative anti-bypass gate.
+    const eligibility = racetrackEligibilityService.assertHorseCanRegister(race, horse);
+    const eligibilityPayload = {
+        eligibility_status: eligibility.status,
+        eligibility_snapshot: eligibility,
+        eligibility_checked_at: new Date()
+    };
+
     const existingRegistration = await findRegistrationByRaceAndHorse(race._id, horse._id);
 
     if (existingRegistration && (
@@ -706,18 +813,22 @@ async function createRegistrationInternal(user, owner, horseId, tournamentId, ra
         && new Date(existingRegistration.payment_expires_at).getTime() > Date.now();
 
     if (hasActivePaymentReservation) {
+        const refreshedRegistration = await updateRegistrationById(existingRegistration._id, {
+            $set: eligibilityPayload
+        });
+        const registration = refreshedRegistration || existingRegistration;
         await registrationSlotService.initializeRaceSlots(race._id);
         const gateway = await paymentGatewayService.createPaymentUrl({
-            orderId: existingRegistration.payment_order_id,
-            amountVnd: existingRegistration.entry_fee_vnd,
+            orderId: registration.payment_order_id,
+            amountVnd: registration.entry_fee_vnd,
             orderInfo: 'Race registration ' + race.name,
             paymentMethod: REGISTRATION_PAYMENT_METHOD
         });
 
         return {
-            registration: existingRegistration,
-            order: buildRegistrationPaymentResponse(existingRegistration),
-            order_id: existingRegistration.payment_order_id,
+            registration,
+            order: buildRegistrationPaymentResponse(registration),
+            order_id: registration.payment_order_id,
             payment_url: gateway.payment_url
         };
     }
@@ -749,7 +860,8 @@ async function createRegistrationInternal(user, owner, horseId, tournamentId, ra
             slot_reserved_at: slotReservedAt,
             slot_released_at: null,
             status: REGISTRATION_STATUS.APPROVED,
-            approved_at: new Date()
+            approved_at: new Date(),
+            ...eligibilityPayload
         };
         let registration;
 
@@ -787,7 +899,8 @@ async function createRegistrationInternal(user, owner, horseId, tournamentId, ra
         slot_released_at: null,
         status: REGISTRATION_STATUS.PENDING,
         approved_at: null,
-        approved_by: null
+        approved_by: null,
+        ...eligibilityPayload
     };
     let registration;
 
@@ -1034,6 +1147,7 @@ module.exports = {
     getTournaments,
     getRacesByTournamentId,
     getRoundsByRaceId,
+    getEligibleHorsesForRace,
     registerHorseForRace,
     updateRaceEntryDetails,
     handleRegistrationPaymentWebhook,

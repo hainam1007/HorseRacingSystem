@@ -16,7 +16,10 @@ module.exports = (sequelize, DataTypes) => {
             assignment_id: { type: DataTypes.UUID, allowNull: false, unique: true },
             contract_number: { type: DataTypes.STRING(128) },
             title: { type: DataTypes.STRING(255) },
-            file_url: { type: DataTypes.STRING(512) },
+            // A local upload can temporarily be represented by a data URI
+            // when Cloudinary is not configured, so this must match the
+            // migration's TEXT column rather than truncating the file URL.
+            file_url: { type: DataTypes.TEXT },
             file_public_id: { type: DataTypes.STRING(255) },
             file_type: { type: DataTypes.STRING(64) },
             file_name: { type: DataTypes.STRING(255) },

@@ -8,6 +8,7 @@ import {
   Gauge,
   Gift,
   LogOut,
+  MapPin,
   ShieldCheck,
   Trophy,
   UserRoundCheck,
@@ -33,6 +34,7 @@ const navigationGroups = [
     items: [
       { to: "/admin/tournament", label: "Tournaments", icon: Flag },
       { to: "/admin/schedule", label: "Race schedule", icon: CalendarRange },
+      { to: "/admin/racetracks", label: "Racetracks", icon: MapPin },
     ],
   },
   {

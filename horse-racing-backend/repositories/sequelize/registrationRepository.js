@@ -86,6 +86,42 @@ async function count(filter = {}) {
     return M.Registration.count({ where: buildWhere(filter) });
 }
 
+async function hasUncancelledRegistrationForRace(raceId) {
+    const M = models();
+    const count = await M.Registration.count({
+        where: {
+            race_id: raceId,
+            deleted_at: null,
+            status: { [Op.ne]: 'cancelled' }
+        }
+    });
+    return count > 0;
+}
+
+async function hasPendingOrPaidPaymentForRace(raceId) {
+    const M = models();
+    const count = await M.Registration.count({
+        where: {
+            race_id: raceId,
+            deleted_at: null,
+            payment_status: { [Op.in]: ['pending', 'paid'] }
+        }
+    });
+    return count > 0;
+}
+
+async function hasReservedSlotForRace(raceId) {
+    const M = models();
+    const count = await M.Registration.count({
+        where: {
+            race_id: raceId,
+            deleted_at: null,
+            slot_reserved: true
+        }
+    });
+    return count > 0;
+}
+
 async function updateById(id, data) {
     const M = models();
     const fields = require('./adapter').projectUpdate(data);
@@ -100,5 +136,8 @@ module.exports = {
     find,
     findById,
     findByPaymentOrderId,
-    updateById
+    updateById,
+    hasUncancelledRegistrationForRace,
+    hasPendingOrPaidPaymentForRace,
+    hasReservedSlotForRace
 };

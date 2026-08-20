@@ -144,6 +144,13 @@ export const refereeApi = {
     });
   },
 
+  confirmHorseCheckBallast(id, payload) {
+    return apiRequest(`/horse-checks/${id}/confirm-ballast`, {
+      method: "POST",
+      body: payload,
+    });
+  },
+
   bulkSaveHorseChecks(phase, payload) {
     const phasePath = {
       pre_race: "pre-race",

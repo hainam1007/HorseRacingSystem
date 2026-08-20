@@ -27,6 +27,7 @@ var horseCheckRouter = require("./routes/horseChecks");
 var refereeReportRouter = require("./routes/refereeReports");
 var roleApplicationRouter = require("./routes/roleApplications");
 var internalRaceRouter = require("./routes/internalRaces");
+var racetrackRouter = require("./routes/racetracks");
 // ── Wallet & Payment ────────────────────────────────────────────────────────
 var walletRouter = require("./routes/wallet");
 var rewardRouter = require("./routes/rewards");
@@ -135,6 +136,7 @@ app.use("/api/horse-owner", horseOwnerRouter);
 app.use("/api/horse-checks", horseCheckRouter);
 app.use("/api/referee-reports", refereeReportRouter);
 app.use("/api/internal", internalRaceRouter);
+app.use("/api/racetracks", racetrackRouter);
 // ── Wallet & Payment ────────────────────────────────────────────────────────
 app.use("/api/wallet", walletRouter);
 app.use("/api/rewards", rewardRouter);

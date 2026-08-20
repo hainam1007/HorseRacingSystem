@@ -51,13 +51,19 @@ test('admin operational registration is auto-confirmed and queues owner email', 
     _id: raceId,
     tournament_id: { _id: tournamentId, name: 'Demo Meeting' },
     status: 'scheduled',
-    max_participants: 6
+    max_participants: 6,
+    eligibility_rule_snapshot: {
+      racetrack_id: newObjectId(),
+      racetrack_code: 'TEST_TRACK',
+      rule_version: 1,
+      rule: { schema_version: 1, type: 'horse_weight_range', min_kg: 450, max_kg: 500, ballast_allowed: true }
+    }
   });
   raceEngineService.ensureRaceRegistrationIsUnlocked = async () => true;
   registrationSlotService.reserveRaceSlot = async () => true;
   registrationSlotService.releaseRaceSlot = async () => true;
   registrationRepository.count = async () => 0;
-  Horse.findByPk = async () => ({ _id: horseId, owner_id: ownerId, name: 'Silver Comet' });
+  Horse.findByPk = async () => ({ _id: horseId, owner_id: ownerId, name: 'Silver Comet', status: 'active', weight: 485 });
   registrationRepository.create = async (payload) => {
     createdPayload = payload;
     return { _id: registrationId, ...payload };
@@ -89,6 +95,8 @@ test('admin operational registration is auto-confirmed and queues owner email', 
   assert.equal(String(createdPayload.approved_by), String(adminId));
   assert.equal(String(createdPayload.tournament_id), String(tournamentId));
   assert.ok(createdPayload.approved_at instanceof Date);
+  assert.equal(createdPayload.eligibility_status, 'eligible');
+  assert.equal(createdPayload.eligibility_snapshot.status, 'eligible');
   assert.equal(result.email_delivery.status, 'queued');
   assert.equal(emailContext.user.email, 'owner@example.com');
 });

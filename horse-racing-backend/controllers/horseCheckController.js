@@ -31,9 +31,16 @@ async function updateHorseCheck(req, res) {
   return sendSuccess(res, 200, 'Horse check updated successfully', data);
 }
 
+async function confirmBallast(req, res) {
+  const data = await horseCheckService.confirmBallast(req, req.params.id, req.validatedBody);
+
+  return sendSuccess(res, 200, 'Ballast confirmed successfully', data);
+}
+
 module.exports = {
   bulkSaveHorseChecks,
   createHorseCheck,
+  confirmBallast,
   getHorseCheck,
   listHorseChecks,
   updateHorseCheck

@@ -32,6 +32,12 @@ module.exports = (sequelize, DataTypes) => {
             weight: { type: DataTypes.DECIMAL(6, 2) },
             check_note: { type: DataTypes.TEXT },
             is_eligible: { type: DataTypes.BOOLEAN, defaultValue: true },
+            ballast_required_kg: { type: DataTypes.DECIMAL(6, 2), validate: { min: 0 } },
+            ballast_added_kg: { type: DataTypes.DECIMAL(6, 2), validate: { min: 0 } },
+            ballast_confirmed: { type: DataTypes.BOOLEAN, defaultValue: false },
+            ballast_confirmed_by: { type: DataTypes.UUID },
+            ballast_confirmed_at: { type: DataTypes.DATE },
+            eligibility_result: { type: DataTypes.JSONB },
             checked_at: { type: DataTypes.DATE, defaultValue: DataTypes.NOW }
         },
         {
@@ -47,6 +53,7 @@ module.exports = (sequelize, DataTypes) => {
         HorseCheck.belongsTo(models.Horse, { foreignKey: 'horse_id', as: 'horse' });
         HorseCheck.belongsTo(models.Jockey, { foreignKey: 'jockey_id', as: 'jockey' });
         HorseCheck.belongsTo(models.RaceReferee, { foreignKey: 'referee_id', as: 'referee' });
+        HorseCheck.belongsTo(models.User, { foreignKey: 'ballast_confirmed_by', as: 'ballast_confirmer' });
         HorseCheck.belongsTo(models.Violation, { foreignKey: 'linked_violation_id', as: 'linked_violation' });
         HorseCheck.hasMany(models.HorseCheckIssue, { foreignKey: 'horse_check_id', as: 'issues' });
     };

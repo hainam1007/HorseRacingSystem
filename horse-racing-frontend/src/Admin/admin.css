@@ -593,6 +593,404 @@
   background: rgba(166, 67, 60, 0.3);
 }
 
+/* Racetrack directory */
+.admin-racetrack {
+  display: grid;
+  gap: 18px;
+}
+
+.admin-racetrack__metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.admin-racetrack__metrics .admin-metric-card {
+  display: grid;
+  gap: 4px;
+  min-height: 122px;
+  padding: 16px;
+}
+
+.admin-racetrack__metrics .admin-metric-card > span,
+.admin-racetrack__metrics .admin-metric-card small {
+  color: var(--admin-muted);
+  font-size: 0.73rem;
+}
+
+.admin-racetrack__metrics .admin-metric-card > span {
+  font-weight: 720;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.admin-racetrack__metrics .admin-metric-card strong {
+  align-self: end;
+  color: var(--admin-text);
+  font-family: "Sora", sans-serif;
+  font-size: 2rem;
+  line-height: 1;
+  letter-spacing: -0.07em;
+}
+
+.admin-racetrack__ledger {
+  gap: 16px;
+}
+
+.admin-racetrack__ledger-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.admin-racetrack__ledger-heading > div {
+  display: grid;
+  gap: 4px;
+}
+
+.admin-racetrack__ledger-heading > div > span {
+  color: var(--admin-muted);
+  font-size: 0.78rem;
+}
+
+.admin-racetrack__toolbar {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.admin-racetrack__search {
+  display: flex;
+  flex: 1 1 360px;
+  align-items: center;
+  gap: 9px;
+  min-height: 42px;
+  padding: 0 12px;
+  border: 1px solid var(--admin-line-strong);
+  border-radius: 5px;
+  background: rgba(9, 15, 11, 0.48);
+  color: var(--admin-muted);
+}
+
+.admin-racetrack__search:focus-within {
+  border-color: var(--admin-accent);
+}
+
+.admin-racetrack__search input {
+  width: 100%;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--admin-text);
+}
+
+.admin-racetrack__filter {
+  flex: 0 0 164px;
+}
+
+.admin-racetrack__table {
+  min-width: 990px;
+}
+
+.admin-racetrack__table td:first-child strong,
+.admin-racetrack__table td:first-child small,
+.admin-racetrack__rule {
+  display: block;
+}
+
+.admin-racetrack__table td:first-child strong {
+  color: var(--admin-text);
+}
+
+.admin-racetrack__table td:first-child small,
+.admin-racetrack__rule small {
+  margin-top: 3px;
+  color: var(--admin-muted);
+  font-size: 0.72rem;
+}
+
+.admin-racetrack__rule {
+  min-width: 210px;
+}
+
+.admin-racetrack__rule strong {
+  color: var(--admin-copy);
+  font-size: 0.76rem;
+  font-weight: 720;
+}
+
+.admin-racetrack__row-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.admin-racetrack__row-actions button,
+.admin-racetrack__modal-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 32px;
+  padding: 0 8px;
+  border: 1px solid var(--admin-line);
+  border-radius: 4px;
+  background: transparent;
+  color: var(--admin-copy);
+  font-size: 0.73rem;
+  font-weight: 700;
+}
+
+.admin-racetrack__row-actions button:hover,
+.admin-racetrack__modal-close:hover {
+  border-color: var(--admin-accent);
+  background: rgba(var(--racing-accent-rgb), 0.07);
+  color: var(--admin-text);
+}
+
+.admin-racetrack__empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-height: 220px;
+  color: var(--admin-muted);
+  text-align: center;
+}
+
+.admin-racetrack__empty h3,
+.admin-racetrack__empty p {
+  margin: 0;
+}
+
+.admin-racetrack__empty h3 {
+  margin-bottom: 4px;
+  color: var(--admin-text);
+  font-size: 0.95rem;
+}
+
+.admin-racetrack__empty p {
+  font-size: 0.8rem;
+}
+
+.admin-racetrack__modal {
+  width: min(760px, 100%);
+}
+
+.admin-racetrack__modal-header {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 16px;
+}
+
+.admin-racetrack__modal-close {
+  flex: 0 0 auto;
+  width: 34px;
+  padding: 0;
+}
+
+.admin-racetrack__form {
+  display: grid;
+  gap: 18px;
+}
+
+.admin-racetrack__section-heading {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.admin-racetrack__section-heading h3,
+.admin-racetrack__section-heading p {
+  margin: 0;
+}
+
+.admin-racetrack__section-heading h3 {
+  color: var(--admin-text);
+  font-family: "Sora", sans-serif;
+  font-size: 1rem;
+  letter-spacing: -0.025em;
+}
+
+.admin-racetrack__section-heading p {
+  max-width: 54ch;
+  margin-top: 4px;
+  color: var(--admin-copy);
+  font-size: 0.78rem;
+  line-height: 1.45;
+}
+
+.admin-racetrack__section-heading > span {
+  flex: 0 0 auto;
+  color: var(--admin-muted);
+  font-size: 0.7rem;
+  font-weight: 760;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.admin-racetrack__form-grid,
+.admin-racetrack__rule-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.admin-racetrack__field--wide {
+  grid-column: span 2;
+}
+
+.admin-racetrack__rule-editor {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid var(--admin-line);
+  border-radius: 6px;
+  background: rgba(var(--racing-contrast-rgb), 0.025);
+}
+
+.admin-racetrack__check {
+  display: flex;
+  grid-column: span 2;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 11px 12px;
+  border: 1px solid var(--admin-line);
+  border-radius: 5px;
+  color: var(--admin-copy);
+  cursor: pointer;
+}
+
+.admin-racetrack__check input,
+.admin-racetrack__breed-option input {
+  width: auto;
+  min-height: 0;
+  margin: 3px 0 0;
+  accent-color: var(--admin-accent);
+}
+
+.admin-racetrack__check span {
+  display: grid;
+  gap: 2px;
+}
+
+.admin-racetrack__check strong {
+  color: var(--admin-text);
+  font-size: 0.78rem;
+}
+
+.admin-racetrack__check small {
+  color: var(--admin-muted);
+  font-size: 0.72rem;
+}
+
+.admin-racetrack__breed-options {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.admin-racetrack__breed-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 8px 10px;
+  border: 1px solid var(--admin-line);
+  border-radius: 5px;
+  color: var(--admin-copy);
+  cursor: pointer;
+  font-size: 0.76rem;
+}
+
+.admin-racetrack__breed-option:has(input:checked) {
+  border-color: rgba(var(--racing-accent-rgb), 0.55);
+  background: rgba(var(--racing-accent-rgb), 0.07);
+  color: var(--admin-text);
+}
+
+.admin-racetrack__rule-preview {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  padding: 10px 12px;
+  border-left: 2px solid var(--admin-accent);
+  background: rgba(var(--racing-accent-rgb), 0.055);
+  color: var(--admin-accent);
+}
+
+.admin-racetrack__rule-preview > div {
+  display: grid;
+  gap: 2px;
+}
+
+.admin-racetrack__rule-preview span {
+  color: var(--admin-muted);
+  font-size: 0.69rem;
+  font-weight: 720;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.admin-racetrack__rule-preview strong {
+  color: var(--admin-copy);
+  font-size: 0.79rem;
+}
+
+.admin-racetrack__form-actions {
+  justify-content: flex-end;
+}
+
+.admin-racetrack__archive {
+  display: grid;
+  gap: 13px;
+}
+
+.admin-racetrack__archive > svg {
+  color: var(--racing-danger-soft);
+}
+
+.admin-racetrack__archive h2,
+.admin-racetrack__archive p {
+  margin: 0;
+}
+
+.admin-racetrack__archive h2 {
+  margin-top: 4px;
+  color: var(--admin-text);
+  font-family: "Sora", sans-serif;
+}
+
+.admin-racetrack__archive p:last-child {
+  margin-top: 7px;
+  color: var(--admin-copy);
+  font-size: 0.84rem;
+  line-height: 1.45;
+}
+
+@media (max-width: 840px) {
+  .admin-racetrack__metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .admin-racetrack__breed-options { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 560px) {
+  .admin-racetrack__metrics,
+  .admin-racetrack__form-grid,
+  .admin-racetrack__rule-fields,
+  .admin-racetrack__breed-options { grid-template-columns: 1fr; }
+  .admin-racetrack__toolbar,
+  .admin-racetrack__ledger-heading { align-items: stretch; flex-direction: column; }
+  .admin-racetrack__filter { flex-basis: auto; }
+  .admin-racetrack__field--wide,
+  .admin-racetrack__check { grid-column: auto; }
+  .admin-racetrack__section-heading { display: grid; }
+}
+
 /* Dashboard */
 .admin-command-strip {
   display: grid;

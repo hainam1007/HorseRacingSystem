@@ -72,6 +72,10 @@ export const ownerApi = {
     return apiRequest(`/horse-owner/races/${raceId}/rounds`);
   },
 
+  getEligibleHorses(raceId) {
+    return apiRequest(`/horse-owner/races/${raceId}/eligible-horses`);
+  },
+
   registerHorseForRace(payload) {
     return apiRequest("/horse-owner/race-registrations", {
       method: "POST",

@@ -105,7 +105,10 @@ function mapAssignment(item, index = 0) {
     ? item.owner
     : (item.owner_id && typeof item.owner_id === "object" ? item.owner_id : (horse && horse.owner_id && typeof horse.owner_id === "object" ? horse.owner_id : {}));
   const meeting = item.meeting || {};
-  const contract = item.contract || {};
+  const terms = item.terms || item.standby_terms || {};
+  const contract = (item.contract && typeof item.contract === "object")
+    ? item.contract
+    : ((item.standby_contract && typeof item.standby_contract === "object") ? item.standby_contract : {});
   const cancellationRequest = item.cancellation_request || null;
   const withdrawal = item.withdrawal || null;
   const assignmentType = item.assignment_type || "primary";
@@ -138,7 +141,7 @@ function mapAssignment(item, index = 0) {
     date: formatRaceTime(race.race_date || item.race_date || item.created_at),
     venue: race.location || item.location || "Race track",
     round: getName(race.round_id || race.round || item.round_id, item.round_name || "Race round"),
-    note: item.invitation_message || item.response_message || item.note || "Owner invitation is ready for review.",
+    note: item.invitation_message || meeting.note || item.response_message || item.note || "Owner invitation is ready for review.",
     rawStatus,
     sourceStatus: item.status || "",
     raceStatus,
@@ -154,10 +157,11 @@ function mapAssignment(item, index = 0) {
     mapUrl: meeting.map_url || item.map_url || "",
     contactName: meeting.contact_name || item.contact_name || "",
     contactPhone: meeting.contact_phone || item.contact_phone || "",
-    contractUrl: contract.file_url || item.contract_url || item.contract_link || "",
-    contractFileName: contract.file_name || item.contract_file_name || "",
-    terms: item.terms?.agreed_terms || item.agreed_terms || "",
-    meetingNote: item.terms?.meeting_note || "",
+    contractUrl: contract.file_url || contract.fileUrl || item.contract_url || item.contract_link || "",
+    contractFileName: contract.file_name || contract.fileName || contract.title || item.contract_file_name || "",
+    contractNote: contract.note || "",
+    terms: terms.agreed_terms || item.agreed_terms || "",
+    meetingNote: terms.meeting_note || "",
     responseMessage: contract.response_message || meeting.response_message || item.response_message || "",
     cancellationRequest,
     withdrawal,

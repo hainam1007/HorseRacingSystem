@@ -6,11 +6,13 @@ const raceService = require('../services/raceService');
 const tournamentRepository = require('../repositories/tournamentRepository');
 const roundRepository = require('../repositories/roundRepository');
 const raceRepository = require('../repositories/raceRepository');
+const racetrackRepository = require('../repositories/racetrackRepository');
 const cloudinaryService = require('../services/cloudinaryService');
 
 const IMAGE_DATA = 'data:image/png;base64,aGVsbG8=';
 const TOURNAMENT_ID = '507f1f77bcf86cd799439011';
 const ROUND_ID = '507f1f77bcf86cd799439012';
+const RACETRACK_ID = '507f1f77bcf86cd799439013';
 
 test('competition services upload image files and persist the Cloudinary result', async (t) => {
   const originals = {
@@ -18,7 +20,8 @@ test('competition services upload image files and persist the Cloudinary result'
     createTournament: tournamentRepository.create,
     findTournament: tournamentRepository.findById,
     findRound: roundRepository.findById,
-    createRace: raceRepository.create
+    createRace: raceRepository.create,
+    findRacetrack: racetrackRepository.findById
   };
 
   t.after(() => {
@@ -27,6 +30,7 @@ test('competition services upload image files and persist the Cloudinary result'
     tournamentRepository.findById = originals.findTournament;
     roundRepository.findById = originals.findRound;
     raceRepository.create = originals.createRace;
+    racetrackRepository.findById = originals.findRacetrack;
   });
 
   cloudinaryService.uploadAsset = async (source, options) => ({
@@ -37,6 +41,14 @@ test('competition services upload image files and persist the Cloudinary result'
   tournamentRepository.create = async (payload) => payload;
   tournamentRepository.findById = async (id) => (id === TOURNAMENT_ID ? { _id: id } : null);
   roundRepository.findById = async (id) => (id === ROUND_ID ? { _id: id } : null);
+  racetrackRepository.findById = async (id) => (id === RACETRACK_ID ? {
+    _id: id,
+    code: 'TEST_TRACK',
+    name: 'Test Track',
+    status: 'active',
+    rule_version: 1,
+    eligibility_rule: { schema_version: 1, type: 'horse_breed', allowed_values: ['Thoroughbred'] }
+  } : null);
   raceRepository.create = async (payload) => payload;
 
   const tournamentResult = await tournamentService.createTournament('admin-id', {
@@ -46,6 +58,7 @@ test('competition services upload image files and persist the Cloudinary result'
   const raceResult = await raceService.createRace({
     tournament_id: TOURNAMENT_ID,
     round_id: ROUND_ID,
+    racetrack_id: RACETRACK_ID,
     name: 'Uploaded race',
     image_file_data: IMAGE_DATA
   });
@@ -56,4 +69,7 @@ test('competition services upload image files and persist the Cloudinary result'
   assert.equal(raceResult.race.image_url, 'https://res.cloudinary.com/demo/horse-racing/races/image.png');
   assert.equal(raceResult.race.image_public_id, 'horse-racing/races/image');
   assert.equal(raceResult.race.image_file_data, undefined);
+  assert.equal(raceResult.race.location, 'Test Track');
+  assert.equal(raceResult.race.venue_code, 'TEST_TRACK');
+  assert.equal(raceResult.race.eligibility_rule_snapshot.racetrack_id, RACETRACK_ID);
 });

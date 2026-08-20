@@ -6,6 +6,7 @@
     "start": "node ./bin/www",
     "test": "node --test tests/*.test.js",
     "seed:demo:full": "node scripts/seedFullDemo.js",
+    "seed:demo:replace": "node scripts/seedFullDemo.js --replace-tournaments",
     "migrate": "node scripts/migrate.js",
     "migrate:status": "node scripts/migrate.js --status",
     "migrate:dry-run": "node scripts/migrate.js --dry-run"

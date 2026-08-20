@@ -265,6 +265,9 @@ async function getRaceReadiness(req, raceId) {
     const eligibleParticipants = participantData.participants.filter(function(participant) {
         return participant.eligible;
     });
+    const preRaceBlockedParticipants = participantData.participants.filter(function(participant) {
+        return !participant.eligible;
+    });
     const missingPostCheckHorseIds = eligibleParticipants
         .filter(function(participant) {
             return !participant.post_race_check;
@@ -284,6 +287,7 @@ async function getRaceReadiness(req, raceId) {
     const ready = race.registration_locked === true &&
         raceCompleted &&
         eligibleParticipants.length > 0 &&
+        preRaceBlockedParticipants.length === 0 &&
         Boolean(submittedReport) &&
         missingPostCheckHorseIds.length === 0 &&
         underInvestigationHorseIds.length === 0 &&
@@ -305,6 +309,12 @@ async function getRaceReadiness(req, raceId) {
         race_status: race.status,
         registration_locked: race.registration_locked,
         eligible_participant_count: eligibleParticipants.length,
+        pre_race_blocked_participants: preRaceBlockedParticipants.map(function(participant) {
+            return {
+                horse_id: getDocumentId(participant.horse),
+                blockers: participant.blockers
+            };
+        }),
         submitted_report_id: submittedReport ? submittedReport._id : null,
         missing_report: !submittedReport,
         missing_post_check_horse_ids: missingPostCheckHorseIds,

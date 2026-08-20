@@ -47,11 +47,17 @@ function buildWhere(filter) {
     return where;
 }
 
+function racetrackInclude() {
+    const M = models();
+    return [{ model: M.Racetrack, as: 'racetrack', required: false }];
+}
+
 async function find(filter = {}) {
     const M = models();
     const where = buildWhere(filter);
     const rows = await M.Race.findAll({
         where,
+        include: racetrackInclude(),
         order: [['created_at', 'DESC'], ['race_date', 'DESC']]
     });
     return rows.map(toPlain);
@@ -78,7 +84,7 @@ async function findByTournamentIds(tournamentIds) {
 
 async function findById(id) {
     const M = models();
-    const row = await M.Race.findByPk(id);
+    const row = await M.Race.findByPk(id, { include: racetrackInclude() });
     return toPlain(row);
 }
 
