@@ -98,7 +98,7 @@ function normalizeAssignmentStatus(item) {
   return status;
 }
 
-function mapAssignment(item, index = 0) {
+export function mapAssignment(item, index = 0) {
   const race = (item.race && typeof item.race === "object") ? item.race : (item.race_id && typeof item.race_id === "object" ? item.race_id : {});
   const horse = (item.horse && typeof item.horse === "object") ? item.horse : (item.horse_id && typeof item.horse_id === "object" ? item.horse_id : {});
   const owner = (item.owner && typeof item.owner === "object")
@@ -111,6 +111,7 @@ function mapAssignment(item, index = 0) {
     : ((item.standby_contract && typeof item.standby_contract === "object") ? item.standby_contract : {});
   const cancellationRequest = item.cancellation_request || null;
   const withdrawal = item.withdrawal || null;
+  const jockey = (item.jockey && typeof item.jockey === "object") ? item.jockey : (item.jockey_id && typeof item.jockey_id === "object" ? item.jockey_id : {});
   const assignmentType = item.assignment_type || "primary";
   const rawStatus = normalizeAssignmentStatus({ ...item, assignment_type: assignmentType });
   const status = normalizeStatus(rawStatus);
@@ -129,6 +130,7 @@ function mapAssignment(item, index = 0) {
 
   return {
     id: getId(item) || `ASG-${index + 1}`,
+    jockey,
     horse: getName(horse, item.horse_name || `Horse ${index + 1}`),
     owner: getName(owner, item.owner_name || "Race owner"),
     status,
@@ -137,6 +139,9 @@ function mapAssignment(item, index = 0) {
     isBackup: assignmentType === "backup",
     backupPriority: item.backup_priority || "",
     race: getName(race, item.race_name || "Assigned race"),
+    race_id: race,
+    horse_id: horse,
+    owner_id: owner,
     tournament: getName(race.tournament_id || race.tournament || item.tournament_id, item.tournament_name || "Tournament"),
     date: formatRaceTime(race.race_date || item.race_date || item.created_at),
     venue: race.location || item.location || "Race track",

@@ -275,6 +275,9 @@ function buildFeatureEntry(context) {
   const owner = registration.owner || registration.owner_id;
   const assignment = context.assignment;
   const jockey = assignment && (assignment.jockey || assignment.jockey_id);
+  const horseDocumentId = documentId(horse);
+  const jockeyDocumentId = jockey ? documentId(jockey) : null;
+  const ownerDocumentId = owner ? documentId(owner) : null;
   const fallbacks = [];
   const currentDistance = toNumber(getLooseField(race, 'distance'), 1200);
   const currentGoing = getLooseField(race, 'going') || 'Good';
@@ -324,17 +327,17 @@ function buildFeatureEntry(context) {
     currentDistance: currentDistance,
     currentVenue: currentVenue,
     currentGoing: currentGoing,
-    horseId: horse && horse._id,
-    jockeyId: jockey && jockey._id,
-    ownerId: owner && owner._id,
+    horseId: horseDocumentId,
+    jockeyId: jockeyDocumentId,
+    ownerId: ownerDocumentId,
     pastResults: context.pastResults,
     fallbacks: fallbacks
   });
 
   return {
     participant: {
-      horse_id: horse && horse._id,
-      jockey_id: jockey && jockey._id,
+      horse_id: horseDocumentId,
+      jockey_id: jockeyDocumentId || undefined,
       horse_no: toNumber(getLooseField(registration, 'horse_no'), context.index + 1),
       horse_name: horse ? horse.name : `Horse ${context.index + 1}`,
       jockey_name: getJockeyName(jockey),
