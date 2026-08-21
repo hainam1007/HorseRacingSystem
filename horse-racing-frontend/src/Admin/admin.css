@@ -5397,6 +5397,241 @@
   }
 }
 
+/* Demo timeline: per-race controls for a safe end-to-end walkthrough. */
+.admin-demo-timeline__loading {
+  color: var(--admin-muted);
+}
+
+.admin-demo-timeline__guide {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0;
+  margin-bottom: 20px;
+  border: 1px solid var(--admin-line);
+  background: var(--admin-panel);
+}
+
+.admin-demo-timeline__guide > div {
+  position: relative;
+  min-width: 0;
+  min-height: 116px;
+  padding: 17px 18px;
+  display: grid;
+  align-content: start;
+  gap: 6px;
+  border-right: 1px solid var(--admin-line);
+}
+
+.admin-demo-timeline__guide > div:last-child {
+  border-right: 0;
+}
+
+.admin-demo-timeline__guide span {
+  color: var(--admin-accent);
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.admin-demo-timeline__guide strong {
+  color: var(--admin-text);
+  font-size: 0.86rem;
+}
+
+.admin-demo-timeline__guide small,
+.admin-demo-timeline__heading span {
+  color: var(--admin-muted);
+  font-size: 0.74rem;
+  line-height: 1.45;
+}
+
+.admin-demo-timeline__guide svg {
+  position: absolute;
+  right: -9px;
+  top: 49px;
+  z-index: 1;
+  padding: 2px;
+  color: var(--admin-muted);
+  background: var(--admin-panel);
+}
+
+.admin-demo-timeline__panel {
+  display: grid;
+  gap: 20px;
+}
+
+.admin-demo-timeline__heading {
+  align-items: flex-start;
+}
+
+.admin-demo-timeline__heading .admin-header__button {
+  flex: 0 0 auto;
+}
+
+.admin-demo-timeline__form {
+  display: grid;
+  gap: 17px;
+  max-width: 860px;
+}
+
+.admin-demo-timeline__race-field {
+  max-width: 560px;
+}
+
+.admin-demo-timeline__date-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.admin-demo-timeline__status {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 1px solid var(--admin-line);
+  background: rgba(var(--racing-contrast-rgb), 0.025);
+}
+
+.admin-demo-timeline__status-dot {
+  width: 9px;
+  height: 9px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: var(--admin-muted);
+}
+
+.admin-demo-timeline__status-dot--open {
+  background: #22a06b;
+  box-shadow: 0 0 0 4px rgba(34, 160, 107, 0.12);
+}
+
+.admin-demo-timeline__status div {
+  display: grid;
+  gap: 2px;
+}
+
+.admin-demo-timeline__status strong {
+  color: var(--admin-text);
+  font-size: 0.79rem;
+}
+
+.admin-demo-timeline__status small,
+.admin-demo-timeline__summary {
+  color: var(--admin-muted);
+  font-size: 0.72rem;
+}
+
+.admin-demo-timeline__summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  padding: 0 2px;
+}
+
+.admin-demo-timeline__summary strong {
+  color: var(--admin-copy);
+}
+
+.admin-demo-timeline__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.admin-demo-timeline__empty {
+  min-height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  color: var(--admin-muted);
+  text-align: left;
+}
+
+.admin-demo-timeline__empty h3 {
+  margin: 0 0 5px;
+  color: var(--admin-text);
+  font-size: 0.92rem;
+}
+
+.admin-demo-timeline__empty p,
+.admin-demo-timeline__notes p {
+  margin: 0;
+  font-size: 0.77rem;
+  line-height: 1.55;
+}
+
+.admin-demo-timeline__notes {
+  margin-top: 18px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.admin-demo-timeline__notes > div {
+  padding: 16px 17px;
+  border-left: 3px solid var(--admin-accent);
+  background: rgba(var(--racing-contrast-rgb), 0.035);
+}
+
+.admin-demo-timeline__notes strong {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--admin-text);
+  font-size: 0.8rem;
+}
+
+.admin-demo-timeline__notes p {
+  color: var(--admin-copy);
+}
+
+@media (max-width: 980px) {
+  .admin-demo-timeline__guide {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .admin-demo-timeline__guide > div:nth-child(2) {
+    border-right: 0;
+  }
+
+  .admin-demo-timeline__guide > div:nth-child(-n + 2) {
+    border-bottom: 1px solid var(--admin-line);
+  }
+}
+
+@media (max-width: 640px) {
+  .admin-demo-timeline__guide,
+  .admin-demo-timeline__date-grid,
+  .admin-demo-timeline__notes {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-demo-timeline__guide > div,
+  .admin-demo-timeline__guide > div:nth-child(2) {
+    min-height: auto;
+    border-right: 0;
+    border-bottom: 1px solid var(--admin-line);
+  }
+
+  .admin-demo-timeline__guide > div:last-child {
+    border-bottom: 0;
+  }
+
+  .admin-demo-timeline__guide svg {
+    display: none;
+  }
+
+  .admin-demo-timeline__heading .admin-header__button {
+    width: 100%;
+  }
+
+  .admin-demo-timeline__actions .admin-header__button {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
 /* Role application review */
 .admin-role-application-filter-row {
   display: grid;

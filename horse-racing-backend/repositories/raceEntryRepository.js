@@ -1,7 +1,17 @@
 const { Op } = require('sequelize');
 const { loadSequelizeModels } = require('../models/sequelize/index.js');
+const { projectUpdate } = require('./sequelize/adapter');
 
 function getModels() { return loadSequelizeModels().models; }
+
+function buildWhere(filter) {
+  const where = { ...filter };
+  if (where._id !== undefined) {
+    where.id = where._id;
+    delete where._id;
+  }
+  return where;
+}
 
 function regInclude() {
   const { Race, Horse, HorseOwner, User } = getModels();
@@ -48,9 +58,9 @@ async function bulkWrite(operations) {
   // Repository abstraction level.
   for (const op of operations) {
     if (op.updateOne && op.updateOne.filter && op.updateOne.update) {
-      await Registration.update(op.updateOne.update, { where: op.updateOne.filter });
+      await Registration.update(projectUpdate(op.updateOne.update), { where: buildWhere(op.updateOne.filter) });
     } else if (op.updateMany && op.updateMany.filter && op.updateMany.update) {
-      await Registration.update(op.updateMany.update, { where: op.updateMany.filter });
+      await Registration.update(projectUpdate(op.updateMany.update), { where: buildWhere(op.updateMany.filter) });
     }
   }
 }
@@ -59,7 +69,7 @@ async function updateById(id, update) {
   const { Registration } = getModels();
   const instance = await Registration.findByPk(id);
   if (!instance) return null;
-  await instance.update(update);
+  await instance.update(projectUpdate(update));
   return Registration.findByPk(id, { include: regInclude() });
 }
 

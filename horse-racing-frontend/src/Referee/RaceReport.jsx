@@ -3,6 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import { refereeApi } from "../api/refereeApi";
 import LoadingSkeleton from "../components/LoadingSkeleton";
 import RefereeLayout from "./RefereeLayout";
+import RefereeNotifications from "./RefereeNotifications";
 import { formatStatus, RESULT_STATUSES } from "./refereeConstants";
 import { useRefereeData } from "./useRefereeData";
 
@@ -50,7 +51,11 @@ function RaceReport() {
   const isPublished = race.resultStatus === RESULT_STATUSES.PUBLISHED || isSubmitted;
   const confirmedTime = race.report?.submittedAt ? new Date(race.report.submittedAt).toLocaleString() : new Date().toLocaleString();
 
-  const addMsg = (message) => setMessages((prev) => [message, ...prev].slice(0, 4));
+  const addMsg = (notice) => setMessages((prev) => [
+    { id: `${Date.now()}-${Math.random()}`, ...notice },
+    ...prev,
+  ].slice(0, 4));
+  const dismissMessage = (id) => setMessages((prev) => prev.filter((message) => message.id !== id));
   const updateField = (field, value) => setForm((current) => ({ ...current, [field]: value }));
 
   const buildPayload = () => ({
@@ -63,9 +68,9 @@ function RaceReport() {
     conclusion: form.conclusion,
   });
 
-  const handleSaveDraft = async () => {
+  const handleSaveDraft = async ({ notify = true } = {}) => {
     if (!form.title.trim()) {
-      addMsg("Report title is required.");
+      addMsg({ tone: "warning", title: "Report title required", detail: "Add a title before saving or submitting this report." });
       return null;
     }
 
@@ -85,12 +90,14 @@ function RaceReport() {
         }
 
         await reload();
-        addMsg("Report draft saved.");
+        if (notify) {
+          addMsg({ tone: "success", title: "Draft saved", detail: "Your report changes are saved and remain editable." });
+        }
         return savedReportId;
       }
 
     } catch (apiError) {
-      addMsg(apiError.message || "Unable to save referee report.");
+      addMsg({ tone: "error", title: "Could not save report", detail: apiError.message || "Unable to save the referee report. Try again." });
       return null;
     } finally {
       setIsSaving(false);
@@ -98,7 +105,7 @@ function RaceReport() {
   };
 
   const handleSubmit = async () => {
-    const savedReportId = await handleSaveDraft();
+    const savedReportId = await handleSaveDraft({ notify: false });
     if (!savedReportId) return;
 
     try {
@@ -106,15 +113,15 @@ function RaceReport() {
       const reportId = typeof savedReportId === "string" ? savedReportId : race.report?.id;
 
       if (!reportId) {
-        addMsg("Draft saved. Reload the report before submitting.");
+        addMsg({ tone: "warning", title: "Reload required", detail: "The draft was saved, but its report ID is unavailable. Reload before submitting." });
         return;
       }
 
       await refereeApi.submitRefereeReport(reportId);
       await reload();
-      addMsg("Report submitted.");
+      addMsg({ tone: "success", title: "Report submitted", detail: "The official report is now locked and available to the results workflow." });
     } catch (apiError) {
-      addMsg(apiError.message || "Unable to submit referee report.");
+      addMsg({ tone: "error", title: "Could not submit report", detail: apiError.message || "Unable to submit the referee report. Try again." });
     } finally {
       setIsSaving(false);
     }
@@ -144,11 +151,7 @@ function RaceReport() {
     >
       {error && <section className="admin-live-state admin-live-state--warning" role="alert">{error}</section>}
 
-      {!!messages.length && (
-        <section className="admin-toast-stack" aria-live="polite">
-          {messages.map((message, index) => <div key={index} className="admin-toast">{message}</div>)}
-        </section>
-      )}
+      <RefereeNotifications items={messages} onDismiss={dismissMessage} />
 
       <section className="admin-panel">
         <div className="admin-panel__header">

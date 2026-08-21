@@ -5,18 +5,28 @@ const test = require('node:test');
 const { newObjectId } = require('../utils/objectId');
 
 const betRepository = require('../repositories/betRepository');
+const raceRepository = require('../repositories/raceRepository');
 const raceOddsMarketRepository = require('../repositories/raceOddsMarketRepository');
 const transactionRepository = require('../repositories/transactionRepository');
 const walletRepository = require('../repositories/walletRepository');
 const betService = require('../services/betService');
+const { HorseCheck, RaceResult, Violation } = require('../models');
 
 const projectRoot = path.resolve(__dirname, '..');
 const originalBetCreate = betRepository.create;
+const originalFindPendingByRaceId = betRepository.findPendingByRaceId;
+const originalUpdateBetById = betRepository.updateById;
+const originalFindRaceById = raceRepository.findById;
+const originalUpdateRaceById = raceRepository.updateById;
 const originalFindMarketByRaceId = raceOddsMarketRepository.findByRaceId;
+const originalUpdateMarketByRaceId = raceOddsMarketRepository.updateByRaceId;
 const originalCreateLog = transactionRepository.createLog;
 const originalUpsertWallet = walletRepository.upsertWallet;
 const originalDeductTokenIfSufficient = walletRepository.deductTokenIfSufficient;
 const originalIncrementToken = walletRepository.incrementToken;
+const originalFindRaceResults = RaceResult.findAll;
+const originalFindHorseChecks = HorseCheck.findAll;
+const originalFindViolations = Violation.findAll;
 
 function readProjectFile(relativePath) {
   return fs.readFileSync(path.join(projectRoot, relativePath), 'utf8');
@@ -24,11 +34,19 @@ function readProjectFile(relativePath) {
 
 test.afterEach(() => {
   betRepository.create = originalBetCreate;
+  betRepository.findPendingByRaceId = originalFindPendingByRaceId;
+  betRepository.updateById = originalUpdateBetById;
+  raceRepository.findById = originalFindRaceById;
+  raceRepository.updateById = originalUpdateRaceById;
   raceOddsMarketRepository.findByRaceId = originalFindMarketByRaceId;
+  raceOddsMarketRepository.updateByRaceId = originalUpdateMarketByRaceId;
   transactionRepository.createLog = originalCreateLog;
   walletRepository.upsertWallet = originalUpsertWallet;
   walletRepository.deductTokenIfSufficient = originalDeductTokenIfSufficient;
   walletRepository.incrementToken = originalIncrementToken;
+  RaceResult.findAll = originalFindRaceResults;
+  HorseCheck.findAll = originalFindHorseChecks;
+  Violation.findAll = originalFindViolations;
 });
 
 test('bet APIs are wired into app, docs, and route layer', () => {
@@ -98,6 +116,48 @@ test('pre-race exclusion is refundable, but post-start exclusion is not', () => 
     ),
     false
   );
+});
+
+test('settlement updates a losing Sequelize-shaped bet that only exposes id', async () => {
+  const raceId = newObjectId();
+  const betId = newObjectId();
+  const losingHorseId = newObjectId();
+  const winnerHorseId = newObjectId();
+  const winnerResultId = newObjectId();
+  const settledByUserId = newObjectId();
+  const updates = [];
+
+  raceRepository.findById = async () => ({ id: raceId, status: 'completed' });
+  raceRepository.updateById = async () => ({ id: raceId, betting_status: 'settled' });
+  raceOddsMarketRepository.updateByRaceId = async () => ({ id: newObjectId(), status: 'settled' });
+  betRepository.findPendingByRaceId = async () => [{
+    id: betId,
+    spectator_id: newObjectId(),
+    predicted_horse_id: losingHorseId,
+    stake_amount: 25,
+    potential_payout: 80
+  }];
+  betRepository.updateById = async (id, update) => {
+    updates.push({ id, update });
+    return { id, ...update };
+  };
+  RaceResult.findAll = async () => [{
+    id: winnerResultId,
+    horse_id: winnerHorseId,
+    final_position: 1,
+    status: 'published'
+  }];
+  HorseCheck.findAll = async () => [];
+  Violation.findAll = async () => [];
+
+  const result = await betService.settleRaceBets(raceId, settledByUserId);
+
+  assert.equal(result.settled_count, 1);
+  assert.equal(result.lost_count, 1);
+  assert.equal(updates.length, 1);
+  assert.equal(updates[0].id, betId);
+  assert.equal(updates[0].update.status, 'lost');
+  assert.equal(updates[0].update.settled_result_id, winnerResultId);
 });
 
 test('failed bet creation refunds wallet and writes refund audit log', async () => {

@@ -1,6 +1,7 @@
 const assert = require('node:assert/strict');
 const test = require('node:test');
 
+const betRepository = require('../repositories/betRepository');
 const raceOddsMarketRepository = require('../repositories/raceOddsMarketRepository');
 const raceRepository = require('../repositories/raceRepository');
 const raceEngineService = require('../services/raceEngineService');
@@ -12,6 +13,7 @@ const originalUpdateMany = raceRepository.updateMany;
 const originalFindMarketByRaceId = raceOddsMarketRepository.findByRaceId;
 const originalCaptureOpeningOdds = raceOddsMarketRepository.captureOpeningOdds;
 const originalUpdateMarketByRaceId = raceOddsMarketRepository.updateByRaceId;
+const originalCountBets = betRepository.count;
 const originalLockRace = raceEngineService.lockRace;
 const originalCollectParticipants = raceEngineService.collectParticipants;
 const originalGenerateProvisionalRaceRun = raceEngineService.generateProvisionalRaceRun;
@@ -23,6 +25,7 @@ test.afterEach(function() {
   raceOddsMarketRepository.findByRaceId = originalFindMarketByRaceId;
   raceOddsMarketRepository.captureOpeningOdds = originalCaptureOpeningOdds;
   raceOddsMarketRepository.updateByRaceId = originalUpdateMarketByRaceId;
+  betRepository.count = originalCountBets;
   raceEngineService.lockRace = originalLockRace;
   raceEngineService.collectParticipants = originalCollectParticipants;
   raceEngineService.generateProvisionalRaceRun = originalGenerateProvisionalRaceRun;
@@ -153,6 +156,85 @@ test('demo registration mode validates enabled boolean', async function() {
       message: 'enabled must be a boolean'
     }
   );
+});
+
+test('demo timeline updates only a safe scheduled race with the selected deadline', async function() {
+  const raceDate = new Date(Date.now() + 90 * 60 * 1000);
+  const registrationLockAt = new Date(Date.now() + 25 * 60 * 1000);
+  let raceUpdate;
+  let marketUpdate;
+
+  raceRepository.findById = async function() {
+    return {
+      _id: 'race-id',
+      status: 'scheduled',
+      model_input_version: 4,
+      betting_market: { min_stake: 5, max_stake: 250, currency: 'TOKEN' }
+    };
+  };
+  betRepository.count = async function() { return 0; };
+  raceOddsMarketRepository.findByRaceId = async function() {
+    return { _id: 'market-id', status: 'generated' };
+  };
+  raceOddsMarketRepository.updateByRaceId = async function(_, payload) {
+    marketUpdate = payload;
+    return { _id: 'market-id', ...payload };
+  };
+  raceRepository.updateById = async function(_, payload) {
+    raceUpdate = payload;
+    return { _id: 'race-id', ...payload };
+  };
+
+  const result = await raceService.prepareDemoTimeline('race-id', {
+    race_date: raceDate,
+    registration_lock_at: registrationLockAt
+  });
+
+  assert.equal(result.registration_open, true);
+  assert.equal(result.market_reset, true);
+  assert.equal(raceUpdate.race_date, raceDate);
+  assert.equal(raceUpdate.registration_lock_at, registrationLockAt);
+  assert.equal(raceUpdate.registration_locked, false);
+  assert.equal(raceUpdate.entries_finalized_at, null);
+  assert.equal(raceUpdate.model_input_version, 5);
+  assert.equal(raceUpdate.betting_status, 'stale');
+  assert.equal(marketUpdate.status, 'stale');
+});
+
+test('demo timeline refuses to modify a race after a spectator has a bet', async function() {
+  raceRepository.findById = async function() {
+    return { _id: 'race-id', status: 'scheduled' };
+  };
+  betRepository.count = async function() { return 1; };
+
+  await assert.rejects(
+    raceService.prepareDemoTimeline('race-id', {
+      race_date: new Date(Date.now() + 90 * 60 * 1000),
+      registration_lock_at: new Date(Date.now() + 25 * 60 * 1000)
+    }),
+    {
+      statusCode: 409,
+      message: 'The demo timeline cannot change after a spectator has placed a bet'
+    }
+  );
+});
+
+test('demo timeline can lock registrations immediately for one safe race', async function() {
+  let raceUpdate;
+  raceRepository.findById = async function() {
+    return { _id: 'race-id', status: 'scheduled', registration_locked: false };
+  };
+  betRepository.count = async function() { return 0; };
+  raceRepository.updateById = async function(_, payload) {
+    raceUpdate = payload;
+    return { _id: 'race-id', ...payload };
+  };
+
+  const result = await raceService.lockRegistrationForDemo('race-id');
+
+  assert.equal(result.locked, true);
+  assert.equal(raceUpdate.registration_locked, true);
+  assert.ok(raceUpdate.registration_lock_at instanceof Date);
 });
 
 test('open betting requires generated odds market and stores race betting config', async function() {

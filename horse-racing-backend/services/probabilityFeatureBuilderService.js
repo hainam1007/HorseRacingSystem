@@ -54,12 +54,16 @@ function getUserName(user, fallback) {
   return user.full_name || user.email || fallback;
 }
 
+function relatedRecord(record, associationName, foreignKeyName) {
+  return record && (record[associationName] || record[foreignKeyName]);
+}
+
 function getOwnerName(owner) {
   if (!owner || typeof owner === 'string') {
     return 'Demo Trainer';
   }
 
-  return owner.stable_name || getUserName(owner.user_id, 'Demo Trainer');
+  return owner.stable_name || getUserName(relatedRecord(owner, 'user', 'user_id'), 'Demo Trainer');
 }
 
 function getJockeyName(jockey) {
@@ -67,7 +71,7 @@ function getJockeyName(jockey) {
     return 'Unknown Jockey';
   }
 
-  return getUserName(jockey.user_id, jockey.license_number || 'Unknown Jockey');
+  return getUserName(relatedRecord(jockey, 'user', 'user_id'), jockey.license_number || 'Unknown Jockey');
 }
 
 function normalizeVenue(race) {
@@ -275,6 +279,9 @@ function buildFeatureEntry(context) {
   const owner = registration.owner || registration.owner_id;
   const assignment = context.assignment;
   const jockey = assignment && (assignment.jockey || assignment.jockey_id);
+  const horseId = documentId(horse);
+  const jockeyId = documentId(jockey);
+  const ownerId = documentId(owner);
   const fallbacks = [];
   const currentDistance = toNumber(getLooseField(race, 'distance'), 1200);
   const currentGoing = getLooseField(race, 'going') || 'Good';
@@ -324,17 +331,17 @@ function buildFeatureEntry(context) {
     currentDistance: currentDistance,
     currentVenue: currentVenue,
     currentGoing: currentGoing,
-    horseId: horse && horse._id,
-    jockeyId: jockey && jockey._id,
-    ownerId: owner && owner._id,
+    horseId: horseId,
+    jockeyId: jockeyId,
+    ownerId: ownerId,
     pastResults: context.pastResults,
     fallbacks: fallbacks
   });
 
   return {
     participant: {
-      horse_id: horse && horse._id,
-      jockey_id: jockey && jockey._id,
+      horse_id: horseId,
+      jockey_id: jockeyId,
       horse_no: toNumber(getLooseField(registration, 'horse_no'), context.index + 1),
       horse_name: horse ? horse.name : `Horse ${context.index + 1}`,
       jockey_name: getJockeyName(jockey),
@@ -482,9 +489,12 @@ async function buildRaceProbabilityPayload(raceId) {
 module.exports = {
   buildRaceProbabilityPayload,
   _private: {
+    buildFeatureEntry,
     computeHistoricalFeatures,
+    documentId,
     filterPriorResults,
     getFinishAverage,
+    getJockeyName,
     kilogramsToPounds,
     normalizeVenue
   }
