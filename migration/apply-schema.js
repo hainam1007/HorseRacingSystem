@@ -113,7 +113,9 @@ async function applySchema(sqlPath) {
         process.exit(1);
     }
 
-    const sql = fs.readFileSync(sqlPath, 'utf8');
+    const sql = fs.readFileSync(sqlPath, 'utf8')
+        // psql meta-commands (for example, \set) are not understood by node-pg.
+        .replace(/^\s*\\[A-Za-z].*$/gm, '');
 
     const client = new Client({ ...opts, multipleStatements: false });
     console.log(`[apply-schema] connecting to Postgres...`);
