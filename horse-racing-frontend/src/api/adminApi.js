@@ -358,6 +358,14 @@ export const adminApi = {
     });
   },
 
+  prepareRaceDemoTimeline(id, payload) {
+    return apiRequest(`/races/${id}/demo-timeline`, { method: "POST", body: payload });
+  },
+
+  lockRaceRegistrationForDemo(id) {
+    return apiRequest(`/races/${id}/demo-timeline/lock`, { method: "POST" });
+  },
+
   deleteRace(id) {
     return apiRequest(`/races/${id}`, { method: "DELETE" });
   },

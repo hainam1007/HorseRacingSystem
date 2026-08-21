@@ -27,6 +27,7 @@
 
 const ApiError = require('../utils/ApiError');
 const { ROLE_NAMES } = require('../constants/roles');
+const betRepository = require('../repositories/betRepository');
 const profileRepository = require('../repositories/profileRepository');
 const raceOddsMarketRepository = require('../repositories/raceOddsMarketRepository');
 const raceRepository = require('../repositories/raceRepository');
@@ -544,6 +545,98 @@ async function setRegistrationDemoMode(payload) {
     };
 }
 
+async function ensureDemoTimelineCanChange(race) {
+    if (String(race.status || '').toLowerCase() !== 'scheduled') {
+        throw new ApiError(409, 'Only a scheduled race can be prepared for the demo timeline');
+    }
+
+    const betCount = await betRepository.count({ race_id: race._id });
+    if (betCount > 0) {
+        throw new ApiError(409, 'The demo timeline cannot change after a spectator has placed a bet', {
+            bet_count: betCount
+        });
+    }
+
+    return betCount;
+}
+
+function demoBettingMarketPayload(race, marketStatus) {
+    const currentMarket = race.betting_market || {};
+    return {
+        status: marketStatus,
+        min_stake: Number(currentMarket.min_stake) || 1,
+        max_stake: Number(currentMarket.max_stake) || 1000,
+        currency: currentMarket.currency || 'TOKEN'
+    };
+}
+
+/**
+ * Purpose-built demo control. Unlike the legacy registration-demo endpoints,
+ * this changes exactly one safe, scheduled race and takes the two timeline
+ * dates explicitly from the Admin UI.
+ */
+async function prepareDemoTimeline(id, payload) {
+    const race = await raceRepository.findById(id);
+
+    if (!race) {
+        throw new ApiError(404, 'Race not found');
+    }
+
+    await ensureDemoTimelineCanChange(race);
+    const market = await raceOddsMarketRepository.findByRaceId(race._id);
+    const nextMarketStatus = market ? ODDS_MARKET_STATUS.STALE : 'unavailable';
+
+    if (market) {
+        await raceOddsMarketRepository.updateByRaceId(race._id, {
+            status: ODDS_MARKET_STATUS.STALE
+        });
+    }
+
+    const updatedRace = await raceRepository.updateById(race._id, {
+        race_date: payload.race_date,
+        registration_lock_at: payload.registration_lock_at,
+        registration_locked: false,
+        starting_at: null,
+        started_at: null,
+        entries_finalized_at: null,
+        entries_finalized_by: null,
+        model_input_version: Number(race.model_input_version || 0) + 1,
+        betting_status: nextMarketStatus,
+        betting_closes_at: null,
+        betting_market: demoBettingMarketPayload(race, nextMarketStatus)
+    });
+
+    return {
+        race: updatedRace,
+        market_reset: Boolean(market),
+        registration_open: true
+    };
+}
+
+/**
+ * A per-race, deliberate shortcut for the hand-off from entry/jockey demo
+ * to entry finalization and betting. It never affects other races.
+ */
+async function lockRegistrationForDemo(id) {
+    const race = await raceRepository.findById(id);
+
+    if (!race) {
+        throw new ApiError(404, 'Race not found');
+    }
+
+    await ensureDemoTimelineCanChange(race);
+    if (race.registration_locked) {
+        return { race: race, locked: false };
+    }
+
+    const updatedRace = await raceRepository.updateById(race._id, {
+        registration_locked: true,
+        registration_lock_at: new Date()
+    });
+
+    return { race: updatedRace, locked: true };
+}
+
 async function deleteRace(id) {
     const race = await raceRepository.softDeleteById(id);
 
@@ -774,6 +867,8 @@ module.exports = {
     getRace,
     openRegistrationForDemo,
     setRegistrationDemoMode,
+    prepareDemoTimeline,
+    lockRegistrationForDemo,
     openBetting,
     closeBetting,
     startRace,

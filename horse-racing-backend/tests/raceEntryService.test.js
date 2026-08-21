@@ -65,6 +65,48 @@ test('model input is not ready until admin finalizes entries', async () => {
   assert.equal(result.ready, false);
 });
 
+test('model input reads the Sequelize horse and jockey associations used by the entries modal', async () => {
+  const race = {
+    _id: 'race-1', entries_finalized_at: new Date(), race_date: new Date(), distance: 1200, race_no: 1,
+    venue_code: 'ST', course: 'B+2', race_class: '5', going: 'Good', surface: 'Turf', model_input_version: 3
+  };
+  const registrations = [
+    {
+      id: 'registration-1', horse_id: 'horse-1', horse_no: 1, draw: 1, rating_snapshot: 55,
+      declared_weight_kg: 54.5, gears: [{ gear_code: 'B' }],
+      horse: { id: 'horse-1', name: 'Northern Dancer', current_rating: 55, default_gears: [{ gear_code: 'B' }] }
+    },
+    {
+      id: 'registration-2', horse_id: 'horse-2', horse_no: 2, draw: 2, rating_snapshot: 49,
+      declared_weight_kg: 54.5, gears: [{ gear_code: 'TT' }],
+      horse: { id: 'horse-2', name: 'Sea Bird', current_rating: 49, default_gears: [{ gear_code: 'TT' }] }
+    }
+  ];
+  const assignments = [
+    {
+      id: 'assignment-1', horse_id: 'horse-1', jockey_id: 'jockey-1',
+      jockey: { id: 'jockey-1', license_number: 'VN-01', user: { full_name: 'Jockey One' } }
+    },
+    {
+      id: 'assignment-2', horse_id: 'horse-2', jockey_id: 'jockey-2',
+      jockey: { id: 'jockey-2', license_number: 'VN-02', user: { full_name: 'Jockey Two' } }
+    }
+  ];
+
+  raceRepository.findById = async () => race;
+  raceEntryRepository.findByRaceId = async () => registrations;
+  raceEntryRepository.findAcceptedPrimaryAssignments = async () => assignments;
+
+  const result = await raceEntryService.getModelInputReadiness('race-1');
+
+  assert.equal(result.ready, true);
+  assert.equal(result.participants[0].registration_id, 'registration-1');
+  assert.equal(result.participants[0].horse_name, 'Northern Dancer');
+  assert.equal(result.participants[0].primary_jockey.name, 'Jockey One');
+  assert.deepEqual(result.participants[0].gears, ['B']);
+  assert.deepEqual(result.participants[0].missing_fields, []);
+});
+
 test('odds preparation assigns draws by approved registration order', async () => {
   const context = readyContext();
   let operations;

@@ -2745,6 +2745,126 @@
   border-left: 3px solid rgba(var(--racing-accent-rgb), 0.42);
 }
 
+.referee-notification-stack {
+  display: grid;
+  gap: 10px;
+  margin: 0 0 16px;
+}
+
+.referee-notification {
+  --notice-color: var(--racing-accent);
+  --notice-rgb: var(--racing-accent-rgb);
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: start;
+  position: relative;
+  overflow: hidden;
+  padding: 13px 12px 13px 13px;
+  border: 1px solid rgba(var(--notice-rgb), 0.3);
+  border-left: 3px solid var(--notice-color);
+  border-radius: 9px;
+  background:
+    linear-gradient(135deg, rgba(var(--notice-rgb), 0.1), transparent 46%),
+    rgba(7, 20, 13, 0.88);
+  box-shadow: 0 12px 30px rgba(4, 13, 8, 0.2);
+  animation: referee-notification-in 220ms ease-out both;
+}
+
+.referee-notification[data-tone="success"] {
+  --notice-color: var(--racing-success);
+  --notice-rgb: var(--racing-success-rgb);
+}
+
+.referee-notification[data-tone="warning"] {
+  --notice-color: var(--racing-accent-soft);
+  --notice-rgb: var(--racing-accent-rgb);
+}
+
+.referee-notification[data-tone="error"] {
+  --notice-color: var(--racing-danger);
+  --notice-rgb: var(--racing-danger-rgb);
+}
+
+.referee-notification[data-tone="info"] {
+  --notice-color: var(--racing-text-soft);
+  --notice-rgb: 183, 205, 191;
+}
+
+.referee-notification__icon {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  border: 1px solid rgba(var(--notice-rgb), 0.34);
+  border-radius: 8px;
+  background: rgba(var(--notice-rgb), 0.13);
+  color: var(--notice-color);
+}
+
+.referee-notification__content {
+  min-width: 0;
+}
+
+.referee-notification__label {
+  display: block;
+  margin: 1px 0 3px;
+  color: var(--notice-color);
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.referee-notification__content h3 {
+  margin: 0;
+  color: var(--referee-ink);
+  font-size: 0.94rem;
+  font-weight: 760;
+  line-height: 1.35;
+}
+
+.referee-notification__content p {
+  max-width: 70ch;
+  margin: 3px 0 0;
+  color: var(--referee-copy);
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+
+.referee-notification__dismiss {
+  display: grid;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  margin: -3px -3px 0 0;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--referee-muted);
+  cursor: pointer;
+  transition: border-color 180ms ease, background 180ms ease, color 180ms ease, transform 180ms ease;
+}
+
+.referee-notification__dismiss:hover {
+  border-color: rgba(var(--notice-rgb), 0.28);
+  background: rgba(var(--notice-rgb), 0.1);
+  color: var(--referee-ink);
+  transform: translateY(-1px);
+}
+
+.referee-notification__dismiss:focus-visible {
+  outline: 2px solid var(--notice-color);
+  outline-offset: 2px;
+}
+
+@keyframes referee-notification-in {
+  from { opacity: 0; transform: translateY(-7px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 @media (max-width: 760px) {
   .referee-phase-strip {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -2758,5 +2878,18 @@
   .referee-inspection-workspace__confirmation {
     align-items: stretch;
     flex-direction: column;
+  }
+}
+
+@media (max-width: 560px) {
+  .referee-notification {
+    grid-template-columns: 34px minmax(0, 1fr) auto;
+    gap: 10px;
+    padding: 12px 10px 12px 11px;
+  }
+
+  .referee-notification__icon {
+    width: 34px;
+    height: 34px;
   }
 }

@@ -3,6 +3,7 @@ import AdminCommandModule from "./AdminCommandModule";
 import AdminCompetitionModule from "./AdminCompetitionModule";
 import AdminCancellationModule from "./AdminCancellationModule";
 import AdminDepositModule from "./AdminDepositModule";
+import AdminDemoTimelineModule from "./AdminDemoTimelineModule";
 import AdminLayout from "./AdminLayout";
 import AdminRoleApplicationsModule from "./AdminRoleApplicationsModule";
 import AdminRegistryModule from "./AdminRegistryModule";
@@ -18,6 +19,7 @@ function AdminModulePage() {
 
   if (moduleName === "cancellations") return <AdminCancellationModule />;
   if (moduleName === "deposits") return <AdminDepositModule />;
+  if (moduleName === "demo") return <AdminDemoTimelineModule />;
   if (moduleName === "rewards") return <AdminRewardsModule />;
   if (moduleName === "role-applications") return <AdminRoleApplicationsModule />;
   if (moduleName === "racetracks") return <AdminRacetrackModule />;

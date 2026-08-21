@@ -43,6 +43,18 @@ async function setRegistrationDemoMode(req, res) {
   return sendSuccess(res, 200, 'Race registration demo mode updated successfully', data);
 }
 
+async function prepareDemoTimeline(req, res) {
+  const data = await raceService.prepareDemoTimeline(req.params.id, req.validatedBody);
+
+  return sendSuccess(res, 200, 'Demo timeline prepared successfully', data);
+}
+
+async function lockRegistrationForDemo(req, res) {
+  const data = await raceService.lockRegistrationForDemo(req.params.id);
+
+  return sendSuccess(res, 200, 'Race registrations locked for demo successfully', data);
+}
+
 async function deleteRace(req, res) {
   const data = await raceService.deleteRace(req.params.id);
 
@@ -80,6 +92,8 @@ module.exports = {
   getRace,
   openRegistrationForDemo,
   setRegistrationDemoMode,
+  prepareDemoTimeline,
+  lockRegistrationForDemo,
   openBetting,
   closeBetting,
   startRace,

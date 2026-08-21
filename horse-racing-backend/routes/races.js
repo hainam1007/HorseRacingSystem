@@ -8,7 +8,7 @@ const authorizeRoles = require('../middlewares/authorizeRoles');
 const { ROLE_NAMES } = require('../constants/roles');
 const asyncHandler = require('../utils/asyncHandler');
 const { validateObjectIdParam } = require('../validators/commonValidator');
-const { validateCreateRace, validateUpdateRace } = require('../validators/raceValidator');
+const { validateCreateRace, validateUpdateRace, validateDemoTimeline } = require('../validators/raceValidator');
 const { validateUpdateRaceOdds } = require('../validators/raceOddsValidator');
 
 const router = express.Router();
@@ -27,6 +27,8 @@ router.get('/', asyncHandler(raceController.listRaces));
 router.post('/', adminOnly, validateCreateRace, asyncHandler(raceController.createRace));
 router.post('/registration-demo-mode', adminOnly, asyncHandler(raceController.setRegistrationDemoMode));
 router.post('/:id/open-registration-demo', adminOnly, validateObjectIdParam('id'), asyncHandler(raceController.openRegistrationForDemo));
+router.post('/:id/demo-timeline', adminOnly, validateObjectIdParam('id'), validateDemoTimeline, asyncHandler(raceController.prepareDemoTimeline));
+router.post('/:id/demo-timeline/lock', adminOnly, validateObjectIdParam('id'), asyncHandler(raceController.lockRegistrationForDemo));
 router.get('/:id/odds', oddsReaders, validateObjectIdParam('id'), asyncHandler(raceOddsController.getRaceOdds));
 router.post('/:id/odds/generate', adminOnly, validateObjectIdParam('id'), asyncHandler(raceOddsController.generateRaceOdds));
 router.patch('/:id/odds', adminOnly, validateObjectIdParam('id'), validateUpdateRaceOdds, asyncHandler(raceOddsController.updateRaceOdds));

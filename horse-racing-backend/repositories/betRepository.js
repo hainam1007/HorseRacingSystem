@@ -1,4 +1,5 @@
 const { loadSequelizeModels } = require('../models/sequelize/index.js');
+const { toPlain } = require('./sequelize/adapter');
 
 function getModels() { return loadSequelizeModels().models; }
 
@@ -28,7 +29,14 @@ async function findById(id) {
 
 async function findPendingByRaceId(raceId) {
   const { Bet } = getModels();
-  return Bet.findAll({ where: { race_id: raceId, status: 'pending' }, order: [['submitted_at', 'ASC']] });
+  const rows = await Bet.findAll({
+    where: { race_id: raceId, status: 'pending' },
+    order: [['submitted_at', 'ASC']]
+  });
+
+  // Settlement still accepts legacy-shaped records, so expose `_id` alongside
+  // the Sequelize primary key instead of returning raw model instances.
+  return rows.map(toPlain);
 }
 
 async function updateById(id, data) {
