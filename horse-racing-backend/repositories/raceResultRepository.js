@@ -1,5 +1,5 @@
 const { loadSequelizeModels } = require('../models/sequelize/index.js');
-const { projectUpdate } = require('./sequelize/adapter');
+const { projectUpdate, toPlain } = require('./sequelize/adapter');
 
 function getModels() { return loadSequelizeModels().models; }
 
@@ -26,21 +26,22 @@ function baseInclude() {
 
 async function create(data) {
   const { RaceResult } = getModels();
-  return RaceResult.create(data);
+  return toPlain(await RaceResult.create(data));
 }
 
 async function find(filter = {}) {
   const { RaceResult } = getModels();
-  return RaceResult.findAll({
+  const rows = await RaceResult.findAll({
     where: filter,
     include: baseInclude(),
     order: [['published_at', 'DESC'], ['recorded_at', 'DESC']]
   });
+  return toPlain(rows);
 }
 
 async function findById(id) {
   const { RaceResult } = getModels();
-  return RaceResult.findByPk(id, { include: baseInclude() });
+  return toPlain(await RaceResult.findByPk(id, { include: baseInclude() }));
 }
 
 async function count(filter = {}) {

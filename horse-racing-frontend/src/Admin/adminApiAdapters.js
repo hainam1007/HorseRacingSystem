@@ -452,10 +452,11 @@ export function adaptAdminRaceResults(data) {
   const rows = groups.map(([raceId, group]) => {
     const race = group.race;
     const leader = getLeadingResult(group.results);
+    const tournamentName = race?.tournament?.name || race?.round?.name || race?.tournament_id || race?.round_id || "-";
     return [
       raceId,
-      getEntityName(race, "Unnamed race"),
-      getEntityName(race.tournament_id || race.tournament, "-"),
+      race?.name || race?.race_name || "Unnamed race",
+      tournamentName,
       getEntityName(getRaceResultHorse(leader), "Not ranked"),
       String(group.results.length),
       getGroupStatus(group.results),
