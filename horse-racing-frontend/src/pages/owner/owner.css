@@ -2423,7 +2423,33 @@
 
 .owner-entry-horse.is-unavailable {
   cursor: not-allowed;
-  opacity: 0.6;
+  opacity: 0.55;
+  filter: grayscale(0.35);
+}
+
+.owner-entry-horse.is-unavailable:hover,
+.owner-entry-horse.is-unavailable:focus-visible,
+.owner-entry-horse.is-unavailable:active {
+  border-color: inherit;
+  background: inherit;
+  transform: none;
+  outline: none;
+  box-shadow: none;
+}
+
+.owner-entry-horse.is-already-entered {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.owner-entry-horse.is-already-entered:hover,
+.owner-entry-horse.is-already-entered:focus-visible,
+.owner-entry-horse.is-already-entered:active {
+  border-color: inherit;
+  background: inherit;
+  transform: none;
+  outline: none;
+  box-shadow: none;
 }
 
 .owner-entry-horse__marker,
@@ -3582,24 +3608,38 @@
   min-height: 36px;
   display: inline-flex;
   align-items: center;
-  gap: 7px;
-  padding: 0 0 0 14px;
-  border-left: 1px solid rgba(118, 207, 143, 0.22);
+  gap: 8px;
+  padding: 7px 14px;
+  border: 1px solid rgba(118, 207, 143, 0.32);
+  border-radius: 999px;
+  background: rgba(118, 207, 143, 0.08);
   color: var(--racing-success-soft);
-  font-size: 0.8rem;
-  font-weight: 800;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-decoration: none;
+  cursor: pointer;
   white-space: nowrap;
-  transition: color 160ms ease, transform 160ms ease;
+  transition: background 160ms ease, color 160ms ease, border-color 160ms ease, transform 160ms ease, box-shadow 160ms ease;
 }
 
 .owner-assignment-confirmation__contract:hover {
+  background: rgba(118, 207, 143, 0.18);
+  border-color: rgba(118, 207, 143, 0.55);
   color: #d2ffdc;
-  transform: translateX(2px);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(118, 207, 143, 0.18);
+}
+
+.owner-assignment-confirmation__contract:active {
+  transform: translateY(0);
+  box-shadow: none;
 }
 
 .owner-assignment-confirmation__contract:focus-visible {
-  outline: 2px solid var(--racing-success-soft);
-  outline-offset: 4px;
+  outline: none;
+  border-color: var(--racing-success-soft);
+  box-shadow: 0 0 0 3px rgba(118, 207, 143, 0.28);
 }
 
 .owner-assignment-workflow__terms {
@@ -8052,9 +8092,8 @@
     grid-column: 2;
     justify-self: start;
     min-height: 0;
-    padding: 8px 0 0;
-    border-top: 1px solid rgba(118, 207, 143, 0.2);
-    border-left: 0;
+    padding: 6px 12px;
+    font-size: 0.74rem;
   }
 
   .owner-assignment-workflow__trigger {
