@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { ownerApi } from "../../api/ownerApi";
 import { useAuth } from "../../auth/AuthContext";
 import { toHorseApprovalStatus, toOwnerEligibleHorse, toOwnerHorse, toOwnerJockey, toOwnerPrizeAward, toOwnerProfile, toOwnerRegistration, toOwnerTournament } from "./ownerAdapters";
+import { mapAssignment } from "../jockey/jockeyAdapters";
 
 export function useOwnerHorses() {
   const [horses, setHorses] = useState([]);
@@ -328,7 +329,7 @@ export function useOwnerJockeyAssignments() {
 
     try {
       const data = await ownerApi.getJockeyAssignments();
-      setAssignments(data.assignments || []);
+      setAssignments((data.assignments || []).map(mapAssignment));
     } catch (apiError) {
       setError(apiError.message || "Unable to load jockey assignments.");
       setAssignments([]);

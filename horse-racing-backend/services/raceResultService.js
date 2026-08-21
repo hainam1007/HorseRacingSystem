@@ -135,11 +135,13 @@ async function loadViolationByIdWithPenalty(id) {
  */
 async function loadRaceResultsWithSnapshot(raceId) {
     const { Op } = require('sequelize');
-    const { RaceResult, RaceResultAppliedViolation, RaceResultPenaltySnapshotViolation } = getModels();
+    const { RaceResult, RaceResultAppliedViolation, RaceResultPenaltySnapshotViolation, Horse, Jockey, User } = getModels();
 
     const rows = await RaceResult.findAll({
         where: { race_id: raceId },
         include: [
+            { model: Horse, as: 'horse' },
+            { model: Jockey, as: 'jockey', include: [{ model: User, as: 'user' }] },
             { model: RaceResultAppliedViolation, as: 'applied_violations', required: false },
             { model: RaceResultPenaltySnapshotViolation, as: 'penalty_snapshot_violations', required: false }
         ]

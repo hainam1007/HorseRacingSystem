@@ -105,7 +105,14 @@ function getEntityId(value) {
 function getEntityName(value, fallback = "Unknown") {
   if (!value) return fallback;
   if (typeof value === "string") return value;
-  return value.name || value.full_name || value.email || value.title || value.race_name || value.horse_name || fallback;
+  // Horse Sequelize instance: { _id, name, registration_status, ... }
+  if (value.name) return value.name;
+  // Jockey Sequelize instance: { _id, user: { full_name }, full_name, ... }
+  if (value.user?.full_name) return value.user.full_name;
+  if (value.full_name) return value.full_name;
+  // Horse/Jockey UUID string → treated as bare ID; caller should
+  // use getRaceResultHorse/getRaceResultJockey first to get the populated object.
+  return value.full_name || value.title || value.race_name || value.horse_name || fallback;
 }
 
 function unwrapResultDetailData(data) {
@@ -147,11 +154,21 @@ function getPrizeAwards(payload) {
 }
 
 function getRaceResultHorse(result) {
-  return getNamedEntity(result.horse_id || result.horse || result.horseId, {});
+  // Prefer the populated Horse instance from the repository include.
+  // result.horse is the Sequelize instance (with .name etc.) when included.
+  // result.horse_id is the UUID string (used when not populated).
+  const named = result.horse || result.horse_id || {};
+  if (typeof named === "object" && named !== null) return named;
+  return {};
 }
 
 function getRaceResultJockey(result) {
-  return getNamedEntity(result.jockey_id || result.jockey || result.jockeyId, {});
+  // Prefer the populated Jockey instance (with .user.full_name).
+  // result.jockey is the Sequelize instance when included.
+  // result.jockey_id is the UUID string (used when not populated).
+  const named = result.jockey || result.jockey_id || {};
+  if (typeof named === "object" && named !== null) return named;
+  return {};
 }
 
 function getPenaltyLabel(violation) {
@@ -435,11 +452,12 @@ export function adaptAdminRaceResults(data) {
   const rows = groups.map(([raceId, group]) => {
     const race = group.race;
     const leader = getLeadingResult(group.results);
+    const tournamentName = race?.tournament?.name || race?.round?.name || race?.tournament_id || race?.round_id || "-";
     return [
       raceId,
-      getEntityName(race, "Unnamed race"),
-      getEntityName(race.tournament_id || race.tournament, "-"),
-      getEntityName(leader?.horse_id, "Not ranked"),
+      race?.name || race?.race_name || "Unnamed race",
+      tournamentName,
+      getEntityName(getRaceResultHorse(leader), "Not ranked"),
       String(group.results.length),
       getGroupStatus(group.results),
     ];
@@ -545,7 +563,7 @@ export function adaptAdminRaceResultDetail(data) {
       ["Correction requested by", getEntityName(correctionSource.correction_requested_by, "-")],
       ["Correction requested at", formatDateTime(correctionSource.correction_requested_at)],
       ["Result rows", String(results.length)],
-      ["Current leader", getEntityName(leader?.horse_id, "Not ranked")],
+      ["Current leader", getEntityName(getRaceResultHorse(leader), "Not ranked")],
       ["Leader finish time", (() => {
         if (!leader) return "-";
         const val = leader.final_finish_time ?? leader.finish_time;
