@@ -227,6 +227,36 @@ const isAssignmentRaceLocked = (item) => {
   return lockedRaceStatuses.includes(raceStatus);
 };
 
+const openContractPdf = (rawUrl) => {
+  const url = String(rawUrl || "").trim();
+  if (!url) {
+    window.alert("No contract file is available yet.");
+    return;
+  }
+  // Data URI (base64 PDF) — Chrome blocks navigation to data:application/pdf in a new tab.
+  // Decode to Blob and open via a temporary object URL instead.
+  if (/^data:application\/pdf;base64,/i.test(url)) {
+    try {
+      const base64 = url.split(",", 2)[1] || "";
+      const byteChars = atob(base64);
+      const byteNumbers = Array.from(byteChars, (c) => c.charCodeAt(0));
+      const byteArray = new Uint8Array(byteNumbers);
+      const blob = new Blob([byteArray], { type: "application/pdf" });
+      const objectUrl = URL.createObjectURL(blob);
+      const win = window.open(objectUrl, "_blank", "noopener,noreferrer");
+      setTimeout(() => URL.revokeObjectURL(objectUrl), 60000);
+      if (!win) window.alert("Please allow pop-ups to view the signed contract.");
+    } catch (err) {
+      console.error("Failed to open contract PDF", err);
+      window.alert("Could not open the contract file. Please try again.");
+    }
+    return;
+  }
+  // Plain http(s) URL — open in new tab.
+  const win = window.open(url, "_blank", "noopener,noreferrer");
+  if (!win) window.alert("Please allow pop-ups to view the signed contract.");
+};
+
 const withdrawableAssignmentStatuses = [
   "meeting_accepted",
   "terms_pending_confirmation",
@@ -881,6 +911,28 @@ function OwnerRegistrations() {
   const selectedHorse = horses.find((horse) => horse.id === entry.horseId) ?? null;
   const eligibilityLoading = Boolean(selectedRace?.id) && (!eligibilityDataMatchesRace || eligibleHorseData.isLoading);
   const eligibilityError = eligibilityDataMatchesRace ? eligibleHorseData.error : "";
+
+  // Set of horse IDs that already have an active registration for the currently selected race,
+  // so we can disable them in the eligible list and avoid duplicate entries.
+  const enteredHorseIdsForRace = new Set(
+    (registrations || [])
+      .filter((registration) => (
+        String(registration.raceId) === String(entry.raceId)
+        && !["Cancelled", "Rejected"].includes(registration.status)
+      ))
+      .map((registration) => String(registration.horseId))
+  );
+
+  // Clear horseId if the currently selected horse is no longer in the eligible list
+  // (e.g. user switched races or backend re-evaluated eligibility with stricter rules).
+  useEffect(() => {
+    if (!entry.horseId) return;
+    if (horses.length === 0) return;
+    if (eligibilityLoading) return;
+    if (!selectedHorse) {
+      setEntry((prev) => (prev.horseId ? { ...prev, horseId: "" } : prev));
+    }
+  }, [entry.horseId, horses, selectedHorse, eligibilityLoading]);
   const filteredHorses = horses.filter((horse) => (
     `${horse.name} ${horse.registrationNumber} ${horse.breed} ${horse.gender} ${horse.color} ${horse.status}`
       .toLowerCase()
@@ -972,7 +1024,11 @@ function OwnerRegistrations() {
   };
 
   const isHorseEligible = (horse) => {
-    return ["eligible", "conditional_ballast"].includes(String(horse?.eligibilityStatus || "").toLowerCase());
+    return String(horse?.eligibilityStatus || "").toLowerCase() === "eligible";
+  };
+
+  const isHorseConditional = (horse) => {
+    return String(horse?.eligibilityStatus || "").toLowerCase() === "conditional_ballast";
   };
 
   const getRaceEntryState = (race) => {
@@ -1012,6 +1068,11 @@ function OwnerRegistrations() {
 
     if (!isHorseEligible(selectedHorse)) {
       setError("The selected horse is not eligible for this race.");
+      return;
+    }
+
+    if (enteredHorseIdsForRace.has(String(selectedHorse.id))) {
+      setError(`${selectedHorse.name} is already entered in this race.`);
       return;
     }
 
@@ -1126,6 +1187,7 @@ function OwnerRegistrations() {
   const canSubmit = Boolean(
     selectedHorse?.id
     && isHorseEligible(selectedHorse)
+    && !enteredHorseIdsForRace.has(String(selectedHorse.id))
     && selectedTournament?.id
     && selectedRace?.id
     && selectedRaceState?.available
@@ -1143,6 +1205,7 @@ function OwnerRegistrations() {
     if (!horses.length) return "No horse in your stable meets this race's eligibility rule.";
     if (!selectedHorse?.id) return "Select an eligible horse to continue.";
     if (!isHorseEligible(selectedHorse)) return "The selected horse is not eligible for this race.";
+    if (enteredHorseIdsForRace.has(String(selectedHorse.id))) return `${selectedHorse.name} is already entered in this race.`;
     if (!termsAccepted) return "Accept the entry and pre-race inspection conditions.";
     return "";
   })();
@@ -1351,14 +1414,17 @@ function OwnerRegistrations() {
               {selectedRace && !eligibilityLoading && !eligibilityError && filteredHorses.map((horse) => {
                 const eligible = isHorseEligible(horse);
                 const conditionalBallast = horse.eligibilityStatus === "conditional_ballast";
-                const selected = selectedHorse?.id === horse.id;
+                const alreadyEntered = enteredHorseIdsForRace.has(String(horse.id));
+                const locked = !eligible || alreadyEntered;
+                const selected = selectedHorse?.id === horse.id && !alreadyEntered;
                 return (
                   <button
-                    aria-disabled={!eligible}
+                    aria-disabled={locked}
                     aria-selected={selected}
-                    className={`owner-entry-horse${selected ? " is-selected" : ""}${conditionalBallast ? " is-conditional" : ""}${!eligible ? " is-unavailable" : ""}`}
+                    className={`owner-entry-horse${selected ? " is-selected" : ""}${conditionalBallast ? " is-conditional" : ""}${alreadyEntered ? " is-already-entered" : ""}${!eligible && !alreadyEntered ? " is-unavailable" : ""}`}
+                    disabled={locked}
                     key={horse.id}
-                    onClick={() => eligible && updateEntry("horseId", horse.id)}
+                    onClick={() => updateEntry("horseId", horse.id)}
                     role="option"
                     type="button"
                   >
@@ -1367,13 +1433,14 @@ function OwnerRegistrations() {
                       <strong>{horse.name}</strong>
                       <small>{horse.registrationNumber || compactRecordCode("Horse", horse.id)}</small>
                       {conditionalBallast && <span className="owner-entry-horse__ballast">Requires {horse.requiredBallastKg} kg approved ballast before race</span>}
+                      {alreadyEntered && <span className="owner-entry-horse__ballast">Already entered in this race</span>}
                     </span>
                     <span className="owner-entry-horse__facts">
                       {horse.facts.filter((fact) => fact.label !== "Rating").slice(0, 5).map((fact) => (
                         <span key={fact.label}><small>{fact.label}</small>{fact.value}</span>
                       ))}
                     </span>
-                    <span className={`owner-badge ${conditionalBallast ? "owner-badge--amber" : eligible ? "owner-badge--green" : "owner-badge--muted"}`}>{conditionalBallast ? "Ballast required" : eligible ? "Eligible" : "Unavailable"}</span>
+                    <span className={`owner-badge ${alreadyEntered ? "owner-badge--muted" : conditionalBallast ? "owner-badge--amber" : eligible ? "owner-badge--green" : "owner-badge--muted"}`}>{alreadyEntered ? "Already entered" : conditionalBallast ? "Ballast required" : eligible ? "Eligible" : "Unavailable"}</span>
                   </button>
                 );
               })}
@@ -2710,9 +2777,13 @@ function OwnerJockeys() {
                             <span className="owner-assignment-confirmation__meta">{raceName} · {isBackupAssignment ? `Backup${item.backup_priority ? ` #${item.backup_priority}` : ""}` : "Primary assignment"}</span>
                           </div>
                           {!isBackupAssignment && item.contract?.file_url && (
-                            <a className="owner-assignment-confirmation__contract" href={item.contract.file_url} rel="noreferrer" target="_blank">
+                            <button
+                              type="button"
+                              className="owner-assignment-confirmation__contract"
+                              onClick={() => openContractPdf(item.contract.file_url)}
+                            >
                               <FileText size={16} /> <span>View signed contract</span>
-                            </a>
+                            </button>
                           )}
                         </div>
                         {isBackupAssignment && !raceLocked && (

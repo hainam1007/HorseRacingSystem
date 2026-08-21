@@ -153,14 +153,14 @@ function adaptViolation(value) {
 }
 
 function adaptResult(value) {
-  const horse = value.horse_id || {};
-  const jockey = value.jockey_id || {};
+  const horse = value.horse || value.horse_id || {};
+  const jockey = value.jockey || value.jockey_id || {};
   return {
     id: getId(value),
     raceId: raceIdOf(value),
-    horseId: getId(horse),
-    horseName: horse.name || "Unknown horse",
-    jockeyId: getId(jockey),
+    horseId: getId(horse) || getId(value.horse_id),
+    horseName: horse.name || value.horse_id?.name || "Unknown horse",
+    jockeyId: getId(jockey) || getId(value.jockey_id),
     jockeyName: getUserName(jockey, "Unknown jockey"),
     position: value.position,
     finishTime: value.finish_time != null && !Number.isNaN(Number(value.finish_time)) ? Number(value.finish_time).toFixed(2) : value.finish_time,

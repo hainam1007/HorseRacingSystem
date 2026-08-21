@@ -416,8 +416,8 @@ export default function AdminDepositModule() {
                 <tr key={order._id || order.order_id}>
                   <td><strong>{order.order_id}</strong></td>
                   <td>
-                    {order.user_id?.username || order.user_id?.email || "Unknown"}
-                    <span className="admin-deposit-subline">{order.user_id?.email || ""}</span>
+                    {order.user?.full_name || order.user?.email || order.user_id?.full_name || order.user_id?.email || "Unknown"}
+                    <span className="admin-deposit-subline">{order.user?.email || order.user_id?.email || ""}</span>
                   </td>
                   <td>{order.package_id || "CUSTOM"}</td>
                   <td>{order.payment_method || "-"}</td>
