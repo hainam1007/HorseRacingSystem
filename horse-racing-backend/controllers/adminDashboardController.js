@@ -47,6 +47,35 @@ class AdminDashboardController {
       next(error);
     }
   }
+
+  async getRoleAnalytics(req, res, next) {
+    try {
+      const { from, to } = req.query;
+      const result = await adminDashboardService.getRoleAnalyticsSummary(from, to);
+      return sendSuccess(res, 200, 'Role analytics matrix retrieved successfully', result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async getCashflowMatrix(req, res, next) {
+    try {
+      const { from, to, payment_method } = req.query;
+      const result = await adminDashboardService.getCashflowMatrixSummary(from, to, payment_method);
+      return sendSuccess(res, 200, 'Cashflow matrix retrieved successfully', result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async getEquineDirectory(req, res, next) {
+    try {
+      const result = await adminDashboardService.getEquineJockeyDirectory();
+      return sendSuccess(res, 200, 'Equine and jockey directory retrieved successfully', result);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 module.exports = new AdminDashboardController();

@@ -309,7 +309,18 @@ function JockeyInvitations() {
                   </div>
                   {!invite.isBackup && <div>
                     <span><FileText size={13} /> Contract from owner</span>
-                    {invite.contractUrl ? <a href={invite.contractUrl} download={invite.contractFileName || undefined} rel="noreferrer" target="_blank">{invite.contractFileName || "Open sent contract"}</a> : <strong>{invite.contractFileName || (invite.rawStatus === "contract_uploaded" ? "Contract sent" : "Contract link pending")}</strong>}
+                    {invite.contractUrl ? (
+                      <a
+                        href={invite.contractUrl}
+                        download={invite.contractFileName || undefined}
+                        rel="noreferrer"
+                        target="_blank"
+                        className="jockey-contract-file-link"
+                        style={{ display: "inline-flex", alignItems: "center", gap: "6px", color: "#38bdf8", fontWeight: 600, textDecoration: "underline", marginTop: "4px" }}
+                      >
+                        <FileText size={14} /> {invite.contractFileName || "Xem / Tải file hợp đồng (PDF)"}
+                      </a>
+                    ) : <strong>{invite.contractFileName || (invite.rawStatus === "contract_uploaded" ? "Contract sent" : "Contract link pending")}</strong>}
                     {invite.contractNote && <small>{invite.contractNote}</small>}
                   </div>}
                 </div>

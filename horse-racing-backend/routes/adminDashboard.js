@@ -10,6 +10,9 @@ router.use(authenticate);
 router.use(authorizeRoles(ROLE_NAMES.ADMIN));
 
 router.get('/dashboard', adminDashboardController.getDashboardSummary);
+router.get('/role-analytics', adminDashboardController.getRoleAnalytics);
+router.get('/cashflow-matrix', adminDashboardController.getCashflowMatrix);
+router.get('/equine-directory', adminDashboardController.getEquineDirectory);
 router.get('/betting-summary', adminDashboardController.getBettingSummary);
 router.get('/deposit-requests', adminDashboardController.getDepositRequests);
 router.get('/prize-awards/summary', adminDashboardController.getPrizeAwardsSummary);

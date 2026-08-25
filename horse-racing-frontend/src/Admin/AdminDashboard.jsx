@@ -4,6 +4,9 @@ import { AlertTriangle, ArrowUpRight, CalendarDays, Check, CheckCircle2, Chevron
 import LoadingSkeleton from "../components/LoadingSkeleton";
 import { adminApi } from "../api/adminApi";
 import AdminLayout from "./AdminLayout";
+import AdminRoleMatrixTable from "./AdminRoleMatrixTable";
+import AdminCashflowMatrixTable from "./AdminCashflowMatrixTable";
+import AdminEquineJockeyTable from "./AdminEquineJockeyTable";
 
 const number = (value) => new Intl.NumberFormat("en-US").format(Number(value || 0));
 const vnd = (value) => new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND", maximumFractionDigits: 0 }).format(Number(value || 0));
@@ -16,7 +19,8 @@ function changeLabel(change) {
 
 const PERIOD_OPTIONS = [
   { value: "7", label: "Last 7 days", meta: "Short-term pulse" },
-  { value: "30", label: "Last 30 days", meta: "Monthly operating view" }
+  { value: "30", label: "Last 30 days", meta: "Monthly operating view" },
+  { value: "90", label: "Last 90 days", meta: "Quarterly performance" }
 ];
 
 function PeriodPicker({ value, onChange, disabled }) {
@@ -218,6 +222,7 @@ function AdminDashboard() {
   const statuses = useMemo(() => dashboard?.charts?.race_statuses || [], [dashboard]);
   const alerts = dashboard?.alerts || [];
   const topRaces = dashboard?.operations?.top_races || [];
+  const roleMatrix = dashboard?.role_matrix || null;
   const maxStatus = Math.max(...statuses.map((item) => item.value), 1);
 
   return <AdminLayout title="Betting & race operations" eyebrow="Live business intelligence" description="Monitor acquisition, cash flow, wagering exposure, race delivery, and operational risk from verified platform records." actions={<>
@@ -236,6 +241,22 @@ function AdminDashboard() {
         <Metric icon={Trophy} label="Races held" data={metrics.races_held} />
         <Metric icon={CalendarDays} label="Active tournaments" data={metrics.tournaments_in_period} />
       </section>
+
+      {/* 1. ROLE-BASED OPERATIONS & PERFORMANCE MATRIX */}
+      <AdminRoleMatrixTable roleMatrix={roleMatrix} isLoading={isLoading} />
+
+      {/* 2. DEPOSIT PACKAGES & LIQUIDITY MATRIX */}
+      <AdminCashflowMatrixTable
+        cashflowMatrix={dashboard?.cashflow_matrix}
+        isLoading={isLoading}
+      />
+
+      {/* 3. EQUINE & JOCKEY PERFORMANCE DIRECTORY */}
+      <AdminEquineJockeyTable
+        equineDirectory={dashboard?.equine_directory}
+        isLoading={isLoading}
+      />
+
       <section className="admin-analytics-layout">
         <div className="admin-analytics-charts">
           <LineChart points={daily} dataKey="deposits_vnd" color="#ef933d" valueFormatter={vnd} title="Successful deposits (VND)" unit="VND" />

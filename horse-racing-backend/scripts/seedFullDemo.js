@@ -378,7 +378,7 @@ async function createParticipantFlow(models, context) {
       assignment_id: assignment.id,
       contract_number: 'DEMO-CONTRACT-2026-' + tournamentNumber + '-' + raceNumber + '-' + slot,
       title: 'Primary jockey contract',
-      file_url: 'https://example.com/demo-contract.pdf',
+      file_url: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf',
       file_type: 'application/pdf',
       file_name: 'demo-contract.pdf',
       signed_at: addHours(now, -17),

@@ -18,6 +18,18 @@ export const adminApi = {
     return apiRequest(withQuery("/admin/dashboard", params));
   },
 
+  getRoleAnalytics(params = {}) {
+    return apiRequest(withQuery("/admin/role-analytics", params));
+  },
+
+  getCashflowMatrix(params = {}) {
+    return apiRequest(withQuery("/admin/cashflow-matrix", params));
+  },
+
+  getEquineDirectory(params = {}) {
+    return apiRequest(withQuery("/admin/equine-directory", params));
+  },
+
   getBettingSummary(params = {}) {
     return apiRequest(withQuery("/admin/betting-summary", params));
   },
