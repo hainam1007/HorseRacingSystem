@@ -109,4 +109,33 @@ function validateUpdateRace(req, res, next) {
   return next();
 }
 
-module.exports = { validateCreateRace, validateUpdateRace };
+function validateDemoTimeline(req, res, next) {
+  const body = req.body || {};
+  const errors = [];
+  const raceDate = new Date(body.race_date);
+  const registrationLockAt = new Date(body.registration_lock_at);
+  const now = new Date();
+
+  if (!body.race_date || Number.isNaN(raceDate.getTime())) {
+    errors.push({ field: 'race_date', message: 'race_date must be a valid date and time' });
+  }
+  if (!body.registration_lock_at || Number.isNaN(registrationLockAt.getTime())) {
+    errors.push({ field: 'registration_lock_at', message: 'registration_lock_at must be a valid date and time' });
+  }
+
+  if (!errors.length && registrationLockAt.getTime() <= now.getTime()) {
+    errors.push({ field: 'registration_lock_at', message: 'registration_lock_at must be in the future' });
+  }
+  if (!errors.length && raceDate.getTime() <= registrationLockAt.getTime()) {
+    errors.push({ field: 'race_date', message: 'race_date must be after registration_lock_at' });
+  }
+
+  if (errors.length) return next(new ApiError(400, 'Validation failed', errors));
+  req.validatedBody = {
+    race_date: raceDate,
+    registration_lock_at: registrationLockAt
+  };
+  return next();
+}
+
+module.exports = { validateCreateRace, validateUpdateRace, validateDemoTimeline };

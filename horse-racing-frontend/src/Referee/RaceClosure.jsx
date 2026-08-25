@@ -3,6 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import { refereeApi } from "../api/refereeApi";
 import LoadingSkeleton from "../components/LoadingSkeleton";
 import RefereeLayout from "./RefereeLayout";
+import RefereeNotifications from "./RefereeNotifications";
 import { formatStatus, RESULT_STATUSES } from "./refereeConstants";
 import { getId } from "./refereeAdapters";
 import { useRefereeData } from "./useRefereeData";
@@ -109,7 +110,11 @@ function RaceClosure() {
     }, {}));
   }, [race]);
 
-  const addMsg = (message) => setMessages((current) => [message, ...current].slice(0, 4));
+  const addMsg = (notice) => setMessages((current) => [
+    { id: `${Date.now()}-${Math.random()}`, ...notice },
+    ...current,
+  ].slice(0, 4));
+  const dismissMessage = (id) => setMessages((current) => current.filter((message) => message.id !== id));
   const updateField = (field, value) => setForm((current) => ({ ...current, [field]: value }));
   const updateResultEdit = (resultId, field, value) => {
     setResultEdits((current) => ({
@@ -133,15 +138,15 @@ function RaceClosure() {
       } else await refereeApi.applyRaceResultPenalties(raceId);
       await Promise.all([reload(), loadWorkflow()]);
       addMsg(action === "finalize"
-        ? "Penalty-adjusted results finalized and ready for your approval."
+        ? { tone: "success", title: "Results finalized", detail: "Penalty-adjusted rankings are ready for approval and publication." }
         : action === "publish"
-          ? "Official race results approved and published."
-          : "Confirmed penalties applied. Review the adjusted rankings before finalizing them.");
+          ? { tone: "success", title: "Results published", detail: "The official race result is approved and visible to the competition." }
+          : { tone: "success", title: "Penalties applied", detail: "Confirmed penalties are reflected in the adjusted rankings." });
     } catch (apiError) {
       if (action === "publish") {
         await Promise.allSettled([reload(), loadWorkflow()]);
       }
-      addMsg(apiError.message || "Unable to update race results.");
+      addMsg({ tone: "error", title: "Could not update results", detail: apiError.message || "Unable to update race results. Try again." });
     } finally {
       setActiveAction("");
     }
@@ -162,9 +167,9 @@ function RaceClosure() {
       setResultSaving(resultId);
       await refereeApi.updateRaceResult(resultId, payload);
       await Promise.all([reload(), loadWorkflow()]);
-      addMsg("Draft result row updated.");
+      addMsg({ tone: "info", title: "Draft result updated", detail: "The edited result row has been saved." });
     } catch (apiError) {
-      addMsg(apiError.message || "Unable to update draft result.");
+      addMsg({ tone: "error", title: "Could not update result", detail: apiError.message || "Unable to update the draft result. Try again." });
     } finally {
       setResultSaving("");
     }
@@ -180,9 +185,9 @@ function RaceClosure() {
     conclusion: form.conclusion,
   });
 
-  const saveDraft = async () => {
+  const saveDraft = async ({ notify = true } = {}) => {
     if (!form.title.trim()) {
-      addMsg("Report title is required.");
+      addMsg({ tone: "warning", title: "Report title required", detail: "Add a title before saving or submitting this report." });
       return null;
     }
 
@@ -197,10 +202,12 @@ function RaceClosure() {
         reportId = data.referee_report?._id || data.referee_report?.id;
       }
       await Promise.all([reload(), loadWorkflow()]);
-      addMsg("Report draft saved.");
+      if (notify) {
+        addMsg({ tone: "success", title: "Draft saved", detail: "Your report changes are saved and remain editable." });
+      }
       return reportId;
     } catch (apiError) {
-      addMsg(apiError.message || "Unable to save referee report.");
+      addMsg({ tone: "error", title: "Could not save report", detail: apiError.message || "Unable to save the referee report. Try again." });
       return null;
     } finally {
       setIsSavingReport(false);
@@ -208,7 +215,7 @@ function RaceClosure() {
   };
 
   const submitReport = async () => {
-    const reportId = await saveDraft();
+    const reportId = await saveDraft({ notify: false });
     if (!reportId) return;
 
     try {
@@ -216,9 +223,9 @@ function RaceClosure() {
       await refereeApi.submitRefereeReport(reportId);
       await Promise.all([reload(), loadWorkflow()]);
       setActiveTab("result");
-      addMsg("Report submitted.");
+      addMsg({ tone: "success", title: "Report submitted", detail: "The official report is now locked and the results workflow is ready to continue." });
     } catch (apiError) {
-      addMsg(apiError.message || "Unable to submit referee report.");
+      addMsg({ tone: "error", title: "Could not submit report", detail: apiError.message || "Unable to submit the referee report. Try again." });
     } finally {
       setIsSavingReport(false);
     }
@@ -265,7 +272,7 @@ function RaceClosure() {
       actions={<Link className="admin-header__button admin-header__button--ghost" to={`/referee/races/${raceId}`}>Race Detail</Link>}
     >
       {(error || workflowError) && <section className="admin-live-state admin-live-state--warning">{error || workflowError}</section>}
-      {!!messages.length && <section className="admin-toast-stack" aria-live="polite">{messages.map((message, index) => <div key={`${message}-${index}`} className="admin-toast">{message}</div>)}</section>}
+      <RefereeNotifications items={messages} onDismiss={dismissMessage} />
 
       <nav className="referee-phase-strip" aria-label="Race control phases">
         <Link to={`/referee/races/${raceId}/horse-inspection?phase=pre_race`}>1. Pre-race checks</Link>

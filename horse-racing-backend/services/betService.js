@@ -265,8 +265,15 @@ async function listMyBets(userId, query) {
 }
 
 async function creditWinningBet(bet, result, settledByUserId) {
+  const betId = getDocumentId(bet);
+  const resultId = getDocumentId(result);
+
+  if (!betId || !resultId) {
+    throw new ApiError(500, 'Unable to settle bet because its official identifiers are missing');
+  }
+
   const payoutAmount = roundTokenAmount(bet.potential_payout);
-  const referenceId = 'bet-win:' + bet._id.toString();
+  const referenceId = 'bet-win:' + betId.toString();
   const existingLog = await transactionRepository.checkExistsByReference(referenceId);
   let credit = null;
 
@@ -295,29 +302,54 @@ async function creditWinningBet(bet, result, settledByUserId) {
     }
   }
 
-  return betRepository.updateById(bet._id, {
+  const updatedBet = await betRepository.updateById(betId, {
     status: BET_STATUS.WON,
     payout_amount: payoutAmount,
-    settled_result_id: result._id,
+    settled_result_id: resultId,
     settled_at: new Date(),
     checked_at: new Date(),
     settled_by: settledByUserId
   });
+
+  if (!updatedBet) {
+    throw new ApiError(500, 'Unable to mark winning bet as settled');
+  }
+
+  return updatedBet;
 }
 
 async function markLosingBet(bet, result, settledByUserId) {
-  return betRepository.updateById(bet._id, {
+  const betId = getDocumentId(bet);
+  const resultId = getDocumentId(result);
+
+  if (!betId || !resultId) {
+    throw new ApiError(500, 'Unable to settle bet because its official identifiers are missing');
+  }
+
+  const updatedBet = await betRepository.updateById(betId, {
     status: BET_STATUS.LOST,
     payout_amount: 0,
-    settled_result_id: result._id,
+    settled_result_id: resultId,
     settled_at: new Date(),
     checked_at: new Date(),
     settled_by: settledByUserId
   });
+
+  if (!updatedBet) {
+    throw new ApiError(500, 'Unable to mark losing bet as settled');
+  }
+
+  return updatedBet;
 }
 
 async function refundPreRaceExcludedBet(bet, result, settledByUserId) {
-  const referenceId = 'bet-refund:pre-race-exclusion:' + bet._id.toString();
+  const betId = getDocumentId(bet);
+
+  if (!betId) {
+    throw new ApiError(500, 'Unable to refund bet because its identifier is missing');
+  }
+
+  const referenceId = 'bet-refund:pre-race-exclusion:' + betId.toString();
   const existingLog = await transactionRepository.checkExistsByReference(referenceId);
 
   await walletRepository.upsertWallet(bet.spectator_id);
@@ -349,14 +381,20 @@ async function refundPreRaceExcludedBet(bet, result, settledByUserId) {
     }
   }
 
-  return betRepository.updateById(bet._id, {
+  const updatedBet = await betRepository.updateById(betId, {
     status: BET_STATUS.CANCELLED,
     payout_amount: 0,
-    settled_result_id: result ? result._id : undefined,
+    settled_result_id: result ? getDocumentId(result) : undefined,
     settled_at: new Date(),
     checked_at: new Date(),
     settled_by: settledByUserId
   });
+
+  if (!updatedBet) {
+    throw new ApiError(500, 'Unable to mark refunded bet as settled');
+  }
+
+  return updatedBet;
 }
 
 async function markRaceBettingSettled(raceId) {
@@ -422,7 +460,7 @@ async function settleRaceBets(raceId, settledByUserId) {
       payout_total: 0,
       refunded_count: 0,
       refund_total: 0,
-      winner_result_id: officialWinner ? officialWinner._id : null
+      winner_result_id: officialWinner ? getDocumentId(officialWinner) : null
     };
   }
 
@@ -470,7 +508,7 @@ async function settleRaceBets(raceId, settledByUserId) {
     payout_total: roundTokenAmount(payoutTotal),
     refunded_count: refundedCount,
     refund_total: roundTokenAmount(refundTotal),
-    winner_result_id: officialWinner._id
+    winner_result_id: getDocumentId(officialWinner)
   };
 }
 

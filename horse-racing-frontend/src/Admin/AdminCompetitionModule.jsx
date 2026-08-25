@@ -1,4 +1,5 @@
 ﻿import { useCallback, useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { ArrowDownToLine, CalendarDays, CheckCircle2, Image as ImageIcon, Eye, ListChecks, Lock, Pencil, Plus, RefreshCw, Save, Trash2, Unlock, Upload, X } from "lucide-react";
 import LoadingSkeleton from "../components/LoadingSkeleton";
 import { adminApi } from "../api/adminApi";
@@ -756,6 +757,7 @@ function RaceEntryWorkspace({ race, onClose, onChanged, onNotice }) {
 
 function AdminCompetitionModule({ moduleName }) {
   const isSchedule = moduleName === "schedule";
+  const navigate = useNavigate();
   const [data, setData] = useState({ tournaments: [], rounds: [], races: [], referees: [], racetracks: [] });
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -772,8 +774,6 @@ function AdminCompetitionModule({ moduleName }) {
   const [tournamentPage, setTournamentPage] = useState(1);
   const [roundPage, setRoundPage] = useState(1);
   const [racePage, setRacePage] = useState(1);
-  const [registrationModeLoading, setRegistrationModeLoading] = useState("");
-  const [registrationRaceId, setRegistrationRaceId] = useState("");
   const [bettingAction, setBettingAction] = useState("");
   const [bettingRaceId, setBettingRaceId] = useState("");
   const [bettingConfig, setBettingConfig] = useState(defaultBettingConfig);
@@ -964,39 +964,6 @@ function AdminCompetitionModule({ moduleName }) {
     }
   };
 
-  const setOwnerRegistrationMode = async (enabled) => {
-    setRegistrationModeLoading(enabled ? "on" : "off");
-    setError("");
-    try {
-      const data = await adminApi.setRaceRegistrationDemoMode(enabled);
-      const updatedCount = data.updated_count ?? 0;
-      setNotice(enabled
-        ? `Owner registration turned on for ${updatedCount} scheduled races.`
-        : `Owner registration turned off for ${updatedCount} races.`);
-      await loadData(true);
-    } catch (apiError) {
-      setError(apiError.message || "Unable to update owner registration mode.");
-    } finally {
-      setRegistrationModeLoading("");
-    }
-  };
-
-  const openOwnerRegistrationForRace = async (race) => {
-    if (!race?.id) return;
-
-    setRegistrationRaceId(race.id);
-    setError("");
-    try {
-      await adminApi.openRaceRegistrationDemo(race.id);
-      setNotice(`Owner registration opened for ${race.name}. Other races were not changed.`);
-      await loadData(true);
-    } catch (apiError) {
-      setError(apiError.message || `Unable to open owner registration for ${race.name}.`);
-    } finally {
-      setRegistrationRaceId("");
-    }
-  };
-
   const buildOpenBettingPayload = () => {
     const minStake = Number(bettingConfig.min_stake);
     const maxStake = Number(bettingConfig.max_stake);
@@ -1184,7 +1151,7 @@ function AdminCompetitionModule({ moduleName }) {
   if (loading) return <AdminLayout title={title} eyebrow="Competition planning" description={description}><LoadingSkeleton ariaLabel={`Loading ${title}`} rows={6} variant="table" /></AdminLayout>;
 
   return (
-    <AdminLayout title={title} eyebrow="Competition planning" description={description} actions={<><button className="admin-header__button" disabled={isSchedule && (!data.tournaments.length || !data.rounds.length)} title={isSchedule && (!data.tournaments.length || !data.rounds.length) ? "Create a tournament and round first" : undefined} type="button" onClick={() => openForm(isSchedule ? "race" : "tournament")}><Plus size={17} aria-hidden="true" /> {isSchedule ? "Create race" : "Create tournament"}</button>{isSchedule && <><button className="admin-header__button admin-header__button--ghost" disabled={Boolean(registrationModeLoading)} type="button" onClick={() => setOwnerRegistrationMode(true)}><Unlock size={17} aria-hidden="true" /> {registrationModeLoading === "on" ? "Turning on" : "Turn on entries"}</button><button className="admin-header__button admin-header__button--ghost" disabled={Boolean(registrationModeLoading)} type="button" onClick={() => setOwnerRegistrationMode(false)}><Lock size={17} aria-hidden="true" /> {registrationModeLoading === "off" ? "Turning off" : "Turn off entries"}</button></>}{!isSchedule && <button className="admin-header__button admin-header__button--ghost" disabled={!data.tournaments.length} type="button" onClick={() => openForm("round")}><Plus size={17} aria-hidden="true" /> Add round</button>}</>}>
+    <AdminLayout title={title} eyebrow="Competition planning" description={description} actions={<><button className="admin-header__button" disabled={isSchedule && (!data.tournaments.length || !data.rounds.length)} title={isSchedule && (!data.tournaments.length || !data.rounds.length) ? "Create a tournament and round first" : undefined} type="button" onClick={() => openForm(isSchedule ? "race" : "tournament")}><Plus size={17} aria-hidden="true" /> {isSchedule ? "Create race" : "Create tournament"}</button>{!isSchedule && <button className="admin-header__button admin-header__button--ghost" disabled={!data.tournaments.length} type="button" onClick={() => openForm("round")}><Plus size={17} aria-hidden="true" /> Add round</button>}</>}>
       <section className="admin-metrics admin-metrics--module" aria-label="Competition summary">
         {isSchedule ? <><article className="admin-metric-card"><p className="admin-metric-card__label">Total races</p><div className="admin-metric-card__value">{data.races.length}</div></article><article className="admin-metric-card"><p className="admin-metric-card__label">Scheduled</p><div className="admin-metric-card__value">{scheduledCount}</div></article><article className="admin-metric-card"><p className="admin-metric-card__label">Rounds</p><div className="admin-metric-card__value">{data.rounds.length}</div></article></> : <><article className="admin-metric-card"><p className="admin-metric-card__label">Tournaments</p><div className="admin-metric-card__value">{data.tournaments.length}</div></article><article className="admin-metric-card"><p className="admin-metric-card__label">Rounds</p><div className="admin-metric-card__value">{data.rounds.length}</div></article><article className="admin-metric-card"><p className="admin-metric-card__label">Active</p><div className="admin-metric-card__value">{data.tournaments.filter((item) => item.status === "active").length}</div></article></>}
       </section>
@@ -1288,7 +1255,6 @@ function AdminCompetitionModule({ moduleName }) {
                 <tbody>
                   {pagedRaces.map((race) => {
                     const registrationOpen = isRaceRegistrationOpen(race);
-                    const openingThisRace = registrationRaceId === race.id;
 
                     return (
                       <tr key={race.id}>
@@ -1317,12 +1283,11 @@ function AdminCompetitionModule({ moduleName }) {
                           >
                             <button
                               type="button"
-                              disabled={registrationOpen || Boolean(registrationRaceId || registrationModeLoading)}
-                              title={registrationOpen ? "Owner registration is already open for this race" : "Prepare this race for demo entries"}
-                              onClick={() => openOwnerRegistrationForRace(race)}
+                              title="Set this race's entry deadline and demo race time"
+                              onClick={() => navigate("/admin/demo")}
                             >
-                              <Unlock size={15} aria-hidden="true" />
-                              {openingThisRace ? "Opening" : registrationOpen ? "Entries open" : "Open entries"}
+                              <CalendarDays size={15} aria-hidden="true" />
+                              Demo timeline
                             </button>
                             <button type="button" onClick={() => setEntryRace(race)}>
                               <ListChecks size={15} aria-hidden="true" /> Entries
