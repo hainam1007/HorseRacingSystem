@@ -37,6 +37,7 @@ router.post('/:id/entries/finalize', adminOnly, validateObjectIdParam('id'), asy
 router.post('/:id/betting/open', adminOnly, validateObjectIdParam('id'), asyncHandler(raceController.openBetting));
 router.post('/:id/betting/close', adminOnly, validateObjectIdParam('id'), asyncHandler(raceController.closeBetting));
 router.post('/:id/start', refereeOrAdmin, validateObjectIdParam('id'), asyncHandler(raceController.startRace));
+router.post('/:id/fire', refereeOrAdmin, validateObjectIdParam('id'), asyncHandler(raceController.fireRace));
 router.post('/:id/complete', refereeOrAdmin, validateObjectIdParam('id'), asyncHandler(raceController.completeRace));
 router.get('/:id/participants', refereeOrAdmin, validateObjectIdParam('id'), asyncHandler(raceController.getRaceParticipants));
 router.get('/:id', validateObjectIdParam('id'), asyncHandler(raceController.getRace));

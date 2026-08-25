@@ -16,6 +16,17 @@ export function useRaceViewerSession(race, contenders, options = {}) {
       };
     }
 
+    if (race.raceStatus === RACE_STATUS.STARTING) {
+      const startsAt = race.raw?.starting_at
+        ? new Date(race.raw.starting_at).getTime() + 3000 // stale timer = 3s
+        : Date.now() + 3000;
+      return {
+        connectionState: CONNECTION_STATES.CONNECTED,
+        raceResult: null,
+        raceScript: createScript(race.id, startsAt, contenders),
+      };
+    }
+
     if (race.raceStatus === RACE_STATUS.RUNNING) {
       const startsAt = race.engineGeneratedAt
         ? new Date(race.engineGeneratedAt).getTime()

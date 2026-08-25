@@ -4,6 +4,7 @@ import { refereeApi } from "../api/refereeApi";
 import LoadingSkeleton from "../components/LoadingSkeleton";
 import RaceLifecycleControls from "./RaceLifecycleControls";
 import RefereeLayout from "./RefereeLayout";
+import RefereeRaceLiveViewer from "./RefereeRaceLiveViewer";
 import { formatStatus, RACE_PHASES } from "./refereeConstants";
 import { useRefereeData } from "./useRefereeData";
 
@@ -221,6 +222,8 @@ function RaceMonitor() {
       </nav>
 
       <RaceLifecycleControls race={race} participantsUnavailable={participantsUnavailable} reload={reload} />
+
+      <RefereeRaceLiveViewer raceId={raceId} race={race} />
 
       {editable && (
         <section className="admin-panel referee-monitor-entry">
