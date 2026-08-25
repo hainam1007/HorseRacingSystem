@@ -4734,6 +4734,13 @@
 .admin-entity-stat.is-accent strong { color: var(--admin-accent); }
 .admin-entity-workspace { display: grid; grid-template-columns: minmax(0, 1.65fr) minmax(260px, .7fr); gap: 12px; margin-top: 12px; }
 .admin-entity-workspace.is-bettor { grid-template-columns: 1fr; }
+.admin-entity-workspace.is-horse { grid-template-columns: 1fr; }
+.admin-entity-ranking__table.is-horse .admin-entity-ranking__head, .admin-entity-ranking__table.is-horse .admin-entity-ranking__row { grid-template-columns: 34px minmax(150px, 1.35fr) minmax(130px, 1fr) 90px 72px 72px minmax(120px, 1fr); }
+.admin-entity-ranking__table.is-horse .admin-entity-ranking__head > span:nth-child(n + 3), .admin-entity-ranking__table.is-horse .admin-entity-ranking__row > span, .admin-entity-ranking__table.is-horse .admin-entity-ranking__row > b, .admin-entity-ranking__table.is-horse .admin-entity-ranking__row > em { text-align: right; }
+.admin-entity-ranking__table.is-horse { max-height: 324px; overflow-y: auto; }
+.admin-entity-ranking__table.is-horse .admin-entity-ranking__head { position: sticky; top: 0; z-index: 1; background: var(--admin-panel); }
+.admin-entity-ranking__table.is-jockey .admin-entity-ranking__head, .admin-entity-ranking__table.is-jockey .admin-entity-ranking__row { grid-template-columns: 34px minmax(140px, 1.25fr) 88px 92px minmax(130px, 1fr) 72px 72px minmax(120px, 1fr); }
+.admin-entity-ranking__table.is-jockey .admin-entity-ranking__head > span:nth-child(n + 3), .admin-entity-ranking__table.is-jockey .admin-entity-ranking__row > span, .admin-entity-ranking__table.is-jockey .admin-entity-ranking__row > b, .admin-entity-ranking__table.is-jockey .admin-entity-ranking__row > em { text-align: right; }
 .admin-entity-ranking, .admin-entity-detail { min-width: 0; border: 1px solid var(--admin-line); background: var(--admin-panel); }
 .admin-entity-ranking > header { display: flex; align-items: end; justify-content: space-between; gap: 15px; padding: 18px; border-bottom: 1px solid var(--admin-line); }
 .admin-entity-ranking header p, .admin-entity-detail > p { margin: 0 0 4px; color: var(--admin-accent); font-size: 10px; font-weight: 900; letter-spacing: .1em; text-transform: uppercase; }
@@ -4741,9 +4748,9 @@
 .admin-entity-sort { display: grid; gap: 4px; color: var(--admin-muted); font-size: 10px; font-weight: 800; text-transform: uppercase; }
 .admin-entity-sort select { color: var(--admin-text); text-transform: none; }
 .admin-entity-ranking__table { overflow-x: auto; }
-.admin-entity-ranking__head, .admin-entity-ranking__row { display: grid; grid-template-columns: 38px minmax(150px, 1fr) 76px 65px 125px; align-items: center; gap: 10px; min-width: 560px; padding: 0 18px; }
+.admin-entity-ranking__head, .admin-entity-ranking__row { display: grid; grid-template-columns: 34px minmax(180px, 1fr) 72px 72px minmax(120px, 1fr); align-items: center; gap: 10px; width: 100%; min-width: 0; padding: 0 18px; box-sizing: border-box; }
 .admin-entity-ranking__table.is-bettor .admin-entity-ranking__head, .admin-entity-ranking__table.is-bettor .admin-entity-ranking__row { grid-template-columns: 34px minmax(180px, 1fr) repeat(2, 72px) repeat(3, minmax(120px, 1fr)); min-width: 0; }
-.admin-entity-ranking__table.is-bettor .admin-entity-ranking__head > span:nth-child(n + 3), .admin-entity-ranking__table.is-bettor .admin-entity-ranking__row > span, .admin-entity-ranking__table.is-bettor .admin-entity-ranking__row > b, .admin-entity-ranking__table.is-bettor .admin-entity-ranking__row > em { text-align: right; }
+.admin-entity-ranking__head > span:nth-child(n + 3), .admin-entity-ranking__row > span, .admin-entity-ranking__row > b, .admin-entity-ranking__row > em { text-align: right; }
 .admin-entity-ranking__head { min-height: 39px; color: var(--admin-muted); font-size: 9px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
 .admin-entity-ranking__row { width: 100%; min-height: 57px; border: 0; border-top: 1px solid var(--admin-line); background: transparent; color: var(--admin-copy); text-align: left; cursor: pointer; }
 .admin-entity-ranking__row:hover, .admin-entity-ranking__row.is-selected { background: var(--admin-panel-strong); }
@@ -4753,6 +4760,7 @@
 .admin-entity-ranking__row > b { color: var(--admin-accent); }
 .admin-entity-ranking__row > em { color: var(--admin-copy); font-style: normal; font-weight: 800; }
 .admin-entity-detail { padding: 20px; }
+.admin-entity-workspace.is-bettor .admin-entity-detail { width: 100%; box-sizing: border-box; }
 .admin-entity-detail h2 { font-size: 23px; }
 .admin-entity-detail__hero { display: flex; align-items: center; gap: 11px; margin: 21px 0; padding: 13px; border: 1px solid var(--admin-line); color: var(--admin-accent); font-size: 10px; line-height: 1.6; }
 .admin-entity-detail__hero strong { color: var(--admin-text); font-size: 11px; }
@@ -4769,6 +4777,36 @@
 .admin-entity-detail .admin-bettor-stats { grid-template-columns: 1fr; margin: 20px 0; }
 .admin-entity-detail .admin-bettor-stats > div { border-right: 0; border-bottom: 1px solid var(--admin-line); }
 .admin-entity-detail .admin-bettor-stats > div:last-child { border-bottom: 0; }
+.admin-bettor-bets { margin-top: 20px; border: 1px solid var(--admin-line); overflow-x: auto; }
+.admin-bettor-bets table { width: 100%; min-width: 680px; border-collapse: collapse; table-layout: fixed; }
+.admin-bettor-bets col.admin-bettor-bets__race { width: 52%; }
+.admin-bettor-bets th, .admin-bettor-bets td { padding: 12px 18px; border-bottom: 1px solid var(--admin-line); font-size: 11px; }
+.admin-bettor-bets thead th { color: var(--admin-muted); font-size: 9px; font-weight: 900; letter-spacing: .08em; text-align: right; text-transform: uppercase; }
+.admin-bettor-bets thead th:first-child { text-align: left; }
+.admin-bettor-bets tbody th { overflow: hidden; color: var(--admin-text); font-weight: 800; text-align: left; text-overflow: ellipsis; white-space: nowrap; }
+.admin-bettor-bets tbody td, .admin-bettor-bets tfoot td { color: var(--admin-text); font-weight: 800; text-align: right; }
+.admin-bettor-bets tbody td.is-won { color: #67d49f; }
+.admin-bettor-bets tbody td.is-lost { color: #ed7770; }
+.admin-bettor-bets tfoot th, .admin-bettor-bets tfoot td { padding-top: 13px; border-bottom: 0; background: var(--admin-panel-strong); font-weight: 900; }
+.admin-bettor-bets tfoot th { color: var(--admin-text); text-align: left; }
+.admin-bettor-bets tfoot td:last-child { color: var(--admin-accent); }
+.admin-horse-races { margin-top: 20px; border: 1px solid var(--admin-line); overflow-x: auto; }
+.admin-horse-races table { width: 100%; min-width: 720px; border-collapse: collapse; table-layout: fixed; }
+.admin-horse-races col.admin-horse-races__race { width: 30%; }
+.admin-horse-races th, .admin-horse-races td { padding: 12px 18px; border-bottom: 1px solid var(--admin-line); font-size: 11px; }
+.admin-horse-races thead th { color: var(--admin-muted); font-size: 9px; font-weight: 900; letter-spacing: .08em; text-align: right; text-transform: uppercase; }
+.admin-horse-races thead th:first-child, .admin-horse-races tbody th { text-align: left; }
+.admin-horse-races tbody th { color: var(--admin-text); font-weight: 800; }
+.admin-horse-races tbody td { color: var(--admin-text); font-weight: 800; text-align: right; }
+.admin-entity-workspace.is-jockey { grid-template-columns: 1fr; }
+.admin-jockey-races { margin-top: 20px; border: 1px solid var(--admin-line); overflow-x: auto; }
+.admin-jockey-races table { width: 100%; min-width: 720px; border-collapse: collapse; table-layout: fixed; }
+.admin-jockey-races col.admin-jockey-races__race { width: 30%; }
+.admin-jockey-races th, .admin-jockey-races td { padding: 12px 18px; border-bottom: 1px solid var(--admin-line); font-size: 11px; }
+.admin-jockey-races thead th { color: var(--admin-muted); font-size: 9px; font-weight: 900; letter-spacing: .08em; text-align: right; text-transform: uppercase; }
+.admin-jockey-races thead th:first-child, .admin-jockey-races tbody th { text-align: left; }
+.admin-jockey-races tbody th { color: var(--admin-text); font-weight: 800; }
+.admin-jockey-races tbody td { color: var(--admin-text); font-weight: 800; text-align: right; }
 .admin-analytics-layout { display: grid; grid-template-columns: minmax(0, 1.8fr) minmax(280px, .85fr); gap: 12px; margin-top: 12px; }
 .admin-analytics-charts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
 .admin-analytics-chart, .admin-analytics-alerts, .admin-analytics-table, .admin-analytics-status { border: 1px solid var(--admin-line); background: var(--admin-panel); }

@@ -272,7 +272,14 @@ class AdminDashboardService {
             value: Number(row.value || 0),
             deposited: Number(row.deposited || 0),
             staked: Number(row.staked || 0),
-            payout: Number(row.payout || 0)
+            payout: Number(row.payout || 0),
+            bet_details: row.bet_details || [],
+            race_details: row.race_details || [],
+            breed: row.breed || '',
+            weight: row.weight === null || row.weight === undefined ? null : Number(row.weight),
+            weight_kg: row.weight_kg === null || row.weight_kg === undefined ? null : Number(row.weight_kg),
+            experience_years: row.experience_years === null || row.experience_years === undefined ? null : Number(row.experience_years),
+            license_number: row.license_number || ''
         })));
         const raceFilter = `r.race_date BETWEEN ? AND ? AND r.status = 'completed' AND r.deleted_at IS NULL`;
         const resultFilter = `rr.deleted_at IS NULL AND ${raceFilter}`;
@@ -286,30 +293,51 @@ class AdminDashboardService {
                 LEFT JOIN horses h ON h.owner_id = ho.id LEFT JOIN race_results rr ON rr.horse_id = h.id
                 LEFT JOIN races r ON r.id = rr.race_id LEFT JOIN prize_awards pa ON pa.race_result_id = rr.id
                 WHERE ho.deleted_at IS NULL AND (${resultFilter}) GROUP BY ho.id, u.full_name, ho.stable_name ORDER BY races DESC, name`),
-            run(`SELECT j.id, COALESCE(u.full_name, 'Unnamed jockey') AS name,
+            run(`SELECT j.id, COALESCE(u.full_name, 'Unnamed jockey') AS name, j.weight_kg, j.experience_years, j.license_number,
                     COUNT(DISTINCT r.id)::int AS races,
                     COUNT(DISTINCT r.id) FILTER (WHERE rr.final_position = 1 OR rr.position = 1)::int AS wins,
-                    COALESCE(SUM(pa.jockey_amount) FILTER (WHERE pa.status <> 'cancelled'), 0)::numeric AS value
+                    COALESCE(SUM(pa.jockey_amount) FILTER (WHERE pa.status <> 'cancelled'), 0)::numeric AS value,
+                    COALESCE(json_agg(json_build_object(
+                        'id', rr.id,
+                        'tournament_name', t.name,
+                        'race_name', r.name,
+                        'position', COALESCE(rr.final_position, rr.position),
+                        'participants', (SELECT COUNT(*) FROM race_results rr2 WHERE rr2.race_id = r.id AND rr2.deleted_at IS NULL)
+                    ) ORDER BY r.race_date DESC) FILTER (WHERE rr.id IS NOT NULL), '[]'::json) AS race_details
                 FROM jockeys j LEFT JOIN users u ON u.id = j.user_id LEFT JOIN race_results rr ON rr.jockey_id = j.id
-                LEFT JOIN races r ON r.id = rr.race_id LEFT JOIN prize_awards pa ON pa.race_result_id = rr.id
-                WHERE j.deleted_at IS NULL AND (${resultFilter}) GROUP BY j.id, u.full_name ORDER BY races DESC, name`),
+                LEFT JOIN races r ON r.id = rr.race_id LEFT JOIN tournaments t ON t.id = r.tournament_id LEFT JOIN prize_awards pa ON pa.race_result_id = rr.id
+                WHERE j.deleted_at IS NULL AND (${resultFilter}) GROUP BY j.id, u.full_name, j.weight_kg, j.experience_years, j.license_number ORDER BY races DESC, name`),
             run(`SELECT ref.id, COALESCE(u.full_name, 'Unnamed referee') AS name,
                     COUNT(DISTINCT r.id)::int AS races, 0::int AS wins, 0::numeric AS value
                 FROM race_referees ref LEFT JOIN users u ON u.id = ref.user_id LEFT JOIN races r ON r.referee_id = ref.id
                 WHERE ref.deleted_at IS NULL AND ${raceFilter} GROUP BY ref.id, u.full_name ORDER BY races DESC, name`),
-            run(`SELECT h.id, h.name,
+            run(`SELECT h.id, h.name, h.breed, h.weight,
                     COUNT(DISTINCT r.id)::int AS races,
                     COUNT(DISTINCT r.id) FILTER (WHERE rr.final_position = 1 OR rr.position = 1)::int AS wins,
-                    COALESCE(SUM(pa.gross_amount) FILTER (WHERE pa.status <> 'cancelled'), 0)::numeric AS value
+                    COALESCE(SUM(pa.gross_amount) FILTER (WHERE pa.status <> 'cancelled'), 0)::numeric AS value,
+                    COALESCE(json_agg(json_build_object(
+                        'id', rr.id,
+                        'tournament_name', t.name,
+                        'race_name', r.name,
+                        'position', COALESCE(rr.final_position, rr.position),
+                        'participants', (SELECT COUNT(*) FROM race_results rr2 WHERE rr2.race_id = r.id AND rr2.deleted_at IS NULL)
+                    ) ORDER BY r.race_date DESC) FILTER (WHERE rr.id IS NOT NULL), '[]'::json) AS race_details
                 FROM horses h LEFT JOIN race_results rr ON rr.horse_id = h.id LEFT JOIN races r ON r.id = rr.race_id
-                LEFT JOIN prize_awards pa ON pa.race_result_id = rr.id
-                WHERE h.deleted_at IS NULL AND (${resultFilter}) GROUP BY h.id, h.name ORDER BY races DESC, name`),
+                LEFT JOIN tournaments t ON t.id = r.tournament_id LEFT JOIN prize_awards pa ON pa.race_result_id = rr.id
+                WHERE h.deleted_at IS NULL AND (${resultFilter}) GROUP BY h.id, h.name, h.breed, h.weight ORDER BY races DESC, name`),
             run(`SELECT u.id, u.full_name AS name,
                     COUNT(DISTINCT b.race_id)::int AS races,
                     COUNT(*) FILTER (WHERE b.status = 'won')::int AS wins,
                     COALESCE(SUM(b.payout_amount) FILTER (WHERE b.status = 'won'), 0)::numeric AS value,
                     COALESCE(SUM(b.stake_amount), 0)::numeric AS staked,
                     COALESCE(SUM(b.payout_amount), 0)::numeric AS payout,
+                    COALESCE(json_agg(json_build_object(
+                        'id', b.id,
+                        'race_name', r.name,
+                        'stake', b.stake_amount,
+                        'status', b.status,
+                        'payout', b.payout_amount
+                    ) ORDER BY r.race_date DESC) FILTER (WHERE b.id IS NOT NULL), '[]'::json) AS bet_details,
                     COALESCE((SELECT SUM(dr.total_token) FROM deposit_requests dr
                         WHERE dr.user_id = u.id AND dr.status = 'success'
                           AND dr.created_at BETWEEN ? AND ? AND dr.deleted_at IS NULL), 0)::numeric AS deposited

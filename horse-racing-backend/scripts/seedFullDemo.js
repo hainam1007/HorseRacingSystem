@@ -616,11 +616,12 @@ async function createCompletedRaceData(models, context) {
     });
   }
 
+  const raceSeed = Number(race.name.match(/Cup (\d+)/)?.[1] || 1) + race.race_no;
   const betPlans = [
-    { bettor: bettors[0], resultIndex: 0, status: 'won', stake: 500 },
-    { bettor: bettors[1], resultIndex: 1, status: 'lost', stake: 750 },
-    { bettor: bettors[2], resultIndex: 0, status: 'won', stake: 300 },
-    { bettor: bettors[3], resultIndex: 4, status: 'lost', stake: 1000 }
+    { bettor: bettors[0], resultIndex: raceSeed % 2 ? 0 : 1, status: raceSeed % 2 ? 'won' : 'lost', stake: 500 },
+    { bettor: bettors[1], resultIndex: raceSeed % 3 === 0 ? 0 : 4, status: raceSeed % 3 === 0 ? 'won' : 'lost', stake: 750 },
+    { bettor: bettors[2], resultIndex: raceSeed % 2 ? 1 : 0, status: raceSeed % 2 ? 'lost' : 'won', stake: 300 },
+    { bettor: bettors[3], resultIndex: raceSeed % 4 === 0 ? 0 : 4, status: raceSeed % 4 === 0 ? 'won' : 'lost', stake: 1000 }
   ];
   for (const plan of betPlans) {
     const entry = entries[plan.resultIndex];

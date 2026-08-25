@@ -34,6 +34,29 @@ function BettorStats({ record }) {
   </div>;
 }
 
+function BettorBetDetails({ record }) {
+  const details = record?.bet_details || [];
+  const totalStaked = details.reduce((total, bet) => total + Number(bet.stake || 0), 0);
+  const totalReceived = details.reduce((total, bet) => total + Number(bet.payout || 0), 0);
+  return <div className="admin-bettor-bets">
+    {details.length ? <table><colgroup><col className="admin-bettor-bets__race" /><col /><col /><col /></colgroup><thead><tr><th scope="col">Race</th><th scope="col">Stake / bet</th><th scope="col">Result</th><th scope="col">Received</th></tr></thead><tbody>{details.map((bet) => <tr key={bet.id}><th scope="row">{bet.race_name}</th><td>{formatTokens(bet.stake)}</td><td className={bet.status === "won" ? "is-won" : "is-lost"}>{bet.status === "won" ? "Won" : "Lost"}</td><td>{formatTokens(bet.payout)}</td></tr>)}</tbody><tfoot><tr><th scope="row">Total for period</th><td>{formatTokens(totalStaked)}</td><td>—</td><td>{formatTokens(totalReceived)}</td></tr></tfoot></table> : <div className="admin-dashboard-empty">No bets in this period.</div>}
+  </div>;
+}
+
+function HorseRaceDetails({ record }) {
+  const details = record?.race_details || [];
+  return <div className="admin-horse-races">
+    {details.length ? <table><colgroup><col /><col className="admin-horse-races__race" /><col /><col /></colgroup><thead><tr><th scope="col">Tournament</th><th scope="col">Race</th><th scope="col">Finish (field)</th><th scope="col">Outcome</th></tr></thead><tbody>{details.map((race) => <tr key={race.id}><th scope="row">{race.tournament_name}</th><td>{race.race_name}</td><td>{race.position ? `${race.position} / ${race.participants}` : "—"}</td><td>{race.position === 1 ? "Winner" : "Finished"}</td></tr>)}</tbody></table> : <div className="admin-dashboard-empty">No races in this period.</div>}
+  </div>;
+}
+
+function JockeyRaceDetails({ record }) {
+  const details = record?.race_details || [];
+  return <div className="admin-jockey-races">
+    {details.length ? <table><colgroup><col /><col className="admin-jockey-races__race" /><col /><col /></colgroup><thead><tr><th scope="col">Tournament</th><th scope="col">Race</th><th scope="col">Finish (field)</th><th scope="col">Outcome</th></tr></thead><tbody>{details.map((race) => <tr key={race.id}><th scope="row">{race.tournament_name}</th><td>{race.race_name}</td><td>{race.position ? `${race.position} / ${race.participants}` : "—"}</td><td>{race.position === 1 ? "Winner" : "Finished"}</td></tr>)}</tbody></table> : <div className="admin-dashboard-empty">No races in this period.</div>}
+  </div>;
+}
+
 function AdminEntityDashboard() {
   const { entity = "horse" } = useParams();
   const config = DASHBOARDS[entity] || DASHBOARDS.horse;
@@ -76,9 +99,9 @@ function AdminEntityDashboard() {
     {error && <section className="admin-live-state admin-live-state--warning">{error}</section>}
     {!isLoading && !error && <>
       <section className="admin-entity-summary" aria-label={`${config.label} summary`}><Stat label="Records in period" value={formatNumber(rows.length)} /><Stat label="Completed races" value={formatNumber(totals.races)} /><Stat label={config.winLabel} value={formatNumber(totals.wins)} accent /><Stat label={config.valueLabel} value={isBettor ? formatTokens(totals.payout) : formatCurrency(totals.value)} /></section>
-      <section className={`admin-entity-workspace${isBettor ? " is-bettor" : ""}`}>
-        <article className="admin-entity-ranking"><header><div><p>Ranked directory</p><h2>{config.label}</h2></div><label className="admin-entity-sort"><span>Sort by</span><select value={sort} onChange={(event) => setSort(event.target.value)}><option value="wins">Wins: highest first</option><option value="races">Races: highest first</option><option value="revenue">Revenue: highest first</option></select></label></header>{sortedRows.length ? <div className={`admin-entity-ranking__table${isBettor ? " is-bettor" : ""}`}><div className="admin-entity-ranking__head"><span>#</span><span>{config.singular}</span><span>Races</span><span>Wins</span>{isBettor ? <><span>Deposited</span><span>Staked</span><span>Received</span></> : <span>Revenue</span>}</div>{sortedRows.map((row, index) => <button type="button" className="admin-entity-ranking__row" key={row.id} onClick={() => setSelectedId(row.id)}><span>{String(index + 1).padStart(2, "0")}</span><strong>{row.name}</strong><span>{formatNumber(row.races)}</span><b>{formatNumber(row.wins)}</b>{isBettor ? <><em>{formatTokens(row.deposited)}</em><em>{formatTokens(row.staked)}</em><em>{formatTokens(row.payout)}</em></> : <em>{formatCurrency(row.value)}</em>}</button>)}</div> : <div className="admin-dashboard-empty">No completed records in this period.</div>}</article>
-        <aside className="admin-entity-detail"><p>Selected {config.singular.toLowerCase()}</p><h2>{selected?.name || `No ${config.singular.toLowerCase()} selected`}</h2><div className="admin-entity-detail__hero"><Icon size={22} /><span>Period<br /><strong>{from} — {to}</strong></span></div>{isBettor && <BettorStats record={selected} />}<dl><div><dt>Completed races</dt><dd>{formatNumber(selected?.races)}</dd></div><div><dt>{config.winLabel}</dt><dd className="is-accent">{formatNumber(selected?.wins)}</dd></div><div><dt>{config.valueLabel}</dt><dd>{isBettor ? formatTokens(selected?.payout) : formatCurrency(selected?.value)}</dd></div><div><dt>Win rate</dt><dd>{selected?.races ? `${Math.round((selected.wins / selected.races) * 100)}%` : "0%"}</dd></div></dl></aside>
+      <section className={`admin-entity-workspace${isBettor ? " is-bettor" : ""}${entity === "horse" ? " is-horse" : ""}${entity === "jockey" ? " is-jockey" : ""}`}>
+        <article className="admin-entity-ranking"><header><div><p>Ranked directory</p><h2>{config.label}</h2></div><label className="admin-entity-sort"><span>Sort by</span><select value={sort} onChange={(event) => setSort(event.target.value)}><option value="wins">Wins: highest first</option><option value="races">Races: highest first</option><option value="revenue">Revenue: highest first</option></select></label></header>{sortedRows.length ? <div className={`admin-entity-ranking__table${isBettor ? " is-bettor" : ""}${entity === "horse" ? " is-horse" : ""}${entity === "jockey" ? " is-jockey" : ""}`}><div className="admin-entity-ranking__head"><span>#</span><span>{config.singular}</span>{entity === "horse" && <><span>Breed</span><span>Weight</span></>}{entity === "jockey" && <><span>Weight</span><span>Experience</span><span>License</span></>}<span>Races</span><span>Wins</span>{isBettor ? <><span>Deposited</span><span>Total staked</span><span>Total received</span></> : <span>Revenue</span>}</div>{sortedRows.map((row, index) => <button type="button" className="admin-entity-ranking__row" key={row.id} onClick={() => setSelectedId(row.id)}><span>{String(index + 1).padStart(2, "0")}</span><strong>{row.name}</strong>{entity === "horse" && <><span>{row.breed || "—"}</span><span>{row.weight ? `${row.weight} kg` : "—"}</span></>}{entity === "jockey" && <><span>{row.weight_kg ? `${row.weight_kg} kg` : "—"}</span><span>{row.experience_years ?? "—"} yrs</span><span>{row.license_number || "—"}</span></>}<span>{formatNumber(row.races)}</span><b>{formatNumber(row.wins)}</b>{isBettor ? <><em>{formatTokens(row.deposited)}</em><em>{formatTokens(row.staked)}</em><em>{formatTokens(row.payout)}</em></> : <em>{formatCurrency(row.value)}</em>}</button>)}</div> : <div className="admin-dashboard-empty">No completed records in this period.</div>}</article>
+        <aside className="admin-entity-detail"><p>Selected {config.singular.toLowerCase()}</p><h2>{selected?.name || `No ${config.singular.toLowerCase()} selected`}</h2><div className="admin-entity-detail__hero"><Icon size={22} /><span>Period<br /><strong>{from} — {to}</strong></span></div>{isBettor ? <BettorBetDetails record={selected} /> : entity === "horse" ? <HorseRaceDetails record={selected} /> : entity === "jockey" ? <JockeyRaceDetails record={selected} /> : <dl><div><dt>Completed races</dt><dd>{formatNumber(selected?.races)}</dd></div><div><dt>{config.winLabel}</dt><dd className="is-accent">{formatNumber(selected?.wins)}</dd></div><div><dt>{config.valueLabel}</dt><dd>{formatCurrency(selected?.value)}</dd></div><div><dt>Win rate</dt><dd>{selected?.races ? `${Math.round((selected.wins / selected.races) * 100)}%` : "0%"}</dd></div></dl>}</aside>
       </section>
     </>}
   </AdminLayout>;
