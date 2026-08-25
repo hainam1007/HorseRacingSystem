@@ -18,6 +18,10 @@ export const adminApi = {
     return apiRequest(withQuery("/admin/dashboard", params));
   },
 
+  getEntityAnalytics(params = {}) {
+    return apiRequest(withQuery("/admin/dashboard/entities", params));
+  },
+
   getBettingSummary(params = {}) {
     return apiRequest(withQuery("/admin/betting-summary", params));
   },

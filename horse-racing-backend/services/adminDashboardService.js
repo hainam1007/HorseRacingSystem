@@ -260,6 +260,58 @@ class AdminDashboardService {
         };
     }
 
+    async getEntityAnalytics(from, to) {
+        const win = getAnalyticsWindow(from, to);
+        const [fromDate, toDate] = win.current;
+        const params = [fromDate, toDate];
+        const run = (sql) => pgQuery(sql, params).then(([rows]) => rows.map((row) => ({
+            id: row.id,
+            name: row.name || 'Unknown',
+            races: Number(row.races || 0),
+            wins: Number(row.wins || 0),
+            value: Number(row.value || 0)
+        })));
+        const raceFilter = `r.race_date BETWEEN ? AND ? AND r.status = 'completed' AND r.deleted_at IS NULL`;
+        const resultFilter = `rr.deleted_at IS NULL AND ${raceFilter}`;
+
+        const [owners, jockeys, referees, horses, bettors] = await Promise.all([
+            run(`SELECT ho.id, COALESCE(u.full_name, ho.stable_name, 'Unnamed owner') AS name,
+                    COUNT(DISTINCT r.id)::int AS races,
+                    COUNT(DISTINCT r.id) FILTER (WHERE rr.final_position = 1 OR rr.position = 1)::int AS wins,
+                    COALESCE(SUM(pa.owner_amount) FILTER (WHERE pa.status <> 'cancelled'), 0)::numeric AS value
+                FROM horse_owners ho LEFT JOIN users u ON u.id = ho.user_id
+                LEFT JOIN horses h ON h.owner_id = ho.id LEFT JOIN race_results rr ON rr.horse_id = h.id
+                LEFT JOIN races r ON r.id = rr.race_id LEFT JOIN prize_awards pa ON pa.race_result_id = rr.id
+                WHERE ho.deleted_at IS NULL AND (${resultFilter}) GROUP BY ho.id, u.full_name, ho.stable_name ORDER BY races DESC, name`),
+            run(`SELECT j.id, COALESCE(u.full_name, 'Unnamed jockey') AS name,
+                    COUNT(DISTINCT r.id)::int AS races,
+                    COUNT(DISTINCT r.id) FILTER (WHERE rr.final_position = 1 OR rr.position = 1)::int AS wins,
+                    COALESCE(SUM(pa.jockey_amount) FILTER (WHERE pa.status <> 'cancelled'), 0)::numeric AS value
+                FROM jockeys j LEFT JOIN users u ON u.id = j.user_id LEFT JOIN race_results rr ON rr.jockey_id = j.id
+                LEFT JOIN races r ON r.id = rr.race_id LEFT JOIN prize_awards pa ON pa.race_result_id = rr.id
+                WHERE j.deleted_at IS NULL AND (${resultFilter}) GROUP BY j.id, u.full_name ORDER BY races DESC, name`),
+            run(`SELECT ref.id, COALESCE(u.full_name, 'Unnamed referee') AS name,
+                    COUNT(DISTINCT r.id)::int AS races, 0::int AS wins, 0::numeric AS value
+                FROM race_referees ref LEFT JOIN users u ON u.id = ref.user_id LEFT JOIN races r ON r.referee_id = ref.id
+                WHERE ref.deleted_at IS NULL AND ${raceFilter} GROUP BY ref.id, u.full_name ORDER BY races DESC, name`),
+            run(`SELECT h.id, h.name,
+                    COUNT(DISTINCT r.id)::int AS races,
+                    COUNT(DISTINCT r.id) FILTER (WHERE rr.final_position = 1 OR rr.position = 1)::int AS wins,
+                    COALESCE(SUM(pa.gross_amount) FILTER (WHERE pa.status <> 'cancelled'), 0)::numeric AS value
+                FROM horses h LEFT JOIN race_results rr ON rr.horse_id = h.id LEFT JOIN races r ON r.id = rr.race_id
+                LEFT JOIN prize_awards pa ON pa.race_result_id = rr.id
+                WHERE h.deleted_at IS NULL AND (${resultFilter}) GROUP BY h.id, h.name ORDER BY races DESC, name`),
+            run(`SELECT u.id, u.full_name AS name,
+                    COUNT(DISTINCT b.race_id)::int AS races,
+                    COUNT(*) FILTER (WHERE b.status = 'won')::int AS wins,
+                    COALESCE(SUM(b.payout_amount) FILTER (WHERE b.status = 'won'), 0)::numeric AS value
+                FROM users u JOIN bets b ON b.spectator_id = u.id JOIN races r ON r.id = b.race_id
+                WHERE b.deleted_at IS NULL AND ${raceFilter} GROUP BY u.id, u.full_name ORDER BY races DESC, name`)
+        ]);
+
+        return { period: { from: win.from, to: win.to, timezone: ICT_TIMEZONE }, entities: { horseowner: owners, jockey: jockeys, referee: referees, horse: horses, bettor: bettors } };
+    }
+
     /**
      * Helper: aggregate counts and sums for a date range.
      * Returns { metrics: {...}, betting: {...} } matching the original
