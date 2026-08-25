@@ -604,6 +604,7 @@ function RaceEntryWorkspace({ race, onClose, onChanged, onNotice }) {
   const [loading, setLoading] = useState(true);
   const [finalizing, setFinalizing] = useState(false);
   const [savingId, setSavingId] = useState("");
+  const [openEntriesId, setOpenEntriesId] = useState("");
   const [error, setError] = useState("");
 
   const applyReadiness = useCallback((next) => {
@@ -768,6 +769,7 @@ function AdminCompetitionModule({ moduleName }) {
   const [modal, setModal] = useState(null);
   const [form, setForm] = useState(null);
   const [saving, setSaving] = useState(false);
+  const [openEntriesId, setOpenEntriesId] = useState("");
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [deleting, setDeleting] = useState(false);
   const [roundTournament, setRoundTournament] = useState("all");
@@ -1283,11 +1285,24 @@ function AdminCompetitionModule({ moduleName }) {
                           >
                             <button
                               type="button"
-                              title="Set this race's entry deadline and demo race time"
-                              onClick={() => navigate("/admin/demo")}
+                              title="Open race registration for demo"
+                              disabled={openEntriesId === idOf(race) || race.registration_locked === false}
+                              onClick={async () => {
+                                const raceId = idOf(race);
+                                setOpenEntriesId(raceId);
+                                setError("");
+                                try {
+                                  await adminApi.openRaceRegistrationDemo(raceId);
+                                  setNotice("Registration opened for demo");
+                                  await loadData();
+                                } catch (apiError) {
+                                  setError(apiError.message || "Failed to open registration");
+                                  setOpenEntriesId("");
+                                }
+                              }}
                             >
                               <CalendarDays size={15} aria-hidden="true" />
-                              Demo timeline
+                              Open entries
                             </button>
                             <button type="button" onClick={() => setEntryRace(race)}>
                               <ListChecks size={15} aria-hidden="true" /> Entries

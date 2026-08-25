@@ -35,7 +35,6 @@ const navigationGroups = [
     items: [
       { to: "/admin/tournament", label: "Tournaments", icon: Flag },
       { to: "/admin/schedule", label: "Race schedule", icon: CalendarRange },
-      { to: "/admin/demo", label: "Demo timeline", icon: SlidersHorizontal },
       { to: "/admin/racetracks", label: "Racetracks", icon: MapPin },
     ],
   },
