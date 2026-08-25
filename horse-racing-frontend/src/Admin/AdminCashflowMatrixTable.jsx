@@ -3,18 +3,23 @@ import { Link } from "react-router-dom";
 import { adminApi } from "../api/adminApi";
 import {
   Activity,
+  Award,
+  Calendar,
   CheckCircle2,
   ChevronRight,
   CircleDollarSign,
   Clock,
   CreditCard,
+  Crown,
   Eye,
-  EyeOff,
   Filter,
-  Info,
   Layers,
+  Percent,
   Search,
   Sparkles,
+  TrendingUp,
+  Trophy,
+  User,
   Users,
   Wallet,
   X,
@@ -33,28 +38,6 @@ const formatDateTime = (val) => {
   return `${d.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: false })} · ${d.toLocaleDateString("en-US", { day: "2-digit", month: "short", year: "numeric" })}`;
 };
 
-const cleanTimeString = (val) => {
-  if (!val) return "—";
-  let s = String(val);
-  s = s.replace(/\(Tối\)/gi, "(Evening)");
-  s = s.replace(/\(Chiều\)/gi, "(Afternoon)");
-  s = s.replace(/\(Sáng\)/gi, "(Morning)");
-  s = s.replace(/Cuối tuần\s*\/\s*Giờ đua/gi, "Weekends / Race days");
-  s = s.replace(/Trong kỳ/gi, "In period");
-  s = s.replace(/~\s*30\s*phút\s*sau\s*nạp/gi, "~ 30 mins after deposit");
-  s = s.replace(/Rất nhanh\s*\(<\s*20p\)/gi, "Fast (< 20 mins)");
-  s = s.replace(/Rất nhanh\s*\(<\s*15p\)/gi, "Fast (< 15 mins)");
-  s = s.replace(/Rất nhanh/gi, "Fast (< 15 mins)");
-  return s;
-};
-
-const CATEGORIES = [
-  { id: "all", label: "All Metrics", icon: Layers },
-  { id: "volume", label: "Volume & Orders", icon: Users },
-  { id: "revenue", label: "Revenue & Tokens", icon: CircleDollarSign },
-  { id: "time", label: "Timing & Trends", icon: Clock }
-];
-
 const PAYMENT_METHODS = [
   { id: "all", label: "All Gateways" },
   { id: "VNPAY", label: "VNPAY QR/Card" },
@@ -63,56 +46,35 @@ const PAYMENT_METHODS = [
 ];
 
 export default function AdminCashflowMatrixTable({ cashflowMatrix, isLoading, onPaymentMethodChange }) {
-  const [activeCategory, setActiveCategory] = useState("all");
+  const [activeTab, setActiveTab] = useState("packages"); // 'packages' | 'depositors'
   const [activePaymentMethod, setActivePaymentMethod] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
-  const [hideZeroRows, setHideZeroRows] = useState(false);
-  const [showPkgSelector, setShowPkgSelector] = useState(false);
-  const [visiblePackages, setVisiblePackages] = useState({});
-  const [selectedDetailPackage, setSelectedDetailPackage] = useState(null); // When non-null, opens detail modal
-  const [modalSearch, setModalSearch] = useState("");
+  const [sortBy, setSortBy] = useState("popularity"); // 'popularity' | 'revenue' | 'name'
   const [internalData, setInternalData] = useState(null);
+
+  // Modals
+  const [selectedPackage, setSelectedPackage] = useState(null); // When set, opens Package Drilldown Modal
+  const [selectedDepositor, setSelectedDepositor] = useState(null); // When set, opens Customer Deposit History Modal
+  const [modalSearch, setModalSearch] = useState("");
 
   useEffect(() => {
     if (!cashflowMatrix) {
-      adminApi.getCashflowMatrix({ payment_method: activePaymentMethod !== "all" ? activePaymentMethod : undefined }).then((res) => {
-        if (res) setInternalData(res);
-      }).catch(() => {});
+      adminApi
+        .getCashflowMatrix({ payment_method: activePaymentMethod !== "all" ? activePaymentMethod : undefined })
+        .then((res) => {
+          if (res) setInternalData(res);
+        })
+        .catch(() => {});
     }
   }, [cashflowMatrix, activePaymentMethod]);
 
   const effectiveData = cashflowMatrix || internalData;
 
   const packages = useMemo(() => effectiveData?.packages || [], [effectiveData]);
+  const topDepositors = useMemo(() => effectiveData?.top_depositors || [], [effectiveData]);
   const totals = useMemo(() => effectiveData?.totals || {}, [effectiveData]);
+  const kpiSummary = useMemo(() => effectiveData?.kpi_summary || {}, [effectiveData]);
   const allTransactions = useMemo(() => effectiveData?.all_recent_transactions || [], [effectiveData]);
-
-  // Initialize visiblePackages on first load
-  useMemo(() => {
-    if (packages.length > 0 && Object.keys(visiblePackages).length === 0) {
-      const init = {};
-      packages.forEach((pkg) => {
-        init[pkg.package_id] = true;
-      });
-      setVisiblePackages(init);
-    }
-  }, [packages]);
-
-  const togglePackage = (pkgId) => {
-    setVisiblePackages((prev) => {
-      const next = { ...prev, [pkgId]: !prev[pkgId] };
-      const anyVisible = Object.values(next).some(Boolean);
-      return anyVisible ? next : prev;
-    });
-  };
-
-  const selectAllPackages = (select) => {
-    const next = {};
-    packages.forEach((p) => {
-      next[p.package_id] = select;
-    });
-    setVisiblePackages(next);
-  };
 
   const handlePaymentMethodClick = (pmId) => {
     setActivePaymentMethod(pmId);
@@ -121,219 +83,48 @@ export default function AdminCashflowMatrixTable({ cashflowMatrix, isLoading, on
     }
   };
 
-  // Row definitions matching clear business categories: Volume - Revenue - Time
-  const rowDefinitions = useMemo(() => {
-    return [
-      // CATEGORY 1: VOLUME & ORDERS
-      {
-        id: "success_count",
-        category: "volume",
-        factorTag: "Volume",
-        label: "Successful Deposits",
-        sublabel: "Completed orders with tokens credited",
-        badge: "Completed",
-        formatter: (v) => formatNumber(v),
-        getValue: (m) => m.success_count,
-        getTotal: () => totals.success_count || 0,
-        unit: "orders",
-        highlight: true
-      },
-      {
-        id: "unique_depositors",
-        category: "volume",
-        factorTag: "Volume",
-        label: "Unique Depositing Users",
-        sublabel: "Distinct user accounts funding wallets",
-        badge: "Audience",
-        formatter: (v) => formatNumber(v),
-        getValue: (m) => m.unique_depositors,
-        getTotal: () => totals.unique_depositors || 0,
-        unit: "users"
-      },
-      {
-        id: "ftd_count",
-        category: "volume",
-        factorTag: "Volume",
-        label: "First-Time Depositors (FTD)",
-        sublabel: "New users funding accounts for the first time",
-        badge: "Acquisition",
-        formatter: (v) => formatNumber(v),
-        getValue: (m) => m.ftd_count,
-        getTotal: () => totals.ftd_count || 0,
-        unit: "users",
-        highlight: true
-      },
-      {
-        id: "pending_failed",
-        category: "volume",
-        factorTag: "Volume",
-        label: "Pending & Failed Orders",
-        sublabel: "In-flight or unconfirmed gateway orders",
-        badge: "Attention",
-        formatter: (v, m) => {
-          const pending = m?.pending_count || 0;
-          const failed = m?.failed_count || 0;
-          if (pending === 0 && failed === 0) return "0";
-          return `${formatNumber(pending)} pending · ${formatNumber(failed)} failed`;
-        },
-        getValue: (m) => (m.pending_count || 0) + (m.failed_count || 0),
-        getTotal: () => (totals.pending_count || 0) + (totals.failed_count || 0),
-        unit: "orders",
-        isAlert: (v) => v > 0
-      },
-      {
-        id: "success_rate",
-        category: "volume",
-        factorTag: "Volume",
-        label: "Payment Conversion Rate",
-        sublabel: "Percentage of checkout attempts settled",
-        badge: "Conversion",
-        formatter: (v, m) => m?.success_rate || "100%",
-        getValue: (m) => parseFloat(m?.success_rate || 100),
-        getTotal: () => totals.success_rate || "100%",
-        unit: "%"
-      },
-
-      // CATEGORY 2: REVENUE & TOKENS
-      {
-        id: "total_vnd",
-        category: "revenue",
-        factorTag: "Revenue",
-        label: "Gross Fiat Inflow (VND)",
-        sublabel: "Actual fiat revenue received via gateways",
-        badge: "Gross Revenue",
-        formatter: (v) => formatVND(v),
-        getValue: (m) => m.total_vnd,
-        getTotal: () => totals.total_vnd || 0,
-        unit: "VND",
-        highlight: true
-      },
-      {
-        id: "total_tokens",
-        category: "revenue",
-        factorTag: "Revenue",
-        label: "Tokens Minted to Wallets",
-        sublabel: "Total token volume supplied to players",
-        badge: "Issuance",
-        formatter: (v) => formatToken(v),
-        getValue: (m) => m.total_tokens,
-        getTotal: () => totals.total_tokens || 0,
-        unit: "tokens"
-      },
-      {
-        id: "bonus_tokens",
-        category: "revenue",
-        factorTag: "Revenue",
-        label: "Promotional Bonus Tokens",
-        sublabel: "Bonus incentive token allowance",
-        badge: "Incentives",
-        formatter: (v) => formatToken(v),
-        getValue: (m) => m.bonus_tokens,
-        getTotal: () => totals.bonus_tokens || 0,
-        unit: "tokens"
-      },
-      {
-        id: "aov_vnd",
-        category: "revenue",
-        factorTag: "Revenue",
-        label: "Average Order Value (AOV)",
-        sublabel: "Mean fiat value per successful order",
-        badge: "AOV",
-        formatter: (v) => formatVND(v),
-        getValue: (m) => m.aov_vnd,
-        getTotal: () => totals.aov_vnd || 0,
-        unit: "VND"
-      },
-
-      // CATEGORY 3: TIMING & TRENDS
-      {
-        id: "peak_hour_window",
-        category: "time",
-        factorTag: "Timing",
-        label: "Peak Deposit Hours",
-        sublabel: "Timeframe with highest transaction volume",
-        badge: "Peak Hours",
-        formatter: (v, m) => cleanTimeString(m?.peak_hour_window || v || "18:00 – 21:00 (Evening)"),
-        getValue: (m) => m?.peak_hour_window,
-        getTotal: () => cleanTimeString(totals.peak_hour_window || "18:00 – 21:00 (Evening)"),
-        unit: "hours",
-        highlight: true
-      },
-      {
-        id: "token_velocity",
-        category: "time",
-        factorTag: "Timing",
-        label: "Wagering Turnaround Speed",
-        sublabel: "Average duration from deposit to first placed bet",
-        badge: "Velocity",
-        formatter: (v, m) => cleanTimeString(m?.token_velocity || v || "Fast (< 20 mins)"),
-        getValue: (m) => m?.token_velocity,
-        getTotal: () => cleanTimeString(totals.token_velocity || "Fast (< 20 mins)"),
-        unit: "turnaround"
-      },
-      {
-        id: "repeat_rate",
-        category: "time",
-        factorTag: "Timing",
-        label: "Repeat Deposit Retention",
-        sublabel: "Proportion of users funding account ≥2 times",
-        badge: "Retention",
-        formatter: (v, m) => m?.repeat_rate || "0%",
-        getValue: (m) => m?.repeat_rate,
-        getTotal: () => totals.repeat_rate || "0%",
-        unit: "%"
-      },
-      {
-        id: "peak_date",
-        category: "time",
-        factorTag: "Timing",
-        label: "Peak Inflow Surge Date",
-        sublabel: "Day of period with highest total fiat inflow",
-        badge: "Peak Date",
-        formatter: (v, m) => cleanTimeString(m?.peak_date || v || "Race days / Peak"),
-        getValue: (m) => m?.peak_date,
-        getTotal: () => cleanTimeString(totals.peak_date || "Race days / Peak"),
-        unit: "date"
-      }
-    ];
-  }, [totals]);
-
-  // Filter rows
-  const filteredRows = useMemo(() => {
-    return rowDefinitions.filter((row) => {
-      if (activeCategory !== "all" && row.category !== activeCategory) {
-        return false;
-      }
-      if (searchQuery.trim()) {
+  // Filtered and sorted Packages
+  const filteredPackages = useMemo(() => {
+    return packages
+      .filter((pkg) => {
+        if (!searchQuery.trim()) return true;
         const q = searchQuery.toLowerCase();
-        const mLabel = row.label.toLowerCase().includes(q);
-        const mSub = row.sublabel?.toLowerCase().includes(q);
-        const mBadge = row.badge?.toLowerCase().includes(q);
-        if (!mLabel && !mSub && !mBadge) return false;
-      }
-      if (hideZeroRows) {
-        if (typeof row.getTotal === "function") {
-          const tVal = row.getTotal();
-          if (typeof tVal === "number" && tVal === 0) return false;
-        }
-      }
-      return true;
-    });
-  }, [rowDefinitions, activeCategory, searchQuery, hideZeroRows]);
+        const matchesLabel = pkg.label?.toLowerCase().includes(q);
+        const matchesPrice = String(pkg.vnd_price).includes(q);
+        const matchesBadge = pkg.commercial_badge?.toLowerCase().includes(q);
+        return matchesLabel || matchesPrice || matchesBadge;
+      })
+      .sort((a, b) => {
+        if (sortBy === "popularity") return (b.metrics?.success_count || 0) - (a.metrics?.success_count || 0);
+        if (sortBy === "revenue") return (b.metrics?.total_vnd || 0) - (a.metrics?.total_vnd || 0);
+        if (sortBy === "name") return (a.label || "").localeCompare(b.label || "");
+        return 0;
+      });
+  }, [packages, searchQuery, sortBy]);
 
-  const activeVisiblePkgCount = packages.filter((p) => visiblePackages[p.package_id] !== false).length;
+  // Filtered and sorted Depositors
+  const filteredDepositors = useMemo(() => {
+    return topDepositors
+      .filter((dep) => {
+        if (!searchQuery.trim()) return true;
+        const q = searchQuery.toLowerCase();
+        const matchesName = dep.user_name?.toLowerCase().includes(q);
+        const matchesEmail = dep.user_email?.toLowerCase().includes(q);
+        const matchesFav = dep.favorite_package_label?.toLowerCase().includes(q);
+        return matchesName || matchesEmail || matchesFav;
+      })
+      .sort((a, b) => {
+        if (sortBy === "popularity") return (b.success_orders || 0) - (a.success_orders || 0);
+        if (sortBy === "revenue") return (b.total_spent_vnd || 0) - (a.total_spent_vnd || 0);
+        if (sortBy === "name") return (a.user_name || "").localeCompare(b.user_name || "");
+        return 0;
+      });
+  }, [topDepositors, searchQuery, sortBy]);
 
-  // Filtered transactions for detail modal
-  const modalTransactions = useMemo(() => {
-    if (!selectedDetailPackage) return [];
-    let list = [];
-    if (selectedDetailPackage === "all") {
-      list = allTransactions;
-    } else {
-      const pkg = packages.find((p) => p.package_id === selectedDetailPackage);
-      list = pkg?.recent_transactions || [];
-    }
-
+  // Filtered transactions for Package detail modal
+  const packageModalTransactions = useMemo(() => {
+    if (!selectedPackage) return [];
+    const list = selectedPackage.recent_transactions || [];
     if (!modalSearch.trim()) return list;
     const q = modalSearch.toLowerCase();
     return list.filter(
@@ -343,12 +134,21 @@ export default function AdminCashflowMatrixTable({ cashflowMatrix, isLoading, on
         (tx.user_email && tx.user_email.toLowerCase().includes(q)) ||
         (tx.payment_method && tx.payment_method.toLowerCase().includes(q))
     );
-  }, [selectedDetailPackage, packages, allTransactions, modalSearch]);
+  }, [selectedPackage, modalSearch]);
 
-  const selectedPkgObject = useMemo(() => {
-    if (!selectedDetailPackage || selectedDetailPackage === "all") return null;
-    return packages.find((p) => p.package_id === selectedDetailPackage);
-  }, [selectedDetailPackage, packages]);
+  // Filtered transactions for Customer detail modal
+  const customerModalTransactions = useMemo(() => {
+    if (!selectedDepositor) return [];
+    const list = selectedDepositor.orders_history || [];
+    if (!modalSearch.trim()) return list;
+    const q = modalSearch.toLowerCase();
+    return list.filter(
+      (tx) =>
+        (tx.order_id && tx.order_id.toLowerCase().includes(q)) ||
+        (tx.package_id && tx.package_id.toLowerCase().includes(q)) ||
+        (tx.payment_method && tx.payment_method.toLowerCase().includes(q))
+    );
+  }, [selectedDepositor, modalSearch]);
 
   return (
     <article className="admin-cashflow-matrix-container">
@@ -357,11 +157,12 @@ export default function AdminCashflowMatrixTable({ cashflowMatrix, isLoading, on
         <div className="admin-role-matrix-title-group">
           <div className="admin-role-matrix-eyebrow">
             <CreditCard size={14} className="admin-icon-accent" />
-            <span>Deposit & Cash Flow Matrix</span>
+            <span>Commercial & Purchasing Intelligence</span>
           </div>
-          <h2>Deposit Packages & Liquidity Breakdown</h2>
+          <h2>Deposit Packages & Customer Purchasing Breakdown</h2>
           <p>
-            Review gross fiat revenue, token issuance volume, and deposit velocity across all active package tiers.
+            Track package sales popularity, gross revenue contribution share, and individual customer deposit frequency
+            & favorite purchasing habits.
           </p>
         </div>
 
@@ -371,10 +172,14 @@ export default function AdminCashflowMatrixTable({ cashflowMatrix, isLoading, on
             <Search size={15} />
             <input
               type="text"
-              placeholder="Filter cash flow metrics..."
+              placeholder={
+                activeTab === "packages"
+                  ? "Search by package tier or price..."
+                  : "Search customer name, email, favorite..."
+              }
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              aria-label="Filter cash flow metrics"
+              aria-label="Filter packages and depositors"
             />
             {searchQuery && (
               <button
@@ -388,106 +193,122 @@ export default function AdminCashflowMatrixTable({ cashflowMatrix, isLoading, on
             )}
           </div>
 
-          {/* Toggle Column Selector */}
-          <div className="admin-matrix-column-filter">
-            <button
-              type="button"
-              className={`admin-filter-btn${showPkgSelector ? " is-active" : ""}`}
-              onClick={() => setShowPkgSelector(!showPkgSelector)}
-              aria-expanded={showPkgSelector}
-            >
-              <Filter size={15} />
-              <span>Deposit Packs ({activeVisiblePkgCount}/{packages.length})</span>
-            </button>
-
-            {showPkgSelector && (
-              <div className="admin-matrix-dropdown">
-                <div className="admin-matrix-dropdown__header">
-                  <strong>Visible Deposit Packs</strong>
-                  <div className="admin-matrix-dropdown__quick-btns">
-                    <button type="button" onClick={() => selectAllPackages(true)}>
-                      Show all
-                    </button>
-                    <span>·</span>
-                    <button type="button" onClick={() => selectAllPackages(false)}>
-                      Hide all
-                    </button>
-                  </div>
-                </div>
-                <div className="admin-matrix-dropdown__list">
-                  {packages.map((pkg) => {
-                    const isChecked = visiblePackages[pkg.package_id] !== false;
-                    return (
-                      <label key={pkg.package_id} className="admin-matrix-checkbox-item">
-                        <input
-                          type="checkbox"
-                          checked={isChecked}
-                          onChange={() => togglePackage(pkg.package_id)}
-                        />
-                        <Wallet size={14} className="admin-icon-accent" />
-                        <span className="admin-matrix-checkbox-label">
-                          <strong>{pkg.label}</strong>
-                          <small>{formatVND(pkg.vnd_price)}</small>
-                        </span>
-                      </label>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Filter Zero Values Toggle */}
-          <button
-            type="button"
-            className={`admin-filter-btn${hideZeroRows ? " is-active" : ""}`}
-            onClick={() => setHideZeroRows(!hideZeroRows)}
-            title="Hide rows with zero values"
+          {/* Sort Selector */}
+          <select
+            className="admin-filter-select"
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value)}
+            aria-label="Sort by"
           >
-            {hideZeroRows ? <EyeOff size={15} /> : <Eye size={15} />}
-            <span>{hideZeroRows ? "Active rows only" : "Show all rows"}</span>
-          </button>
+            <option value="popularity">Sort by Most Orders (Popularity)</option>
+            <option value="revenue">Sort by Highest Revenue</option>
+            <option value="name">Sort by Name (A-Z)</option>
+          </select>
 
           {/* All Transactions Drill-down button */}
           <button
             type="button"
             className="admin-filter-btn admin-filter-btn--drilldown"
             onClick={() => {
-              setSelectedDetailPackage("all");
+              setSelectedPackage({
+                label: "All Packages (Consolidated)",
+                package_id: "all",
+                vnd_price: totals.aov_vnd || 0,
+                metrics: totals,
+                recent_transactions: allTransactions,
+                top_buyers: topDepositors.slice(0, 5)
+              });
               setModalSearch("");
             }}
           >
             <Zap size={15} />
-            <span>Audit Log ({allTransactions.length})</span>
+            <span>All Orders ({allTransactions.length})</span>
           </button>
         </div>
       </header>
 
-      {/* FILTER CONTROLS: 2 ROWS (CATEGORIES + PAYMENT CHANNELS) */}
-      <div className="admin-cashflow-filters-bar">
-        {/* Category Tabs */}
-        <nav className="admin-matrix-categories" aria-label="Metric category tabs">
-          {CATEGORIES.map((cat) => {
-            const Icon = cat.icon;
-            const isActive = activeCategory === cat.id;
-            const count =
-              cat.id === "all"
-                ? rowDefinitions.length
-                : rowDefinitions.filter((r) => r.category === cat.id).length;
+      {/* TOP EXECUTIVE KPI HIGHLIGHTS BAR */}
+      <section className="admin-commercial-kpi-bar" aria-label="Commercial Highlights">
+        <div className="admin-commercial-kpi-card">
+          <div className="admin-commercial-kpi-icon admin-commercial-kpi-icon--gold">
+            <Trophy size={18} />
+          </div>
+          <div>
+            <span className="admin-commercial-kpi-label">Most Popular Package</span>
+            <strong className="admin-commercial-kpi-val">{kpiSummary.best_seller_label || "50,000 VND Booster"}</strong>
+            <small className="admin-commercial-kpi-sub">
+              {kpiSummary.best_seller_count || 0} orders ({kpiSummary.best_seller_share || 0}% of all sales)
+            </small>
+          </div>
+        </div>
 
-            return (
-              <button
-                key={cat.id}
-                type="button"
-                className={`admin-matrix-category-tab${isActive ? " is-active" : ""}`}
-                onClick={() => setActiveCategory(cat.id)}
-              >
-                <Icon size={15} />
-                <span>{cat.label}</span>
-                <span className="admin-matrix-tab-count">{count}</span>
-              </button>
-            );
-          })}
+        <div className="admin-commercial-kpi-card">
+          <div className="admin-commercial-kpi-icon admin-commercial-kpi-icon--emerald">
+            <CircleDollarSign size={18} />
+          </div>
+          <div>
+            <span className="admin-commercial-kpi-label">Top Revenue Driver</span>
+            <strong className="admin-commercial-kpi-val">{kpiSummary.top_revenue_label || "500,000 VND VIP Pro"}</strong>
+            <small className="admin-commercial-kpi-sub">
+              {formatVND(kpiSummary.top_revenue_vnd)} ({kpiSummary.top_revenue_share || 0}% of gross inflow)
+            </small>
+          </div>
+        </div>
+
+        <div className="admin-commercial-kpi-card">
+          <div className="admin-commercial-kpi-icon admin-commercial-kpi-icon--blue">
+            <Users size={18} />
+          </div>
+          <div>
+            <span className="admin-commercial-kpi-label">Active Depositors</span>
+            <strong className="admin-commercial-kpi-val">{topDepositors.length} Customers</strong>
+            <small className="admin-commercial-kpi-sub">
+              Avg {kpiSummary.avg_orders_per_user || "1.0"} purchases per customer
+            </small>
+          </div>
+        </div>
+
+        <div className="admin-commercial-kpi-card">
+          <div className="admin-commercial-kpi-icon admin-commercial-kpi-icon--purple">
+            <Percent size={18} />
+          </div>
+          <div>
+            <span className="admin-commercial-kpi-label">Repeat Retention</span>
+            <strong className="admin-commercial-kpi-val">{totals.repeat_rate || "0%"}</strong>
+            <small className="admin-commercial-kpi-sub">Users funding account ≥2 times</small>
+          </div>
+        </div>
+      </section>
+
+      {/* FILTER BAR & TAB CONTROLS */}
+      <div className="admin-cashflow-filters-bar">
+        {/* Core Mode Tabs */}
+        <nav className="admin-matrix-categories" aria-label="Commercial mode tabs">
+          <button
+            type="button"
+            className={`admin-matrix-category-tab${activeTab === "packages" ? " is-active" : ""}`}
+            onClick={() => {
+              setActiveTab("packages");
+              setSearchQuery("");
+            }}
+          >
+            <Wallet size={15} />
+            <span>By Package Tiers</span>
+            <span className="admin-matrix-tab-count">{packages.length}</span>
+          </button>
+
+          <button
+            type="button"
+            className={`admin-matrix-category-tab${activeTab === "depositors" ? " is-active" : ""}`}
+            onClick={() => {
+              setActiveTab("depositors");
+              setSearchQuery("");
+            }}
+          >
+            <Users size={15} />
+            <span>Customer Purchasing Habits & Top Depositors</span>
+            <span className="admin-matrix-tab-count">{topDepositors.length}</span>
+          </button>
         </nav>
 
         {/* Payment Method Filter Pills */}
@@ -506,255 +327,364 @@ export default function AdminCashflowMatrixTable({ cashflowMatrix, isLoading, on
         </div>
       </div>
 
-      {/* MATRIX TABLE */}
+      {/* MAIN DATA TABLE */}
       <div className="admin-matrix-table-wrapper">
-        <table className="admin-matrix-table">
-          <thead>
-            <tr>
-              <th className="admin-matrix-col--metric">
-                <div className="admin-matrix-col-header">
-                  <span>Performance Metric</span>
-                  <small>Grouped by Category</small>
-                </div>
-              </th>
-
-              {/* Dynamic Package Columns */}
-              {packages.map((pkg) => {
-                if (visiblePackages[pkg.package_id] === false) return null;
-
-                return (
-                  <th key={pkg.package_id} className="admin-matrix-col--role admin-matrix-col--package">
-                    <div className="admin-role-header-cell">
-                      <div className="admin-role-header-top">
-                        <span className="admin-role-icon-box admin-role-icon-box--package">
-                          <Wallet size={16} />
-                        </span>
-                        <span className="admin-role-badge-pill admin-role-badge-pill--package">
-                          {pkg.bonus_token > 0 ? `+${pkg.bonus_token} bonus` : "Standard"}
-                        </span>
-                      </div>
-                      <strong className="admin-role-title">{pkg.label}</strong>
-                      <div className="admin-pkg-subheading">
-                        <span>{formatVND(pkg.vnd_price)}</span>
-                        <button
-                          type="button"
-                          className="admin-pkg-detail-link"
-                          onClick={() => {
-                            setSelectedDetailPackage(pkg.package_id);
-                            setModalSearch("");
-                          }}
-                          title={`View transactions for ${pkg.label}`}
-                        >
-                          Details <ChevronRight size={12} />
-                        </button>
-                      </div>
+        {/* ================= TAB 1: BY PACKAGE TIERS ================= */}
+        {activeTab === "packages" && (
+          <table className="admin-matrix-table admin-directory-table">
+            <thead>
+              <tr>
+                <th>Package Tier & Pricing</th>
+                <th>Sales Volume & Share</th>
+                <th>Gross Revenue & Share</th>
+                <th>Customer Segmentation</th>
+                <th>Turnaround Velocity</th>
+                <th>Preferred Gateway</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredPackages.length === 0 ? (
+                <tr>
+                  <td colSpan={7} className="admin-matrix-empty-row">
+                    <div className="admin-matrix-empty-state">
+                      <Filter size={24} />
+                      <strong>No deposit packages found</strong>
                     </div>
-                  </th>
-                );
-              })}
-
-              {/* Total Summary Column */}
-              <th className="admin-matrix-col--total">
-                <div className="admin-role-header-cell admin-role-header-cell--total">
-                  <div className="admin-role-header-top">
-                    <span className="admin-role-icon-box admin-role-icon-box--total">
-                      <Sparkles size={16} />
-                    </span>
-                    <span className="admin-role-badge-pill admin-role-badge-pill--total">Consolidated</span>
-                  </div>
-                  <strong className="admin-role-title">Total Inflow</strong>
-                  <div className="admin-pkg-subheading">
-                    <span>All tiers combined</span>
-                    <button
-                      type="button"
-                      className="admin-pkg-detail-link"
+                  </td>
+                </tr>
+              ) : (
+                filteredPackages.map((pkg) => {
+                  const m = pkg.metrics || {};
+                  return (
+                    <tr
+                      key={pkg.package_id}
+                      className="admin-matrix-row admin-directory-row"
                       onClick={() => {
-                        setSelectedDetailPackage("all");
+                        setSelectedPackage(pkg);
                         setModalSearch("");
                       }}
-                      title="View all transactions in period"
                     >
-                      Audit Log <ChevronRight size={12} />
-                    </button>
-                  </div>
-                </div>
-              </th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {filteredRows.length === 0 ? (
-              <tr>
-                <td colSpan={activeVisiblePkgCount + 2} className="admin-matrix-empty-row">
-                  <div className="admin-matrix-empty-state">
-                    <Filter size={24} />
-                    <strong>No matching metrics found</strong>
-                    <p>Try clearing filters or adjusting your search keyword.</p>
-                  </div>
-                </td>
-              </tr>
-            ) : (
-              filteredRows.map((row) => {
-                const totalVal = typeof row.getTotal === "function" ? row.getTotal() : totals[row.id];
-                const isHighlight = row.highlight;
-
-                return (
-                  <tr
-                    key={row.id}
-                    className={`admin-matrix-row admin-matrix-row--${row.category}${isHighlight ? " is-highlight" : ""}`}
-                  >
-                    {/* Metric Column */}
-                    <td className="admin-matrix-cell--metric">
-                      <div className="admin-metric-cell-content">
-                        <div className="admin-metric-cell-heading">
-                          <span className={`admin-factor-pill admin-factor-pill--${row.category}`}>
-                            {row.factorTag}
-                          </span>
-                          <strong>{row.label}</strong>
+                      <td>
+                        <div className="admin-profile-cell">
+                          <div className="admin-horse-avatar-box">
+                            <Wallet size={18} className="admin-icon-accent" />
+                          </div>
+                          <div>
+                            <div className="admin-pkg-title-row">
+                              <strong className="admin-profile-name">{pkg.label}</strong>
+                              <span className="admin-commercial-rank-pill">{pkg.commercial_badge}</span>
+                            </div>
+                            <small className="admin-subtext">
+                              {formatVND(pkg.vnd_price)} ➔ {formatNumber(pkg.token_received)} tokens
+                              {pkg.bonus_token > 0 ? ` (+${pkg.bonus_token} bonus)` : ""}
+                            </small>
+                          </div>
                         </div>
-                        {row.sublabel && <small className="admin-metric-sublabel">{row.sublabel}</small>}
+                      </td>
+
+                      {/* Sales Volume & Progress bar */}
+                      <td>
+                        <div className="admin-share-stack">
+                          <div className="admin-share-numbers">
+                            <strong>{formatNumber(m.success_count)} orders</strong>
+                            <span className="admin-share-pct">{m.order_share_percent}%</span>
+                          </div>
+                          <div className="admin-progress-bar-bg">
+                            <div
+                              className="admin-progress-bar-fill admin-progress-bar-fill--blue"
+                              style={{ width: `${Math.min(100, Math.max(8, m.order_share_percent || 0))}%` }}
+                            />
+                          </div>
+                        </div>
+                      </td>
+
+                      {/* Gross Revenue & Progress bar */}
+                      <td>
+                        <div className="admin-share-stack">
+                          <div className="admin-share-numbers">
+                            <strong className="admin-prize-vnd">{formatVND(m.total_vnd)}</strong>
+                            <span className="admin-share-pct admin-share-pct--green">{m.revenue_share_percent}%</span>
+                          </div>
+                          <div className="admin-progress-bar-bg">
+                            <div
+                              className="admin-progress-bar-fill admin-progress-bar-fill--emerald"
+                              style={{ width: `${Math.min(100, Math.max(8, m.revenue_share_percent || 0))}%` }}
+                            />
+                          </div>
+                        </div>
+                      </td>
+
+                      {/* Customer Segmentation */}
+                      <td>
+                        <div className="admin-segmentation-cell">
+                          <span>
+                            <strong>{m.unique_depositors}</strong> unique buyers
+                          </span>
+                          <small className="admin-subtext">
+                            {m.ftd_count} First-time ({m.repeat_rate} repeat rate)
+                          </small>
+                        </div>
+                      </td>
+
+                      {/* Turnaround Velocity */}
+                      <td>
+                        <span className="admin-velocity-pill">
+                          <Clock size={12} />
+                          {m.token_velocity || "Fast (< 15m)"}
+                        </span>
+                      </td>
+
+                      {/* Preferred Gateway */}
+                      <td>
+                        <span className="admin-dim-text">{m.preferred_gateway || "VNPAY · MoMo"}</span>
+                      </td>
+
+                      {/* Action */}
+                      <td>
+                        <button
+                          type="button"
+                          className="admin-table-action-btn"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedPackage(pkg);
+                            setModalSearch("");
+                          }}
+                        >
+                          <Eye size={14} />
+                          <span>Details</span>
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
+            </tbody>
+          </table>
+        )}
+
+        {/* ================= TAB 2: BY CUSTOMER HABITS ================= */}
+        {activeTab === "depositors" && (
+          <table className="admin-matrix-table admin-directory-table">
+            <thead>
+              <tr>
+                <th>Customer Profile</th>
+                <th>Total Purchases</th>
+                <th>Favorite Package Tier</th>
+                <th>Total Spent (VND)</th>
+                <th>Tokens Minted</th>
+                <th>Last Active Deposit</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredDepositors.length === 0 ? (
+                <tr>
+                  <td colSpan={7} className="admin-matrix-empty-row">
+                    <div className="admin-matrix-empty-state">
+                      <Users size={24} />
+                      <strong>No customer deposit records found</strong>
+                    </div>
+                  </td>
+                </tr>
+              ) : (
+                filteredDepositors.map((dep) => (
+                  <tr
+                    key={dep.user_id}
+                    className="admin-matrix-row admin-directory-row"
+                    onClick={() => {
+                      setSelectedDepositor(dep);
+                      setModalSearch("");
+                    }}
+                  >
+                    <td>
+                      <div className="admin-profile-cell">
+                        <div className="admin-jockey-avatar-box">
+                          {dep.avatar_url ? (
+                            <img src={dep.avatar_url} alt={dep.user_name} className="admin-avatar-img" />
+                          ) : (
+                            <User size={18} />
+                          )}
+                        </div>
+                        <div>
+                          <strong className="admin-profile-name">{dep.user_name}</strong>
+                          <small className="admin-subtext">{dep.user_email}</small>
+                        </div>
                       </div>
                     </td>
 
-                    {/* Package Values */}
-                    {packages.map((pkg) => {
-                      if (visiblePackages[pkg.package_id] === false) return null;
+                    {/* Total Purchases */}
+                    <td>
+                      <div className="admin-record-stack">
+                        <strong>{dep.success_orders} purchases</strong>
+                        <small className="admin-highlight-text">
+                          {dep.success_orders >= 5 ? "💎 High Roller" : "⭐ Verified Buyer"}
+                        </small>
+                      </div>
+                    </td>
 
-                      const m = pkg.metrics || {};
-                      const rawVal = row.getValue(m);
-                      const isAlert = row.isAlert ? row.isAlert(rawVal) : false;
-                      const isZero = typeof rawVal === "number" && rawVal === 0;
+                    {/* Favorite Package */}
+                    <td>
+                      <div className="admin-favorite-pkg-cell">
+                        <span className="admin-fav-tag">⭐ {dep.favorite_package_label}</span>
+                        <small className="admin-subtext">
+                          {dep.favorite_package_count}/{dep.success_orders} orders ({dep.favorite_package_share_percent}%)
+                        </small>
+                      </div>
+                    </td>
 
-                      return (
-                        <td
-                          key={pkg.package_id}
-                          className={`admin-matrix-cell--value${isAlert ? " is-alert-cell" : ""}${isZero ? " is-dimmed" : ""}`}
-                        >
-                          <span className="admin-cell-value-text">
-                            {row.formatter ? row.formatter(rawVal, m) : formatNumber(rawVal)}
-                          </span>
-                        </td>
-                      );
-                    })}
+                    {/* Total Spent */}
+                    <td>
+                      <strong className="admin-prize-vnd">{formatVND(dep.total_spent_vnd)}</strong>
+                    </td>
 
-                    {/* Total Column */}
-                    <td className="admin-matrix-cell--total-val">
-                      <strong className="admin-total-value-text">
-                        {row.formatter ? row.formatter(totalVal, totals) : formatNumber(totalVal)}
-                      </strong>
+                    {/* Total Tokens */}
+                    <td>
+                      <span>{formatNumber(dep.total_tokens_received)} tokens</span>
+                    </td>
+
+                    {/* Last Deposit */}
+                    <td>
+                      <span className="admin-dim-text">{formatDateTime(dep.last_deposit_at)}</span>
+                    </td>
+
+                    {/* Action */}
+                    <td>
+                      <button
+                        type="button"
+                        className="admin-table-action-btn"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedDepositor(dep);
+                          setModalSearch("");
+                        }}
+                      >
+                        <Eye size={14} />
+                        <span>History</span>
+                      </button>
                     </td>
                   </tr>
-                );
-              })
-            )}
-          </tbody>
-        </table>
+                ))
+              )}
+            </tbody>
+          </table>
+        )}
       </div>
 
-      {/* FOOTER & ACTIONS */}
+      {/* FOOTER */}
       <footer className="admin-role-matrix-footer">
         <div className="admin-matrix-footer-info">
           <CheckCircle2 size={15} />
           <span>
-            Aggregated real-time from <code>deposit_requests</code> and <code>deposit_packages</code>. Click{" "}
-            <strong>"Details"</strong> on any tier to inspect individual transactions.
+            Payment intelligence synchronized in real time with VNPAY & MoMo settlement logs. Click any row or customer
+            to view comprehensive purchasing history.
           </span>
         </div>
 
         <div className="admin-matrix-quick-links">
           <Link to="/admin/deposits">
-            <span>Deposit Approvals Queue</span>
+            <span>All Deposit Orders</span>
             <ChevronRight size={14} />
           </Link>
         </div>
       </footer>
 
-      {/* DRILL-DOWN DETAIL MODAL */}
-      {selectedDetailPackage && (
+      {/* ================= MODAL 1: PACKAGE DETAIL & TOP BUYERS ================= */}
+      {selectedPackage && (
         <div
           className="admin-modal-backdrop"
           role="dialog"
           aria-modal="true"
-          aria-labelledby="drilldown-modal-title"
-          onClick={() => setSelectedDetailPackage(null)}
+          aria-labelledby="pkg-modal-title"
+          onClick={() => setSelectedPackage(null)}
         >
-          <div className="admin-detail-modal" onClick={(e) => e.stopPropagation()}>
+          <div className="admin-detail-modal admin-detail-modal--large" onClick={(e) => e.stopPropagation()}>
             <header className="admin-detail-modal__header">
-              <div>
-                <div className="admin-role-matrix-eyebrow">
-                  <Activity size={14} />
-                  <span>Verified Transaction Audit Log</span>
+              <div className="admin-profile-cell">
+                <div className="admin-horse-avatar-box admin-horse-avatar-box--large">
+                  <Wallet size={26} className="admin-icon-accent" />
                 </div>
-                <h3 id="drilldown-modal-title">
-                  {selectedDetailPackage === "all"
-                    ? "Consolidated Deposit Log (All Tiers)"
-                    : `${selectedPkgObject?.label || "Tier"} — Transaction Log`}
-                </h3>
+                <div>
+                  <div className="admin-role-matrix-eyebrow">
+                    <Sparkles size={14} />
+                    <span>Package Commercial Breakdown</span>
+                  </div>
+                  <h3 id="pkg-modal-title">{selectedPackage.label}</h3>
+                  <span className="admin-commercial-rank-pill">{selectedPackage.commercial_badge || "Active Tier"}</span>
+                </div>
               </div>
               <button
                 type="button"
                 className="admin-detail-modal__close"
-                onClick={() => setSelectedDetailPackage(null)}
+                onClick={() => setSelectedPackage(null)}
                 aria-label="Close modal"
               >
                 <X size={18} />
               </button>
             </header>
 
-            {/* Modal KPI Mini Summary */}
+            {/* KPI Summary Grid */}
             <div className="admin-detail-kpi-grid">
               <div className="admin-detail-kpi-card">
-                <span>Gross Fiat Inflow</span>
-                <strong>
-                  {selectedDetailPackage === "all"
-                    ? formatVND(totals.total_vnd)
-                    : formatVND(selectedPkgObject?.metrics?.total_vnd || 0)}
-                </strong>
-              </div>
-              <div className="admin-detail-kpi-card">
-                <span>Total Tokens Credited</span>
-                <strong>
-                  {selectedDetailPackage === "all"
-                    ? formatToken(totals.total_tokens)
-                    : formatToken(selectedPkgObject?.metrics?.total_tokens || 0)}
-                </strong>
-              </div>
-              <div className="admin-detail-kpi-card">
                 <span>Completed Orders</span>
-                <strong>
-                  {selectedDetailPackage === "all"
-                    ? `${formatNumber(totals.success_count)} orders`
-                    : `${formatNumber(selectedPkgObject?.metrics?.success_count || 0)} orders`}
-                </strong>
+                <strong>{formatNumber(selectedPackage.metrics?.success_count)} orders</strong>
               </div>
               <div className="admin-detail-kpi-card">
-                <span>Peak Concentration</span>
-                <strong>
-                  {selectedDetailPackage === "all"
-                    ? totals.peak_hour_window
-                    : selectedPkgObject?.metrics?.peak_hour_window || "—"}
-                </strong>
+                <span>Gross Fiat Inflow</span>
+                <strong className="admin-prize-vnd">{formatVND(selectedPackage.metrics?.total_vnd)}</strong>
+              </div>
+              <div className="admin-detail-kpi-card">
+                <span>Tokens Issued</span>
+                <strong>{formatNumber(selectedPackage.metrics?.total_tokens)} tokens</strong>
+              </div>
+              <div className="admin-detail-kpi-card">
+                <span>Unique Buyers</span>
+                <strong>{selectedPackage.metrics?.unique_depositors || 0} users</strong>
               </div>
             </div>
 
-            {/* Modal Search Bar */}
+            {/* Top Buyers of this package */}
+            {selectedPackage.top_buyers && selectedPackage.top_buyers.length > 0 && (
+              <div className="admin-modal-sub-section">
+                <h4 className="admin-modal-sub-heading">
+                  <Crown size={15} className="admin-icon-accent" />
+                  <span>Top Buyers of this Package</span>
+                </h4>
+                <div className="admin-top-buyers-grid">
+                  {selectedPackage.top_buyers.map((buyer, idx) => (
+                    <div key={buyer.user_id || idx} className="admin-buyer-mini-card">
+                      <div className="admin-buyer-rank">#{idx + 1}</div>
+                      <div>
+                        <strong>{buyer.user_name}</strong>
+                        <small className="admin-subtext">{buyer.user_email}</small>
+                      </div>
+                      <div className="admin-buyer-stats">
+                        <span className="admin-fav-tag">{buyer.count} purchases</span>
+                        <strong>{formatVND(buyer.total_vnd)}</strong>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Search Box in Modal */}
             <div className="admin-detail-modal__search">
               <Search size={15} />
               <input
                 type="text"
-                placeholder="Search by Order ID, User Name, Email, or Payment Gateway..."
+                placeholder="Search orders by ID, user name, email, gateway..."
                 value={modalSearch}
                 onChange={(e) => setModalSearch(e.target.value)}
-                aria-label="Search transaction records"
               />
               {modalSearch && (
-                <button type="button" onClick={() => setModalSearch("")} aria-label="Clear search">
+                <button type="button" onClick={() => setModalSearch("")}>
                   <X size={13} />
                 </button>
               )}
             </div>
 
-            {/* Transactions Table in Modal */}
+            {/* Transactions Log Table */}
             <div className="admin-detail-table-wrapper">
               <table className="admin-detail-table">
                 <thead>
@@ -762,53 +692,48 @@ export default function AdminCashflowMatrixTable({ cashflowMatrix, isLoading, on
                     <th>Order ID</th>
                     <th>Depositor</th>
                     <th>Fiat Value</th>
-                    <th>Tokens</th>
+                    <th>Tokens Credited</th>
                     <th>Gateway</th>
                     <th>Timestamp</th>
                     <th>Status</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {modalTransactions.length === 0 ? (
+                  {packageModalTransactions.length === 0 ? (
                     <tr>
                       <td colSpan={7} className="admin-detail-empty">
-                        <Info size={18} />
-                        <span>No transaction records found matching the criteria in this timeframe.</span>
+                        No transactions recorded.
                       </td>
                     </tr>
                   ) : (
-                    modalTransactions.map((tx) => (
+                    packageModalTransactions.map((tx) => (
                       <tr key={tx.id || tx.order_id}>
                         <td>
-                          <code className="admin-tx-code">{tx.order_id}</code>
+                          <code className="admin-profile-code">{tx.order_id}</code>
                         </td>
                         <td>
-                          <div className="admin-tx-user">
-                            <strong>{tx.user_name || "Customer"}</strong>
-                            <small>{tx.user_email || "—"}</small>
-                          </div>
+                          <strong>{tx.user_name}</strong>
+                          <small className="admin-subtext">{tx.user_email}</small>
                         </td>
                         <td>
                           <strong>{formatVND(tx.total_vnd)}</strong>
                         </td>
                         <td>
-                          <span className="admin-tx-token">+{formatNumber(tx.total_token)}</span>
+                          <span className="admin-highlight-text">{formatToken(tx.total_token)}</span>
                         </td>
                         <td>
-                          <span className="admin-tx-method">{tx.payment_method || "VNPAY"}</span>
+                          <span className="admin-gateway-badge">{tx.payment_method}</span>
                         </td>
                         <td>
-                          <span className="admin-tx-time">{formatDateTime(tx.created_at)}</span>
+                          <small>{formatDateTime(tx.created_at)}</small>
                         </td>
                         <td>
                           <span
-                            className={`admin-tx-status admin-tx-status--${tx.status || "success"}`}
+                            className={`admin-status-pill admin-status-pill--${
+                              tx.status === "success" ? "success" : tx.status === "pending" ? "warning" : "danger"
+                            }`}
                           >
-                            {tx.status === "success"
-                              ? "Completed"
-                              : tx.status === "pending"
-                              ? "Pending"
-                              : "Failed"}
+                            {tx.status === "success" ? "Completed" : tx.status}
                           </span>
                         </td>
                       </tr>
@@ -819,11 +744,157 @@ export default function AdminCashflowMatrixTable({ cashflowMatrix, isLoading, on
             </div>
 
             <footer className="admin-detail-modal__footer">
-              <span>Displaying {modalTransactions.length} recent transaction records</span>
+              <span>Showing {packageModalTransactions.length} transaction entries</span>
               <button
                 type="button"
                 className="admin-header__button admin-header__button--ghost"
-                onClick={() => setSelectedDetailPackage(null)}
+                onClick={() => setSelectedPackage(null)}
+              >
+                Close
+              </button>
+            </footer>
+          </div>
+        </div>
+      )}
+
+      {/* ================= MODAL 2: INDIVIDUAL CUSTOMER HISTORY ================= */}
+      {selectedDepositor && (
+        <div
+          className="admin-modal-backdrop"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="customer-modal-title"
+          onClick={() => setSelectedDepositor(null)}
+        >
+          <div className="admin-detail-modal admin-detail-modal--large" onClick={(e) => e.stopPropagation()}>
+            <header className="admin-detail-modal__header">
+              <div className="admin-profile-cell">
+                <div className="admin-jockey-avatar-box admin-jockey-avatar-box--large">
+                  {selectedDepositor.avatar_url ? (
+                    <img src={selectedDepositor.avatar_url} alt={selectedDepositor.user_name} className="admin-avatar-img" />
+                  ) : (
+                    <User size={28} />
+                  )}
+                </div>
+                <div>
+                  <div className="admin-role-matrix-eyebrow">
+                    <User size={14} />
+                    <span>Customer Purchasing History</span>
+                  </div>
+                  <h3 id="customer-modal-title">{selectedDepositor.user_name}</h3>
+                  <span className="admin-subtext">{selectedDepositor.user_email} · {selectedDepositor.user_phone}</span>
+                </div>
+              </div>
+              <button
+                type="button"
+                className="admin-detail-modal__close"
+                onClick={() => setSelectedDepositor(null)}
+                aria-label="Close modal"
+              >
+                <X size={18} />
+              </button>
+            </header>
+
+            {/* KPI Summary Grid */}
+            <div className="admin-detail-kpi-grid">
+              <div className="admin-detail-kpi-card">
+                <span>Total Purchases</span>
+                <strong>{selectedDepositor.success_orders} orders</strong>
+              </div>
+              <div className="admin-detail-kpi-card">
+                <span>Total Spent</span>
+                <strong className="admin-prize-vnd">{formatVND(selectedDepositor.total_spent_vnd)}</strong>
+              </div>
+              <div className="admin-detail-kpi-card">
+                <span>Total Tokens Minted</span>
+                <strong>{formatNumber(selectedDepositor.total_tokens_received)} tokens</strong>
+              </div>
+              <div className="admin-detail-kpi-card">
+                <span>Favorite Package</span>
+                <strong>⭐ {selectedDepositor.favorite_package_label}</strong>
+              </div>
+            </div>
+
+            {/* Search Box in Modal */}
+            <div className="admin-detail-modal__search">
+              <Search size={15} />
+              <input
+                type="text"
+                placeholder="Filter customer orders by ID, gateway..."
+                value={modalSearch}
+                onChange={(e) => setModalSearch(e.target.value)}
+              />
+              {modalSearch && (
+                <button type="button" onClick={() => setModalSearch("")}>
+                  <X size={13} />
+                </button>
+              )}
+            </div>
+
+            {/* User Transactions Table */}
+            <div className="admin-detail-table-wrapper">
+              <table className="admin-detail-table">
+                <thead>
+                  <tr>
+                    <th>Order ID</th>
+                    <th>Package Code</th>
+                    <th>Amount (VND)</th>
+                    <th>Tokens Credited</th>
+                    <th>Gateway</th>
+                    <th>Timestamp</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {customerModalTransactions.length === 0 ? (
+                    <tr>
+                      <td colSpan={7} className="admin-detail-empty">
+                        No orders found for this user in selected period.
+                      </td>
+                    </tr>
+                  ) : (
+                    customerModalTransactions.map((tx) => (
+                      <tr key={tx.id || tx.order_id}>
+                        <td>
+                          <code className="admin-profile-code">{tx.order_id}</code>
+                        </td>
+                        <td>
+                          <strong>{tx.package_id}</strong>
+                        </td>
+                        <td>
+                          <strong className="admin-prize-vnd">{formatVND(tx.total_vnd)}</strong>
+                        </td>
+                        <td>
+                          <span className="admin-highlight-text">{formatToken(tx.total_token)}</span>
+                        </td>
+                        <td>
+                          <span className="admin-gateway-badge">{tx.payment_method}</span>
+                        </td>
+                        <td>
+                          <small>{formatDateTime(tx.created_at)}</small>
+                        </td>
+                        <td>
+                          <span
+                            className={`admin-status-pill admin-status-pill--${
+                              tx.status === "success" ? "success" : tx.status === "pending" ? "warning" : "danger"
+                            }`}
+                          >
+                            {tx.status === "success" ? "Completed" : tx.status}
+                          </span>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+
+            <footer className="admin-detail-modal__footer">
+              <span>Customer ID: {selectedDepositor.user_id}</span>
+              <button
+                type="button"
+                className="admin-header__button admin-header__button--ghost"
+                onClick={() => setSelectedDepositor(null)}
               >
                 Close
               </button>

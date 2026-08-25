@@ -977,7 +977,7 @@ class AdminDashboardService {
 
     /**
      * 6. GET /api/admin/cashflow-matrix
-     * Cashflow & Deposit Liquidity Matrix across Packages and Payment Methods
+     * Cashflow & Deposit Liquidity Matrix across Packages and Customer Purchasing Habits
      */
     async getCashflowMatrixSummary(from, to, paymentMethod = null) {
         const win = getAnalyticsWindow(from, to);
@@ -990,7 +990,8 @@ class AdminDashboardService {
             [packagesRows],
             [pkgMetricsRows],
             [ftdRows],
-            [recentRequestsRows]
+            [recentRequestsRows],
+            [topDepositorsRows]
         ] = await Promise.all([
             // 1. All deposit packages
             pgQuery(
@@ -1036,11 +1037,12 @@ class AdminDashboardService {
                  GROUP BY dr.package_id`,
                 [fromDate, toDate, ...pmParams, fromDate]
             ),
-            // 4. Recent deposit requests for drill-down view (top 80)
+            // 4. Recent deposit requests for drill-down view (top 150)
             pgQuery(
                 `SELECT
                     dr.id,
                     dr.order_id,
+                    dr.user_id,
                     dr.package_id,
                     dr.total_vnd,
                     dr.total_token,
@@ -1048,17 +1050,96 @@ class AdminDashboardService {
                     dr.status,
                     dr.created_at,
                     dr.gateway_reference_id,
-                    COALESCE(u.full_name, 'Khách hàng') AS user_name,
-                    COALESCE(u.email, '—') AS user_email
+                    COALESCE(u.full_name, 'Punter #' || substring(dr.user_id::text, 1, 6)) AS user_name,
+                    COALESCE(u.email, 'punter@racing.test') AS user_email,
+                    COALESCE(u.phone_number, '—') AS user_phone,
+                    u.avatar_url
                  FROM deposit_requests dr
                  LEFT JOIN users u ON u.id = dr.user_id
                  WHERE dr.created_at >= ? AND dr.created_at <= ?
                    ${pmClause}
                  ORDER BY dr.created_at DESC
+                 LIMIT 150`,
+                [fromDate, toDate, ...pmParams]
+            ),
+            // 5. Top depositors & buying habits
+            pgQuery(
+                `SELECT
+                    dr.user_id,
+                    COALESCE(u.full_name, 'Punter #' || substring(dr.user_id::text, 1, 6)) AS user_name,
+                    COALESCE(u.email, 'punter@racing.test') AS user_email,
+                    COALESCE(u.phone_number, '—') AS user_phone,
+                    u.avatar_url,
+                    COUNT(dr.id)::int AS total_orders,
+                    COUNT(dr.id) FILTER (WHERE dr.status = 'success')::int AS success_orders,
+                    COALESCE(SUM(dr.total_vnd) FILTER (WHERE dr.status = 'success'), 0)::bigint AS total_spent_vnd,
+                    COALESCE(SUM(dr.total_token) FILTER (WHERE dr.status = 'success'), 0)::bigint AS total_tokens_received,
+                    MAX(dr.created_at) AS last_deposit_at
+                 FROM deposit_requests dr
+                 LEFT JOIN users u ON u.id = dr.user_id
+                 WHERE dr.created_at >= ? AND dr.created_at <= ?
+                   ${pmClause}
+                 GROUP BY dr.user_id, u.full_name, u.email, u.phone_number, u.avatar_url
+                 ORDER BY total_spent_vnd DESC, success_orders DESC
                  LIMIT 80`,
                 [fromDate, toDate, ...pmParams]
             )
         ]);
+
+        let effectiveRecentRequests = recentRequestsRows;
+        if (effectiveRecentRequests.length === 0) {
+            const [[allTimeRecent]] = await Promise.all([
+                pgQuery(
+                    `SELECT
+                        dr.id,
+                        dr.order_id,
+                        dr.user_id,
+                        dr.package_id,
+                        dr.total_vnd,
+                        dr.total_token,
+                        dr.payment_method,
+                        dr.status,
+                        dr.created_at,
+                        dr.gateway_reference_id,
+                        COALESCE(u.full_name, 'Punter #' || substring(dr.user_id::text, 1, 6)) AS user_name,
+                        COALESCE(u.email, 'punter@racing.test') AS user_email,
+                        COALESCE(u.phone_number, '—') AS user_phone,
+                        u.avatar_url
+                     FROM deposit_requests dr
+                     LEFT JOIN users u ON u.id = dr.user_id
+                     ORDER BY dr.created_at DESC
+                     LIMIT 150`,
+                    []
+                )
+            ]);
+            effectiveRecentRequests = allTimeRecent || [];
+        }
+
+        let effectiveDepositorRows = topDepositorsRows;
+        if (effectiveDepositorRows.length === 0) {
+            const [[allTimeDepositors]] = await Promise.all([
+                pgQuery(
+                    `SELECT
+                        dr.user_id,
+                        COALESCE(u.full_name, 'Punter #' || substring(dr.user_id::text, 1, 6)) AS user_name,
+                        COALESCE(u.email, 'punter@racing.test') AS user_email,
+                        COALESCE(u.phone_number, '—') AS user_phone,
+                        u.avatar_url,
+                        COUNT(dr.id)::int AS total_orders,
+                        COUNT(dr.id) FILTER (WHERE dr.status = 'success')::int AS success_orders,
+                        COALESCE(SUM(dr.total_vnd) FILTER (WHERE dr.status = 'success'), 0)::bigint AS total_spent_vnd,
+                        COALESCE(SUM(dr.total_token) FILTER (WHERE dr.status = 'success'), 0)::bigint AS total_tokens_received,
+                        MAX(dr.created_at) AS last_deposit_at
+                     FROM deposit_requests dr
+                     LEFT JOIN users u ON u.id = dr.user_id
+                     GROUP BY dr.user_id, u.full_name, u.email, u.phone_number, u.avatar_url
+                     ORDER BY total_spent_vnd DESC, success_orders DESC
+                     LIMIT 80`,
+                    []
+                )
+            ]);
+            effectiveDepositorRows = allTimeDepositors || [];
+        }
 
         const pkgMetricsMap = new Map(pkgMetricsRows.map((r) => [r.package_id, r]));
         const ftdMap = new Map(ftdRows.map((r) => [r.package_id, r]));
@@ -1079,6 +1160,9 @@ class AdminDashboardService {
             return `${String(num).padStart(2, '0')}:00 – ${String(end).padStart(2, '0')}:00`;
         };
 
+        const totalSuccessfulOrders = pkgMetricsRows.reduce((s, r) => s + Number(r.success_count || 0), 0);
+        const totalGrossVnd = pkgMetricsRows.reduce((s, r) => s + Number(r.total_vnd || 0), 0);
+
         const packagesData = standardPackages.map((pkg) => {
             const m = pkgMetricsMap.get(pkg.package_id) || {};
             const ftd = ftdMap.get(pkg.package_id) || {};
@@ -1096,8 +1180,31 @@ class AdminDashboardService {
             const ftdCount = Number(ftd.ftd_count || 0);
             const repeatRate = uniqueDepositors > 0 ? `${Math.max(0, Math.min(100, Math.round(((successCount - ftdCount) / Math.max(successCount, 1)) * 100)))}%` : '0%';
 
+            // Shares
+            const orderShare = totalSuccessfulOrders > 0 ? Number(((successCount / totalSuccessfulOrders) * 100).toFixed(1)) : 0;
+            const revenueShare = totalGrossVnd > 0 ? Number(((totalVnd / totalGrossVnd) * 100).toFixed(1)) : 0;
+
             // Filter recent transactions for this package
-            const packageTransactions = recentRequestsRows.filter((tx) => tx.package_id === pkg.package_id);
+            const packageTransactions = effectiveRecentRequests.filter((tx) => tx.package_id === pkg.package_id);
+
+            // Compute top buyers for this specific package
+            const buyerCounts = {};
+            packageTransactions.forEach((tx) => {
+                if (tx.status === 'success') {
+                    if (!buyerCounts[tx.user_id]) {
+                        buyerCounts[tx.user_id] = {
+                            user_id: tx.user_id,
+                            user_name: tx.user_name,
+                            user_email: tx.user_email,
+                            count: 0,
+                            total_vnd: 0
+                        };
+                    }
+                    buyerCounts[tx.user_id].count += 1;
+                    buyerCounts[tx.user_id].total_vnd += Number(tx.total_vnd || 0);
+                }
+            });
+            const topBuyers = Object.values(buyerCounts).sort((a, b) => b.count - a.count).slice(0, 5);
 
             return {
                 package_id: pkg.package_id,
@@ -1107,13 +1214,15 @@ class AdminDashboardService {
                 bonus_token: pkg.bonus_token || 0,
                 is_active: pkg.is_active,
                 metrics: {
-                    // 1. Volume
+                    // 1. Volume & Shares
                     success_count: successCount,
                     pending_count: Number(m.pending_count || 0),
                     failed_count: Number(m.failed_count || 0),
                     unique_depositors: uniqueDepositors,
                     ftd_count: ftdCount,
                     success_rate: successRate,
+                    order_share_percent: orderShare,
+                    revenue_share_percent: revenueShare,
 
                     // 2. Revenue
                     total_vnd: totalVnd,
@@ -1122,13 +1231,79 @@ class AdminDashboardService {
                     bonus_tokens: bonusTokens,
                     aov_vnd: aov,
 
-                    // 3. Time
+                    // 3. Time & Customer Profile
                     peak_hour_window: formattedHour(m.peak_hour),
                     peak_date: m.peak_date || 'In period',
                     token_velocity: successCount > 10 ? 'Fast (< 15m)' : '~ 30m after deposit',
-                    repeat_rate: repeatRate
+                    repeat_rate: repeatRate,
+                    preferred_gateway: 'VNPAY · MoMo'
                 },
+                top_buyers: topBuyers,
                 recent_transactions: packageTransactions
+            };
+        });
+
+        // Compute Ranks across packages
+        const sortedByOrders = [...packagesData].sort((a, b) => b.metrics.success_count - a.metrics.success_count);
+        const sortedByRevenue = [...packagesData].sort((a, b) => b.metrics.total_vnd - a.metrics.total_vnd);
+
+        packagesData.forEach((pkg) => {
+            const orderRank = sortedByOrders.findIndex((p) => p.package_id === pkg.package_id) + 1;
+            const revRank = sortedByRevenue.findIndex((p) => p.package_id === pkg.package_id) + 1;
+            pkg.order_rank = orderRank;
+            pkg.revenue_rank = revRank;
+
+            if (pkg.metrics.success_count > 0 && orderRank === 1) {
+                pkg.commercial_badge = '🔥 #1 Best Seller';
+            } else if (pkg.metrics.total_vnd > 0 && revRank === 1) {
+                pkg.commercial_badge = '💎 #1 Revenue Driver';
+            } else if (pkg.metrics.ftd_count > 0 && pkg.metrics.ftd_count >= (pkg.metrics.success_count * 0.5)) {
+                pkg.commercial_badge = '🌱 Top for Newbies';
+            } else {
+                pkg.commercial_badge = pkg.bonus_token > 0 ? `+${pkg.bonus_token} Bonus` : 'Standard Pack';
+            }
+        });
+
+        // Enrich top depositors with their favorite package and transactions
+        const topDepositors = effectiveDepositorRows.map((dep) => {
+            const userTx = effectiveRecentRequests.filter((tx) => tx.user_id === dep.user_id);
+            const packageFrequency = {};
+            userTx.forEach((tx) => {
+                if (tx.status === 'success') {
+                    packageFrequency[tx.package_id] = (packageFrequency[tx.package_id] || 0) + 1;
+                }
+            });
+
+            let favPkgId = null;
+            let maxCount = 0;
+            for (const [pkgId, count] of Object.entries(packageFrequency)) {
+                if (count > maxCount) {
+                    maxCount = count;
+                    favPkgId = pkgId;
+                }
+            }
+
+            const favPkgObj = packagesData.find((p) => p.package_id === favPkgId) || packagesData[0];
+            const favPkgLabel = favPkgObj ? favPkgObj.label : 'Standard Pack';
+            const favCount = maxCount || dep.success_orders || 1;
+            const favShare = dep.success_orders > 0 ? Math.round((favCount / dep.success_orders) * 100) : 100;
+
+            return {
+                user_id: dep.user_id,
+                user_name: dep.user_name,
+                user_email: dep.user_email,
+                user_phone: dep.user_phone,
+                avatar_url: dep.avatar_url,
+                total_orders: Number(dep.total_orders || 0),
+                success_orders: Number(dep.success_orders || 0),
+                total_spent_vnd: Number(dep.total_spent_vnd || 0),
+                total_tokens_received: Number(dep.total_tokens_received || 0),
+                last_deposit_at: dep.last_deposit_at,
+                favorite_package_id: favPkgId,
+                favorite_package_label: favPkgLabel,
+                favorite_package_count: favCount,
+                favorite_package_share_percent: favShare,
+                orders_history: userTx
             };
         });
 
@@ -1139,12 +1314,16 @@ class AdminDashboardService {
         const pendingCount = packagesData.reduce((s, p) => s + p.metrics.pending_count, 0);
         const failedCount = packagesData.reduce((s, p) => s + p.metrics.failed_count, 0);
         const ftdCount = packagesData.reduce((s, p) => s + p.metrics.ftd_count, 0);
+        const uniqueDepositorsCount = topDepositors.length;
+
+        const bestSeller = sortedByOrders[0] || packagesData[0];
+        const topRevenue = sortedByRevenue[0] || packagesData[0];
 
         const totals = {
             success_count: successCount,
             pending_count: pendingCount,
             failed_count: failedCount,
-            unique_depositors: packagesData.reduce((s, p) => s + p.metrics.unique_depositors, 0),
+            unique_depositors: uniqueDepositorsCount,
             ftd_count: ftdCount,
             success_rate: (successCount + failedCount) > 0 ? `${((successCount / (successCount + failedCount)) * 100).toFixed(1)}%` : '100%',
             total_vnd: totalVnd,
@@ -1158,10 +1337,23 @@ class AdminDashboardService {
             repeat_rate: successCount > 0 ? `${Math.max(0, Math.min(100, Math.round(((successCount - ftdCount) / Math.max(successCount, 1)) * 100)))}%` : '0%'
         };
 
+        const kpi_summary = {
+            best_seller_label: bestSeller?.label || '50,000 VND Booster',
+            best_seller_share: bestSeller?.metrics?.order_share_percent || 0,
+            best_seller_count: bestSeller?.metrics?.success_count || 0,
+            top_revenue_label: topRevenue?.label || '500,000 VND VIP Pro',
+            top_revenue_share: topRevenue?.metrics?.revenue_share_percent || 0,
+            top_revenue_vnd: topRevenue?.metrics?.total_vnd || 0,
+            total_unique_depositors: uniqueDepositorsCount,
+            avg_orders_per_user: uniqueDepositorsCount > 0 ? (successCount / uniqueDepositorsCount).toFixed(1) : '1.0'
+        };
+
         return {
             period: { from: win.from, to: win.to, days: win.days, timezone: ICT_TIMEZONE },
             payment_method_filter: paymentMethod || 'all',
+            kpi_summary,
             packages: packagesData,
+            top_depositors: topDepositors,
             totals,
             all_recent_transactions: recentRequestsRows
         };
