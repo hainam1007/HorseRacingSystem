@@ -9,6 +9,7 @@ const { validateObjectIdParam } = require('../validators/commonValidator');
 
 const router = express.Router();
 const spectatorOnly = authorizeRoles(ROLE_NAMES.SPECTATOR);
+const spectatorOrReferee = authorizeRoles(ROLE_NAMES.SPECTATOR, ROLE_NAMES.RACE_REFEREE);
 
 router.use(authenticate);
 
@@ -27,7 +28,7 @@ router.get(
 );
 router.get(
   '/spectator/races/:raceId/live-state',
-  spectatorOnly,
+  spectatorOrReferee,
   validateObjectIdParam('raceId'),
   asyncHandler(userController.getSpectatorRaceLiveState)
 );

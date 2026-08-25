@@ -1,5 +1,6 @@
 export const RACE_STATUS = Object.freeze({
   SCHEDULED: "scheduled",
+  STARTING: "starting",
   RUNNING: "running",
   COMPLETED: "completed",
   CANCELLED: "cancelled",
@@ -19,6 +20,7 @@ export const BETTING_STATUS = Object.freeze({
 
 export const raceStatusMeta = {
   [RACE_STATUS.SCHEDULED]: { label: "Scheduled", tone: "neutral" },
+  [RACE_STATUS.STARTING]: { label: "Starting", tone: "live" },
   [RACE_STATUS.RUNNING]: { label: "Live", tone: "live" },
   [RACE_STATUS.COMPLETED]: { label: "Completed", tone: "muted" },
   [RACE_STATUS.CANCELLED]: { label: "Cancelled", tone: "danger" },
@@ -40,7 +42,7 @@ export function normalizeRaceLifecycle(status) {
   const value = String(status || "").trim().toLowerCase();
 
   if (["scheduled", "upcoming", "pending"].includes(value)) return RACE_STATUS.SCHEDULED;
-  if (["ready", "at_gate", "at-the-gate"].includes(value)) return RACE_STATUS.SCHEDULED;
+  if (["starting", "ready", "at_gate", "at-the-gate"].includes(value)) return RACE_STATUS.STARTING;
   if (["active", "started", "running", "ongoing", "in_progress", "in-progress"].includes(value)) return RACE_STATUS.RUNNING;
   if (["completed", "finished", "published"].includes(value)) return RACE_STATUS.COMPLETED;
   if (["cancelled", "canceled"].includes(value)) return RACE_STATUS.CANCELLED;

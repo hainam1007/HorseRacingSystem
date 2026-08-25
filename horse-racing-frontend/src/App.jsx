@@ -1,6 +1,7 @@
 import "./App.css";
 import { Navigate, Route, Routes, useSearchParams } from "react-router-dom";
 import AdminDashboard from "./Admin/AdminDashboard";
+import AdminEntityDashboard from "./Admin/AdminEntityDashboard";
 import AdminModulePage from "./Admin/AdminModulePage";
 import LandingPage from "./Landing Page/LandingPage";
 import Login from "./Login/Login";
@@ -67,6 +68,7 @@ function App() {
     <Routes>
       <Route path="/" element={<LandingPage />} />
       <Route path="/admin" element={<ProtectedRoute role="admin"><AdminDashboard /></ProtectedRoute>} />
+      <Route path="/admin/analytics/:entity" element={<ProtectedRoute role="admin"><AdminEntityDashboard /></ProtectedRoute>} />
       <Route path="/admin/:module" element={<ProtectedRoute role="admin"><AdminModulePage /></ProtectedRoute>} />
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<SignUp />} />

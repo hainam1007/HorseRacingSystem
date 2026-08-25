@@ -48,6 +48,11 @@ const accounts = [
   { key: 'jockey3', name: 'Demo Jockey 3', email: 'demo.jockey3@racing.test', role: 'jockey' },
   { key: 'jockey4', name: 'Demo Jockey 4', email: 'demo.jockey4@racing.test', role: 'jockey' },
   { key: 'jockey5', name: 'Demo Jockey 5', email: 'demo.jockey5@racing.test', role: 'jockey' },
+  { key: 'jockey6', name: 'Demo Jockey 6', email: 'demo.jockey6@racing.test', role: 'jockey' },
+  { key: 'jockey7', name: 'Demo Jockey 7', email: 'demo.jockey7@racing.test', role: 'jockey' },
+  { key: 'jockey8', name: 'Demo Jockey 8', email: 'demo.jockey8@racing.test', role: 'jockey' },
+  { key: 'jockey9', name: 'Demo Jockey 9', email: 'demo.jockey9@racing.test', role: 'jockey' },
+  { key: 'jockey10', name: 'Demo Jockey 10', email: 'demo.jockey10@racing.test', role: 'jockey' },
   { key: 'referee1', name: 'Demo Referee 1', email: 'demo.referee1@racing.test', role: 'race_referee' },
   { key: 'referee2', name: 'Demo Referee 2', email: 'demo.referee2@racing.test', role: 'race_referee' },
   { key: 'referee3', name: 'Demo Referee 3', email: 'demo.referee3@racing.test', role: 'race_referee' },
@@ -180,7 +185,7 @@ async function ensureProfiles(models, users) {
   const jockeys = {};
   const referees = {};
 
-  for (let index = 1; index <= 5; index += 1) {
+  for (let index = 1; index <= 10; index += 1) {
     const owner = await models.HorseOwner.findOrCreate({
       where: { user_id: users['owner' + index].id },
       defaults: {

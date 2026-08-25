@@ -79,6 +79,12 @@ async function startRace(req, res) {
   return sendSuccess(res, 200, 'Race started successfully', data);
 }
 
+async function fireRace(req, res) {
+  const data = await raceService.fireRace(req, req.params.id);
+
+  return sendSuccess(res, 200, 'Race fired successfully', data);
+}
+
 async function completeRace(req, res) {
   const data = await raceService.completeRace(req, req.params.id);
 
@@ -97,6 +103,7 @@ module.exports = {
   openBetting,
   closeBetting,
   startRace,
+  fireRace,
   getRaceParticipants,
   updateRace,
   deleteRace

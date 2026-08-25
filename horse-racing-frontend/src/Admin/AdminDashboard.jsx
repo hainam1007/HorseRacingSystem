@@ -207,7 +207,8 @@ function AdminDashboard() {
       const to = new Date();
       const from = new Date(Date.now() - (Number(days) - 1) * 86400000);
       const toString = (date) => date.toLocaleDateString("en-CA", { timeZone: "Asia/Ho_Chi_Minh" });
-      const response = await adminApi.getDashboard({ from: toString(from), to: toString(to) });
+      const params = { from: toString(from), to: toString(to) };
+      const response = await adminApi.getDashboard(params);
       if (!response?.period || !response?.metrics || !Array.isArray(response?.charts?.daily)) {
         throw new Error("Dashboard API is running an outdated contract. Restart the backend service and refresh this page.");
       }

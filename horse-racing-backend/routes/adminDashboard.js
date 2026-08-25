@@ -10,6 +10,7 @@ router.use(authenticate);
 router.use(authorizeRoles(ROLE_NAMES.ADMIN));
 
 router.get('/dashboard', adminDashboardController.getDashboardSummary);
+router.get('/dashboard/entities', adminDashboardController.getEntityAnalytics);
 router.get('/role-analytics', adminDashboardController.getRoleAnalytics);
 router.get('/cashflow-matrix', adminDashboardController.getCashflowMatrix);
 router.get('/equine-directory', adminDashboardController.getEquineDirectory);

@@ -12,6 +12,15 @@ class AdminDashboardController {
     }
   }
 
+  async getEntityAnalytics(req, res, next) {
+    try {
+      const summary = await adminDashboardService.getEntityAnalytics(req.query.from, req.query.to);
+      return sendSuccess(res, 200, 'Dashboard entity analytics retrieved successfully', summary);
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async getBettingSummary(req, res, next) {
     try {
       const { from, to } = req.query;

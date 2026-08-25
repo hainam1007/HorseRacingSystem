@@ -41,7 +41,7 @@ const { loadSequelizeModels } = require('../models/sequelize/index.js');
 const { ASSIGNMENT_STATUS, ODDS_MARKET_STATUS, REGISTRATION_STATUS } = require('../constants/statuses');
 
 const LOCK_OFFSET_MS = 3 * 60 * 60 * 1000;
-const RACE_START_STALE_MS = 2 * 60 * 1000;
+const RACE_START_STALE_MS = 3 * 1000;
 
 function getModels() {
     return loadSequelizeModels().models;
@@ -840,6 +840,101 @@ async function startRace(req, id) {
     }
 }
 
+async function fireRace(req, id) {
+    const race = await raceRepository.findById(id);
+
+    if (!race) {
+        throw new ApiError(404, 'Race not found');
+    }
+
+    await ensureCanControlRace(req, race);
+
+    if (race.status !== 'starting') {
+        throw new ApiError(400, 'Only races in starting state can be fired');
+    }
+
+    const startAttemptAt = race.starting_at ? new Date(race.starting_at).getTime() : 0;
+    const staleStart = startAttemptAt > 0 && Date.now() - startAttemptAt >= RACE_START_STALE_MS;
+
+    if (!staleStart) {
+        throw new ApiError(400, 'Race cannot be fired yet; a client-side countdown is required');
+    }
+
+    let engine;
+
+    try {
+        const participantData = await raceEngineService.collectParticipants(race._id);
+
+        const ineligibleParticipants = (participantData.participant_statuses || []).filter(function(participant) {
+            return !participant.eligible;
+        });
+
+        if (ineligibleParticipants.length) {
+            throw new ApiError(409, 'Race cannot start until every approved participant passes pre-race readiness', {
+                blocked_participants: ineligibleParticipants.map(function(participant) {
+                    return {
+                        horse_id: getDocumentId(participant.horse),
+                        blockers: participant.blockers
+                    };
+                })
+            });
+        }
+
+        if (!participantData.participants.length) {
+            throw new ApiError(400, 'Race has no eligible participants');
+        }
+
+        engine = await raceEngineService.generateProvisionalRaceRun(
+            race._id,
+            req.user._id,
+            participantData
+        );
+
+        const runningRace = await raceRepository.updateOne({
+            _id: race._id,
+            status: 'starting',
+            starting_at: startAttemptAt
+        }, {
+            $set: {
+                status: 'running',
+                started_at: new Date(),
+                registration_locked: true,
+                betting_status: ODDS_MARKET_STATUS.CLOSED,
+                'betting_market.status': ODDS_MARKET_STATUS.CLOSED
+            },
+            $unset: { starting_at: 1 }
+        });
+
+        if (!runningRace) {
+            throw new ApiError(409, 'Race start attempt changed before completion');
+        }
+
+        return { race: runningRace, engine: engine };
+    } catch (error) {
+        const sequelize = getSequelize();
+        try {
+            await sequelize.transaction(async () => {
+                const rolledBackRace = await raceRepository.updateOne({
+                    _id: race._id,
+                    status: 'starting',
+                    starting_at: startAttemptAt
+                }, {
+                    $set: { status: 'scheduled' },
+                    $unset: { starting_at: 1, started_at: 1 }
+                });
+
+                if (rolledBackRace && engine?.created && engine.race_run?._id) {
+                    await raceEngineService.cancelProvisionalRaceRun(
+                        engine.race_run._id,
+                        {}
+                    );
+                }
+            });
+        } catch (_) { /* rollback already in progress */ }
+        throw error;
+    }
+}
+
 async function completeRace(req, id) {
     const race = await raceRepository.findById(id);
 
@@ -872,6 +967,7 @@ module.exports = {
     openBetting,
     closeBetting,
     startRace,
+    fireRace,
     getRaceParticipants,
     updateRace,
     deleteRace,

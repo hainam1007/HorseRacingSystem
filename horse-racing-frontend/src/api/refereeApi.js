@@ -18,6 +18,10 @@ export const refereeApi = {
     return apiRequest("/referees/me/workspace");
   },
 
+  getRaceLiveState(raceId) {
+    return apiRequest(`/users/spectator/races/${raceId}/live-state`);
+  },
+
   getAssignedRaces(params = {}) {
     return apiRequest(withQuery("/races", params));
   },
@@ -33,6 +37,10 @@ export const refereeApi = {
 
   startRace(id) {
     return apiRequest(`/races/${id}/start`, { method: "POST" });
+  },
+
+  fireRace(id) {
+    return apiRequest(`/races/${id}/fire`, { method: "POST" });
   },
 
   completeRace(id) {

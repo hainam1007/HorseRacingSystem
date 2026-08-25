@@ -48,6 +48,16 @@ const navigationGroups = [
       { to: "/admin/referees", label: "Referees", icon: ShieldCheck },
     ],
   },
+  {
+    label: "Analytics",
+    items: [
+      { to: "/admin/analytics/horseowner", label: "Horse owner", icon: UsersRound },
+      { to: "/admin/analytics/jockey", label: "Jockey", icon: Trophy },
+      { to: "/admin/analytics/referee", label: "Referee", icon: ShieldCheck },
+      { to: "/admin/analytics/horse", label: "Horse", icon: Trophy },
+      { to: "/admin/analytics/bettor", label: "Bettor", icon: CircleDollarSign },
+    ],
+  },
 ];
 
 function AdminLayout({ title, eyebrow, description, children, actions }) {
