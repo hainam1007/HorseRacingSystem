@@ -264,12 +264,15 @@ class AdminDashboardService {
         const win = getAnalyticsWindow(from, to);
         const [fromDate, toDate] = win.current;
         const params = [fromDate, toDate];
-        const run = (sql) => pgQuery(sql, params).then(([rows]) => rows.map((row) => ({
+        const run = (sql, queryParams = params) => pgQuery(sql, queryParams).then(([rows]) => rows.map((row) => ({
             id: row.id,
             name: row.name || 'Unknown',
             races: Number(row.races || 0),
             wins: Number(row.wins || 0),
-            value: Number(row.value || 0)
+            value: Number(row.value || 0),
+            deposited: Number(row.deposited || 0),
+            staked: Number(row.staked || 0),
+            payout: Number(row.payout || 0)
         })));
         const raceFilter = `r.race_date BETWEEN ? AND ? AND r.status = 'completed' AND r.deleted_at IS NULL`;
         const resultFilter = `rr.deleted_at IS NULL AND ${raceFilter}`;
@@ -304,9 +307,14 @@ class AdminDashboardService {
             run(`SELECT u.id, u.full_name AS name,
                     COUNT(DISTINCT b.race_id)::int AS races,
                     COUNT(*) FILTER (WHERE b.status = 'won')::int AS wins,
-                    COALESCE(SUM(b.payout_amount) FILTER (WHERE b.status = 'won'), 0)::numeric AS value
+                    COALESCE(SUM(b.payout_amount) FILTER (WHERE b.status = 'won'), 0)::numeric AS value,
+                    COALESCE(SUM(b.stake_amount), 0)::numeric AS staked,
+                    COALESCE(SUM(b.payout_amount), 0)::numeric AS payout,
+                    COALESCE((SELECT SUM(dr.total_token) FROM deposit_requests dr
+                        WHERE dr.user_id = u.id AND dr.status = 'success'
+                          AND dr.created_at BETWEEN ? AND ? AND dr.deleted_at IS NULL), 0)::numeric AS deposited
                 FROM users u JOIN bets b ON b.spectator_id = u.id JOIN races r ON r.id = b.race_id
-                WHERE b.deleted_at IS NULL AND ${raceFilter} GROUP BY u.id, u.full_name ORDER BY races DESC, name`)
+                WHERE b.deleted_at IS NULL AND ${raceFilter} GROUP BY u.id, u.full_name ORDER BY races DESC, name`, [fromDate, toDate, fromDate, toDate])
         ]);
 
         return { period: { from: win.from, to: win.to, timezone: ICT_TIMEZONE }, entities: { horseowner: owners, jockey: jockeys, referee: referees, horse: horses, bettor: bettors } };

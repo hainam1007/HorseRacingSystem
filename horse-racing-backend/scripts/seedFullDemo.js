@@ -56,7 +56,10 @@ const accounts = [
   { key: 'referee1', name: 'Demo Referee 1', email: 'demo.referee1@racing.test', role: 'race_referee' },
   { key: 'referee2', name: 'Demo Referee 2', email: 'demo.referee2@racing.test', role: 'race_referee' },
   { key: 'referee3', name: 'Demo Referee 3', email: 'demo.referee3@racing.test', role: 'race_referee' },
-  { key: 'spectator', name: 'Demo Spectator', email: 'demo.spectator@racing.test', role: 'spectator' }
+  { key: 'spectator', name: 'Demo Spectator', email: 'demo.spectator@racing.test', role: 'spectator' },
+  { key: 'bettor1', name: 'Demo Bettor 1', email: 'demo.bettor1@racing.test', role: 'spectator' },
+  { key: 'bettor2', name: 'Demo Bettor 2', email: 'demo.bettor2@racing.test', role: 'spectator' },
+  { key: 'bettor3', name: 'Demo Bettor 3', email: 'demo.bettor3@racing.test', role: 'spectator' }
 ];
 
 const racetrackFixtures = [
@@ -185,7 +188,7 @@ async function ensureProfiles(models, users) {
   const jockeys = {};
   const referees = {};
 
-  for (let index = 1; index <= 10; index += 1) {
+  for (let index = 1; index <= 5; index += 1) {
     const owner = await models.HorseOwner.findOrCreate({
       where: { user_id: users['owner' + index].id },
       defaults: {
@@ -234,7 +237,56 @@ async function ensureProfiles(models, users) {
   });
   if (Number(wallet[0].token_balance) < 5000) await wallet[0].update({ token_balance: 50000 });
 
+  for (const key of ['bettor1', 'bettor2', 'bettor3']) {
+    const bettorWallet = await models.Wallet.findOrCreate({
+      where: { user_id: users[key].id },
+      defaults: { user_id: users[key].id, token_balance: 50000 }
+    });
+    if (Number(bettorWallet[0].token_balance) < 5000) await bettorWallet[0].update({ token_balance: 50000 });
+  }
+
   return { owners, jockeys, referees };
+}
+
+async function ensureBettorDeposits(models, users) {
+  const packages = [
+    { package_id: 'PKG_DEMO_50K', label: 'Demo 50K tokens', vnd_price: 50000, token_received: 50000, bonus_token: 0 },
+    { package_id: 'PKG_DEMO_100K', label: 'Demo 100K tokens', vnd_price: 100000, token_received: 100000, bonus_token: 10000 }
+  ];
+  for (const item of packages) {
+    await models.DepositPackage.findOrCreate({ where: { package_id: item.package_id }, defaults: { ...item, is_active: true } });
+  }
+  for (const [index, key] of ['spectator', 'bettor1', 'bettor2', 'bettor3'].entries()) {
+    const orderId = 'DEMO-DEPOSIT-2026-' + (index + 1);
+    const request = await models.DepositRequest.findOrCreate({
+      where: { order_id: orderId },
+      defaults: {
+        order_id: orderId,
+        user_id: users[key].id,
+        package_id: index % 2 ? 'PKG_DEMO_100K' : 'PKG_DEMO_50K',
+        total_vnd: index % 2 ? 100000 : 50000,
+        total_token: index % 2 ? 110000 : 50000,
+        payment_method: 'MOCK',
+        status: 'success',
+        gateway_reference_id: 'DEMO-GATEWAY-2026-' + (index + 1),
+        note: 'Seeded successful deposit for dashboard testing.'
+      }
+    });
+    await models.TransactionHistory.findOrCreate({
+      where: { reference_id: orderId },
+      defaults: {
+        user_id: users[key].id,
+        transaction_type: 'deposit',
+        amount: request[0].total_token,
+        direction: 'credit',
+        balance_before: 0,
+        balance_after: request[0].total_token,
+        status: 'completed',
+        reference_id: orderId,
+        note: 'Seeded deposit transaction.'
+      }
+    });
+  }
 }
 
 async function ensureRacetracks(models, adminUserId) {
@@ -469,7 +521,7 @@ async function createMarket(models, race, entries, adminUserId, completed, betti
 }
 
 async function createCompletedRaceData(models, context) {
-  const { race, tournament, entries, market, oddsByHorse, referee, admin, spectator } = context;
+  const { race, tournament, entries, market, oddsByHorse, referee, admin, bettors } = context;
   const reportTime = addHours(race.race_date, 2);
   await models.RefereeReport.create({
     race_id: race.id,
@@ -564,26 +616,33 @@ async function createCompletedRaceData(models, context) {
     });
   }
 
-  const winner = entries[0];
-  const winnerOdds = oddsByHorse[winner.horse.id];
-  const stake = 500;
-  const payout = Number((stake * winnerOdds).toFixed(2));
-  await models.Bet.create({
-    spectator_id: spectator.id,
-    race_id: race.id,
-    predicted_horse_id: winner.horse.id,
-    stake_amount: stake,
-    odds_market_id: market.id,
-    potential_payout: payout,
-    payout_amount: payout,
-    status: 'won',
-    settled_result_id: results[0].id,
-    settled_by: admin.id,
-    settled_at: addHours(reportTime, 2),
-    submitted_at: race.race_date,
-    checked_at: addHours(reportTime, 2),
-    odds_snapshot: { horse_id: winner.horse.id, game_odds: winnerOdds, stake }
-  });
+  const betPlans = [
+    { bettor: bettors[0], resultIndex: 0, status: 'won', stake: 500 },
+    { bettor: bettors[1], resultIndex: 1, status: 'lost', stake: 750 },
+    { bettor: bettors[2], resultIndex: 0, status: 'won', stake: 300 },
+    { bettor: bettors[3], resultIndex: 4, status: 'lost', stake: 1000 }
+  ];
+  for (const plan of betPlans) {
+    const entry = entries[plan.resultIndex];
+    const gameOdds = oddsByHorse[entry.horse.id];
+    const payout = plan.status === 'won' ? Number((plan.stake * gameOdds).toFixed(2)) : 0;
+    await models.Bet.create({
+      spectator_id: plan.bettor.id,
+      race_id: race.id,
+      predicted_horse_id: entry.horse.id,
+      stake_amount: plan.stake,
+      odds_market_id: market.id,
+      potential_payout: Number((plan.stake * gameOdds).toFixed(2)),
+      payout_amount: payout,
+      status: plan.status,
+      settled_result_id: results[plan.resultIndex].id,
+      settled_by: admin.id,
+      settled_at: addHours(reportTime, 2),
+      submitted_at: race.race_date,
+      checked_at: addHours(reportTime, 2),
+      odds_snapshot: { horse_id: entry.horse.id, game_odds: gameOdds, stake: plan.stake }
+    });
+  }
 }
 
 async function createPendingBet(models, race, market, oddsByHorse, entry, spectatorId) {
@@ -612,6 +671,7 @@ async function main() {
 
   const users = await ensureBaseAccounts(models);
   const profiles = await ensureProfiles(models, users);
+  await ensureBettorDeposits(models, users);
   const tracks = await ensureRacetracks(models, users.admin.id);
   const horses = await ensureHorses(models, profiles.owners);
 
@@ -651,7 +711,7 @@ async function main() {
       const raceNumber = raceIndex + 1;
       const track = tracks[fixture.tracks[raceIndex]];
       const startingAt = raceTime(fixture, raceIndex);
-      const completed = tournamentIndex === 0 && raceIndex === 0;
+      const completed = tournamentIndex < 4;
       const bettingOpen = !completed && raceIndex === 1;
       const referee = profiles.referees[((tournamentIndex + raceIndex) % 3) + 1];
       const race = await models.Race.create({
@@ -707,7 +767,7 @@ async function main() {
           oddsByHorse: marketData.oddsByHorse,
           referee,
           admin: users.admin,
-          spectator: users.spectator
+          bettors: [users.spectator, users.bettor1, users.bettor2, users.bettor3]
         });
       } else {
         if (bettingOpen) {

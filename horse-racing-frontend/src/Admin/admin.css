@@ -4733,6 +4733,7 @@
 .admin-entity-stat strong { color: var(--admin-text); font-family: "Sora", sans-serif; font-size: 23px; letter-spacing: -.04em; }
 .admin-entity-stat.is-accent strong { color: var(--admin-accent); }
 .admin-entity-workspace { display: grid; grid-template-columns: minmax(0, 1.65fr) minmax(260px, .7fr); gap: 12px; margin-top: 12px; }
+.admin-entity-workspace.is-bettor { grid-template-columns: 1fr; }
 .admin-entity-ranking, .admin-entity-detail { min-width: 0; border: 1px solid var(--admin-line); background: var(--admin-panel); }
 .admin-entity-ranking > header { display: flex; align-items: end; justify-content: space-between; gap: 15px; padding: 18px; border-bottom: 1px solid var(--admin-line); }
 .admin-entity-ranking header p, .admin-entity-detail > p { margin: 0 0 4px; color: var(--admin-accent); font-size: 10px; font-weight: 900; letter-spacing: .1em; text-transform: uppercase; }
@@ -4741,6 +4742,8 @@
 .admin-entity-sort select { color: var(--admin-text); text-transform: none; }
 .admin-entity-ranking__table { overflow-x: auto; }
 .admin-entity-ranking__head, .admin-entity-ranking__row { display: grid; grid-template-columns: 38px minmax(150px, 1fr) 76px 65px 125px; align-items: center; gap: 10px; min-width: 560px; padding: 0 18px; }
+.admin-entity-ranking__table.is-bettor .admin-entity-ranking__head, .admin-entity-ranking__table.is-bettor .admin-entity-ranking__row { grid-template-columns: 34px minmax(180px, 1fr) repeat(2, 72px) repeat(3, minmax(120px, 1fr)); min-width: 0; }
+.admin-entity-ranking__table.is-bettor .admin-entity-ranking__head > span:nth-child(n + 3), .admin-entity-ranking__table.is-bettor .admin-entity-ranking__row > span, .admin-entity-ranking__table.is-bettor .admin-entity-ranking__row > b, .admin-entity-ranking__table.is-bettor .admin-entity-ranking__row > em { text-align: right; }
 .admin-entity-ranking__head { min-height: 39px; color: var(--admin-muted); font-size: 9px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
 .admin-entity-ranking__row { width: 100%; min-height: 57px; border: 0; border-top: 1px solid var(--admin-line); background: transparent; color: var(--admin-copy); text-align: left; cursor: pointer; }
 .admin-entity-ranking__row:hover, .admin-entity-ranking__row.is-selected { background: var(--admin-panel-strong); }
@@ -4758,6 +4761,14 @@
 .admin-entity-detail dt { color: var(--admin-muted); font-size: 11px; }
 .admin-entity-detail dd { margin: 0; color: var(--admin-text); font-size: 12px; font-weight: 800; text-align: right; }
 .admin-entity-detail dd.is-accent { color: var(--admin-accent); }
+.admin-bettor-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border: 1px solid var(--admin-line); background: var(--admin-panel); }
+.admin-bettor-stats > div { display: grid; gap: 7px; min-width: 0; padding: 15px 17px; border-right: 1px solid var(--admin-line); }
+.admin-bettor-stats > div:last-child { border-right: 0; }
+.admin-bettor-stats span { color: var(--admin-muted); font-size: 10px; font-weight: 800; text-transform: uppercase; }
+.admin-bettor-stats strong { color: var(--admin-text); font-size: 16px; }
+.admin-entity-detail .admin-bettor-stats { grid-template-columns: 1fr; margin: 20px 0; }
+.admin-entity-detail .admin-bettor-stats > div { border-right: 0; border-bottom: 1px solid var(--admin-line); }
+.admin-entity-detail .admin-bettor-stats > div:last-child { border-bottom: 0; }
 .admin-analytics-layout { display: grid; grid-template-columns: minmax(0, 1.8fr) minmax(280px, .85fr); gap: 12px; margin-top: 12px; }
 .admin-analytics-charts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
 .admin-analytics-chart, .admin-analytics-alerts, .admin-analytics-table, .admin-analytics-status { border: 1px solid var(--admin-line); background: var(--admin-panel); }
@@ -4814,6 +4825,7 @@
 @media (max-width: 1180px) { .admin-entity-workspace { grid-template-columns: 1fr; } }
 @media (max-width: 760px) { .admin-analytics-metrics, .admin-analytics-charts { grid-template-columns: 1fr; } .admin-analytics-metric, .admin-analytics-metric:nth-child(3) { min-height: 118px; border-right: 0; border-bottom: 1px solid var(--admin-line); } .admin-analytics-metric:last-child { border-bottom: 0; } .admin-analytics-chart__plot { height: 246px; margin-inline: 4px; } .admin-analytics-chart__legend { padding-inline: 15px; } .admin-analytics-chart__legend span:last-child { display: none; } .admin-analytics-table__row { grid-template-columns: minmax(0, 1fr) auto; } .admin-analytics-table__row > em { display: none; } .admin-analytics-range { width: 100%; justify-content: space-between; } .admin-analytics-picker { flex: 1; min-width: 0; } .admin-analytics-picker__menu { width: 100%; } .admin-entity-analytics__header { align-items: start; flex-direction: column; gap: 9px; } .admin-entity-analytics__grid { grid-template-columns: 1fr; } .admin-entity-analytics__column, .admin-entity-analytics__column:nth-child(3) { border-right: 0; border-bottom: 1px solid var(--admin-line); } .admin-entity-analytics__column:last-child { border-bottom: 0; } }
 @media (max-width: 760px) { .admin-entity-toolbar { align-items: stretch; flex-direction: column; } .admin-entity-toolbar__period { align-items: stretch; flex-wrap: wrap; } .admin-entity-toolbar__period label { flex: 1; flex-direction: column; align-items: stretch; } .admin-entity-toolbar input { width: 100%; } .admin-entity-toolbar__period button { width: 100%; } .admin-entity-summary { grid-template-columns: repeat(2, 1fr); } .admin-entity-stat:nth-child(2) { border-right: 0; } .admin-entity-stat:nth-child(-n + 2) { border-bottom: 1px solid var(--admin-line); } .admin-entity-stat:nth-child(3) { border-right: 1px solid var(--admin-line); } .admin-entity-ranking > header { align-items: stretch; flex-direction: column; } }
+@media (max-width: 760px) { .admin-bettor-stats { grid-template-columns: 1fr; } .admin-bettor-stats > div { border-right: 0; border-bottom: 1px solid var(--admin-line); } .admin-bettor-stats > div:last-child { border-bottom: 0; } }
 .admin-incident-penalty-review {
   display: grid;
   gap: 14px;
