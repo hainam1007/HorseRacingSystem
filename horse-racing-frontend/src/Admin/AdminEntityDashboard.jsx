@@ -13,7 +13,7 @@ const formatDate = (value) => new Intl.DateTimeFormat("en-CA", { timeZone: "Asia
 const DASHBOARDS = {
   horseowner: { label: "Horse owners", singular: "Horse owner", title: "Owner performance", description: "Track stable performance, prize earnings, and race participation by owner.", icon: UsersRound, valueLabel: "Owner prize earnings", winLabel: "Winning races" },
   jockey: { label: "Jockeys", singular: "Jockey", title: "Jockey performance", description: "Compare jockey wins, race volume, and prize earnings over the selected period.", icon: Trophy, valueLabel: "Jockey earnings", winLabel: "Winning rides" },
-  referee: { label: "Referees", singular: "Referee", title: "Referee workload", description: "Review completed race assignments and workload distribution for every referee.", icon: Filter, valueLabel: "Recorded earnings", winLabel: "Winning races" },
+  referee: { label: "Referees", singular: "Referee", title: "Referee overview", description: "Review race workload, report progress, and incident activity across the referee team.", icon: Filter, valueLabel: "Reports submitted", winLabel: "Completed races" },
   horse: { label: "Horses", singular: "Horse", title: "Horse performance", description: "Find the strongest horses by wins, starts, and prize earnings in any period.", icon: Trophy, valueLabel: "Prize earnings", winLabel: "Wins" },
   bettor: { label: "Bettors", singular: "Bettor", title: "Bettor performance", description: "Review betting activity, wins, and payouts for each bettor.", icon: CircleDollarSign, valueLabel: "Payouts", winLabel: "Winning bets" }
 };
@@ -43,6 +43,50 @@ function BettorBetDetails({ record }) {
   </div>;
 }
 
+function HorseOwnerDetails({ record }) {
+  const horseCount = Number(record?.horse_count || record?.horse_details?.length || 0);
+  const horseNames = Array.isArray(record?.horse_names) ? record.horse_names : [];
+  const horseDetails = Array.isArray(record?.horse_details) ? record.horse_details : [];
+
+  return <div className="admin-owner-details">
+    <div className="admin-entity-detail__meta">
+      <div>
+        <span>Stable size</span>
+        <strong>{horseCount}</strong>
+      </div>
+      <div>
+        <span>Horses</span>
+        <strong>{horseNames.length ? horseNames.join(", ") : "No horse recorded"}</strong>
+      </div>
+    </div>
+
+    <div className="admin-owner-horse-list">
+      {horseDetails.length ? (
+        <ul>
+          {horseDetails.map((horse) => (
+            <li key={horse.id || horse.name}>
+              <strong>{horse.name || "Unnamed horse"}</strong>
+              <span>{horse.breed || "Unknown breed"}</span>
+              <small>{horse.status || "Unknown status"}</small>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <div className="admin-dashboard-empty">No horse recorded.</div>
+      )}
+    </div>
+  </div>;
+}
+
+function HorseOwnerRaceHistory({ record }) {
+  const details = record?.race_details || [];
+
+  return <section className="admin-owner-race-history">
+    <header><p>Race history for owner's horses</p><h2>Completed races</h2></header>
+    {details.length ? <div className="admin-horse-races"><table><colgroup><col /><col /><col className="admin-horse-races__race" /><col /></colgroup><thead><tr><th scope="col">Tournament</th><th scope="col">Horse</th><th scope="col">Race</th><th scope="col">Finish</th></tr></thead><tbody>{details.map((race) => <tr key={`${race.id}-${race.horse_name || "horse"}`}><th scope="row">{race.tournament_name || "—"}</th><td>{race.horse_name || "—"}</td><td>{race.race_name || "—"}</td><td>{race.position ? `${race.position} / ${race.participants}` : "—"}</td></tr>)}</tbody></table></div> : <div className="admin-dashboard-empty">No races in this period.</div>}
+  </section>;
+}
+
 function HorseRaceDetails({ record }) {
   const details = record?.race_details || [];
   return <div className="admin-horse-races">
@@ -55,6 +99,42 @@ function JockeyRaceDetails({ record }) {
   return <div className="admin-jockey-races">
     {details.length ? <table><colgroup><col /><col className="admin-jockey-races__race" /><col /><col /></colgroup><thead><tr><th scope="col">Tournament</th><th scope="col">Race</th><th scope="col">Finish (field)</th><th scope="col">Outcome</th></tr></thead><tbody>{details.map((race) => <tr key={race.id}><th scope="row">{race.tournament_name}</th><td>{race.race_name}</td><td>{race.position ? `${race.position} / ${race.participants}` : "—"}</td><td>{race.position === 1 ? "Winner" : "Finished"}</td></tr>)}</tbody></table> : <div className="admin-dashboard-empty">No races in this period.</div>}
   </div>;
+}
+
+function RefereeDetailsSummary({ record }) {
+  return <div className="admin-referee-details">
+    <dl><div><dt>License</dt><dd>{record?.license_number || "Not recorded"}</dd></div><div><dt>Account status</dt><dd>{record?.status || "Not recorded"}</dd></div><div><dt>Assigned races</dt><dd>{formatNumber(record?.races)}</dd></div><div><dt>Completed races</dt><dd className="is-accent">{formatNumber(record?.completed_races)}</dd></div><div><dt>Reports submitted</dt><dd>{formatNumber(record?.reports)}</dd></div><div><dt>Pending reports</dt><dd>{formatNumber(record?.pending_reports)}</dd></div><div><dt>Open incidents</dt><dd>{formatNumber(record?.open_incidents)}</dd></div></dl>
+  </div>;
+}
+
+function RefereeRaceHistory({ record }) {
+  const details = record?.race_details || [];
+  return <section className="admin-referee-history-block">
+    <header><p>Race history for selected referee</p><h2>Assigned race records</h2></header>
+    {details.length ? <div className="admin-referee-history"><table><thead><tr><th>Race</th><th>Tournament</th><th>Status</th><th>Report</th><th>Incidents</th><th>Result</th></tr></thead><tbody>{details.map((race) => <tr key={race.id}><th>{race.race_name || "—"}</th><td>{race.tournament_name || "—"}</td><td>{race.status || "—"}</td><td>{race.report_status || "Not created"}</td><td>{formatNumber(race.violations)}</td><td>{race.result_status || "Pending"}</td></tr>)}</tbody></table></div> : <div className="admin-dashboard-empty">No assigned races.</div>}
+  </section>;
+}
+
+function RefereeOverviewSummary({ rows }) {
+  const totals = rows.reduce((result, row) => ({
+    assigned: result.assigned + Number(row.races || 0),
+    completed: result.completed + Number(row.completed_races || 0),
+    reports: result.reports + Number(row.reports || 0),
+    pending: result.pending + Number(row.pending_reports || 0),
+    incidents: result.incidents + Number(row.open_incidents || 0),
+  }), { assigned: 0, completed: 0, reports: 0, pending: 0, incidents: 0 });
+
+  return <section className="admin-referee-summary" aria-label="Referee overview summary">
+    <Stat label="Assigned races" value={formatNumber(totals.assigned)} />
+    <Stat label="Completed races" value={formatNumber(totals.completed)} />
+    <Stat label="Reports submitted" value={formatNumber(totals.reports)} accent />
+    <Stat label="Pending reports" value={formatNumber(totals.pending)} />
+    <Stat label="Open incidents" value={formatNumber(totals.incidents)} />
+  </section>;
+}
+
+function RefereeRankingTable({ rows, selectedId, onSelect }) {
+  return <article className="admin-entity-ranking admin-referee-ranking"><header><div><p>Ranked directory</p><h2>Referee workload</h2></div><span className="admin-referee-ranking__hint">Operational overview</span></header><div className="admin-referee-ranking__table"><div className="admin-referee-ranking__head"><span>#</span><span>Referee</span><span>Assigned</span><span>Completed</span><span>Reports</span><span>Incidents</span><span>Status</span></div>{rows.map((row, index) => <button type="button" className={`admin-referee-ranking__row${row.id === selectedId ? " is-selected" : ""}`} key={row.id} onClick={() => onSelect(row.id)}><span>{String(index + 1).padStart(2, "0")}</span><strong>{row.name}</strong><span>{formatNumber(row.races)}</span><span>{formatNumber(row.completed_races)}</span><b>{formatNumber(row.reports)}</b><span>{formatNumber(row.open_incidents)}</span><em>{row.status || "unknown"}</em></button>)}</div></article>;
 }
 
 function AdminEntityDashboard() {
@@ -99,9 +179,13 @@ function AdminEntityDashboard() {
     {error && <section className="admin-live-state admin-live-state--warning">{error}</section>}
     {!isLoading && !error && <>
       <section className="admin-entity-summary" aria-label={`${config.label} summary`}><Stat label="Records in period" value={formatNumber(rows.length)} /><Stat label="Completed races" value={formatNumber(totals.races)} /><Stat label={config.winLabel} value={formatNumber(totals.wins)} accent /><Stat label={config.valueLabel} value={isBettor ? formatTokens(totals.payout) : formatCurrency(totals.value)} /></section>
-      <section className={`admin-entity-workspace${isBettor ? " is-bettor" : ""}${entity === "horse" ? " is-horse" : ""}${entity === "jockey" ? " is-jockey" : ""}`}>
-        <article className="admin-entity-ranking"><header><div><p>Ranked directory</p><h2>{config.label}</h2></div><label className="admin-entity-sort"><span>Sort by</span><select value={sort} onChange={(event) => setSort(event.target.value)}><option value="wins">Wins: highest first</option><option value="races">Races: highest first</option><option value="revenue">Revenue: highest first</option></select></label></header>{sortedRows.length ? <div className={`admin-entity-ranking__table${isBettor ? " is-bettor" : ""}${entity === "horse" ? " is-horse" : ""}${entity === "jockey" ? " is-jockey" : ""}`}><div className="admin-entity-ranking__head"><span>#</span><span>{config.singular}</span>{entity === "horse" && <><span>Breed</span><span>Weight</span></>}{entity === "jockey" && <><span>Weight</span><span>Experience</span><span>License</span></>}<span>Races</span><span>Wins</span>{isBettor ? <><span>Deposited</span><span>Total staked</span><span>Total received</span></> : <span>Revenue</span>}</div>{sortedRows.map((row, index) => <button type="button" className="admin-entity-ranking__row" key={row.id} onClick={() => setSelectedId(row.id)}><span>{String(index + 1).padStart(2, "0")}</span><strong>{row.name}</strong>{entity === "horse" && <><span>{row.breed || "—"}</span><span>{row.weight ? `${row.weight} kg` : "—"}</span></>}{entity === "jockey" && <><span>{row.weight_kg ? `${row.weight_kg} kg` : "—"}</span><span>{row.experience_years ?? "—"} yrs</span><span>{row.license_number || "—"}</span></>}<span>{formatNumber(row.races)}</span><b>{formatNumber(row.wins)}</b>{isBettor ? <><em>{formatTokens(row.deposited)}</em><em>{formatTokens(row.staked)}</em><em>{formatTokens(row.payout)}</em></> : <em>{formatCurrency(row.value)}</em>}</button>)}</div> : <div className="admin-dashboard-empty">No completed records in this period.</div>}</article>
-        <aside className="admin-entity-detail"><p>Selected {config.singular.toLowerCase()}</p><h2>{selected?.name || `No ${config.singular.toLowerCase()} selected`}</h2><div className="admin-entity-detail__hero"><Icon size={22} /><span>Period<br /><strong>{from} — {to}</strong></span></div>{isBettor ? <BettorBetDetails record={selected} /> : entity === "horse" ? <HorseRaceDetails record={selected} /> : entity === "jockey" ? <JockeyRaceDetails record={selected} /> : <dl><div><dt>Completed races</dt><dd>{formatNumber(selected?.races)}</dd></div><div><dt>{config.winLabel}</dt><dd className="is-accent">{formatNumber(selected?.wins)}</dd></div><div><dt>{config.valueLabel}</dt><dd>{formatCurrency(selected?.value)}</dd></div><div><dt>Win rate</dt><dd>{selected?.races ? `${Math.round((selected.wins / selected.races) * 100)}%` : "0%"}</dd></div></dl>}</aside>
+      {entity === "referee" && <RefereeOverviewSummary rows={rows} />}
+      <section className={`admin-entity-workspace${isBettor ? " is-bettor" : ""}${entity === "horse" ? " is-horse" : ""}${entity === "jockey" ? " is-jockey" : ""}${entity === "horseowner" ? " is-owner" : ""}${entity === "referee" ? " is-referee" : ""}`}>
+        {entity === "referee" && <RefereeRankingTable rows={sortedRows} selectedId={selectedId} onSelect={setSelectedId} />}
+        <article className="admin-entity-ranking"><header><div><p>Ranked directory</p><h2>{config.label}</h2></div><label className="admin-entity-sort"><span>Sort by</span><select value={sort} onChange={(event) => setSort(event.target.value)}><option value="wins">Wins: highest first</option><option value="races">Races: highest first</option><option value="revenue">Revenue: highest first</option></select></label></header>{sortedRows.length ? <div className={`admin-entity-ranking__table${isBettor ? " is-bettor" : ""}${entity === "horse" ? " is-horse" : ""}${entity === "jockey" ? " is-jockey" : ""}`}><div className="admin-entity-ranking__head"><span>#</span><span>{config.singular}</span>{entity === "horse" && <><span>Breed</span><span>Weight</span></>}{entity === "horseowner" && <span>Horses</span>}{entity === "jockey" && <><span>Weight</span><span>Experience</span><span>License</span></>}<span>Races</span><span>Wins</span>{isBettor ? <><span>Deposited</span><span>Total staked</span><span>Total received</span></> : <span>Revenue</span>}</div>{sortedRows.map((row, index) => <button type="button" className="admin-entity-ranking__row" key={row.id} onClick={() => setSelectedId(row.id)}><span>{String(index + 1).padStart(2, "0")}</span><strong>{row.name}</strong>{entity === "horse" && <><span>{row.breed || "—"}</span><span>{row.weight ? `${row.weight} kg` : "—"}</span></>}{entity === "horseowner" && <span>{formatNumber(row.horse_count ?? row.horse_details?.length ?? 0)}</span>}{entity === "jockey" && <><span>{row.weight_kg ? `${row.weight_kg} kg` : "—"}</span><span>{row.experience_years ?? "—"} yrs</span><span>{row.license_number || "—"}</span></>}<span>{formatNumber(row.races)}</span><b>{formatNumber(row.wins)}</b>{isBettor ? <><em>{formatTokens(row.deposited)}</em><em>{formatTokens(row.staked)}</em><em>{formatTokens(row.payout)}</em></> : <em>{formatCurrency(row.value)}</em>}</button>)}</div> : <div className="admin-dashboard-empty">No completed records in this period.</div>}</article>
+        <aside className="admin-entity-detail"><p>Selected {config.singular.toLowerCase()}</p><h2>{selected?.name || `No ${config.singular.toLowerCase()} selected`}</h2><div className="admin-entity-detail__hero"><Icon size={22} /><span>Period<br /><strong>{from} — {to}</strong></span></div>{isBettor ? <BettorBetDetails record={selected} /> : entity === "horseowner" ? <HorseOwnerDetails record={selected} /> : entity === "referee" ? <RefereeDetailsSummary record={selected} /> : entity === "horse" ? <HorseRaceDetails record={selected} /> : entity === "jockey" ? <JockeyRaceDetails record={selected} /> : <dl><div><dt>Completed races</dt><dd>{formatNumber(selected?.races)}</dd></div><div><dt>{config.winLabel}</dt><dd className="is-accent">{formatNumber(selected?.wins)}</dd></div><div><dt>{config.valueLabel}</dt><dd>{formatCurrency(selected?.value)}</dd></div><div><dt>Win rate</dt><dd>{selected?.races ? `${Math.round((selected.wins / selected.races) * 100)}%` : "0%"}</dd></div></dl>}</aside>
+        {entity === "horseowner" && <HorseOwnerRaceHistory record={selected} />}
+        {entity === "referee" && <RefereeRaceHistory record={selected} />}
       </section>
     </>}
   </AdminLayout>;
