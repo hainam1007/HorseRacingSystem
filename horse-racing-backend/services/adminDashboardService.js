@@ -264,49 +264,148 @@ class AdminDashboardService {
         const win = getAnalyticsWindow(from, to);
         const [fromDate, toDate] = win.current;
         const params = [fromDate, toDate];
-        const run = (sql) => pgQuery(sql, params).then(([rows]) => rows.map((row) => ({
+        const run = (sql, queryParams = params) => pgQuery(sql, queryParams).then(([rows]) => rows.map((row) => ({
             id: row.id,
             name: row.name || 'Unknown',
             races: Number(row.races || 0),
-            wins: Number(row.wins || 0),
-            value: Number(row.value || 0)
+            wins: Number(row.completed_races ?? row.wins ?? 0),
+            value: Number(row.reports ?? row.value ?? 0),
+            deposited: Number(row.deposited || 0),
+            staked: Number(row.staked || 0),
+            payout: Number(row.payout || 0),
+            bet_details: row.bet_details || [],
+            race_details: row.race_details || [],
+            completed_races: Number(row.completed_races || 0),
+            reports: Number(row.reports || 0),
+            pending_reports: Number(row.pending_reports || 0),
+            open_incidents: Number(row.open_incidents || 0),
+            last_activity: row.last_activity || null,
+            status: row.status || '',
+            license_number: row.license_number || '',
+            experience_years: row.experience_years === null || row.experience_years === undefined ? null : Number(row.experience_years),
+            horse_count: Number(row.horse_count || 0),
+            horse_names: Array.isArray(row.horse_names) ? row.horse_names : (typeof row.horse_names === 'string' && row.horse_names ? JSON.parse(row.horse_names) : []),
+            horse_details: Array.isArray(row.horse_details) ? row.horse_details : (typeof row.horse_details === 'string' && row.horse_details ? JSON.parse(row.horse_details) : []),
+            breed: row.breed || '',
+            weight: row.weight === null || row.weight === undefined ? null : Number(row.weight),
+            weight_kg: row.weight_kg === null || row.weight_kg === undefined ? null : Number(row.weight_kg),
+            experience_years: row.experience_years === null || row.experience_years === undefined ? null : Number(row.experience_years),
         })));
         const raceFilter = `r.race_date BETWEEN ? AND ? AND r.status = 'completed' AND r.deleted_at IS NULL`;
         const resultFilter = `rr.deleted_at IS NULL AND ${raceFilter}`;
 
         const [owners, jockeys, referees, horses, bettors] = await Promise.all([
             run(`SELECT ho.id, COALESCE(u.full_name, ho.stable_name, 'Unnamed owner') AS name,
-                    COUNT(DISTINCT r.id)::int AS races,
-                    COUNT(DISTINCT r.id) FILTER (WHERE rr.final_position = 1 OR rr.position = 1)::int AS wins,
-                    COALESCE(SUM(pa.owner_amount) FILTER (WHERE pa.status <> 'cancelled'), 0)::numeric AS value
+                    COUNT(DISTINCT CASE WHEN r.race_date BETWEEN ? AND ? AND r.status = 'completed' AND r.deleted_at IS NULL THEN r.id END)::int AS races,
+                    COUNT(DISTINCT CASE WHEN r.race_date BETWEEN ? AND ? AND r.status = 'completed' AND r.deleted_at IS NULL AND (rr.final_position = 1 OR rr.position = 1) THEN r.id END)::int AS wins,
+                    COALESCE(SUM(CASE WHEN r.race_date BETWEEN ? AND ? AND r.status = 'completed' AND r.deleted_at IS NULL AND pa.status <> 'cancelled' THEN pa.owner_amount ELSE 0 END), 0)::numeric AS value,
+                    COALESCE((SELECT COUNT(*) FROM horses h2 WHERE h2.owner_id = ho.id AND h2.deleted_at IS NULL), 0)::int AS horse_count,
+                    COALESCE((SELECT json_agg(h2.name ORDER BY h2.name) FROM (SELECT h2.name FROM horses h2 WHERE h2.owner_id = ho.id AND h2.deleted_at IS NULL) h2), '[]'::json) AS horse_names,
+                    COALESCE((SELECT json_agg(json_build_object(
+                        'id', h2.id,
+                        'name', h2.name,
+                        'breed', h2.breed,
+                        'weight', h2.weight,
+                        'registration_number', h2.registration_number,
+                        'status', h2.status
+                    ) ORDER BY h2.name) FROM horses h2 WHERE h2.owner_id = ho.id AND h2.deleted_at IS NULL), '[]'::json) AS horse_details,
+                    COALESCE((SELECT json_agg(json_build_object(
+                        'id', rr2.id,
+                        'race_id', r2.id,
+                        'tournament_name', t2.name,
+                        'race_name', r2.name,
+                        'horse_name', h2.name,
+                        'position', COALESCE(rr2.final_position, rr2.position),
+                        'participants', (
+                            SELECT COUNT(*) FROM race_results rr3 WHERE rr3.race_id = r2.id AND rr3.deleted_at IS NULL
+                        )
+                    ) ORDER BY r2.race_date DESC)
+                    FROM race_results rr2
+                    JOIN horses h2 ON h2.id = rr2.horse_id
+                    JOIN races r2 ON r2.id = rr2.race_id
+                    LEFT JOIN tournaments t2 ON t2.id = r2.tournament_id
+                    WHERE h2.owner_id = ho.id
+                      AND h2.deleted_at IS NULL
+                      AND rr2.deleted_at IS NULL
+                      AND r2.race_date BETWEEN ? AND ?
+                      AND r2.status = 'completed'
+                      AND r2.deleted_at IS NULL), '[]'::json) AS race_details
                 FROM horse_owners ho LEFT JOIN users u ON u.id = ho.user_id
-                LEFT JOIN horses h ON h.owner_id = ho.id LEFT JOIN race_results rr ON rr.horse_id = h.id
-                LEFT JOIN races r ON r.id = rr.race_id LEFT JOIN prize_awards pa ON pa.race_result_id = rr.id
-                WHERE ho.deleted_at IS NULL AND (${resultFilter}) GROUP BY ho.id, u.full_name, ho.stable_name ORDER BY races DESC, name`),
-            run(`SELECT j.id, COALESCE(u.full_name, 'Unnamed jockey') AS name,
-                    COUNT(DISTINCT r.id)::int AS races,
-                    COUNT(DISTINCT r.id) FILTER (WHERE rr.final_position = 1 OR rr.position = 1)::int AS wins,
-                    COALESCE(SUM(pa.jockey_amount) FILTER (WHERE pa.status <> 'cancelled'), 0)::numeric AS value
-                FROM jockeys j LEFT JOIN users u ON u.id = j.user_id LEFT JOIN race_results rr ON rr.jockey_id = j.id
-                LEFT JOIN races r ON r.id = rr.race_id LEFT JOIN prize_awards pa ON pa.race_result_id = rr.id
-                WHERE j.deleted_at IS NULL AND (${resultFilter}) GROUP BY j.id, u.full_name ORDER BY races DESC, name`),
-            run(`SELECT ref.id, COALESCE(u.full_name, 'Unnamed referee') AS name,
-                    COUNT(DISTINCT r.id)::int AS races, 0::int AS wins, 0::numeric AS value
-                FROM race_referees ref LEFT JOIN users u ON u.id = ref.user_id LEFT JOIN races r ON r.referee_id = ref.id
-                WHERE ref.deleted_at IS NULL AND ${raceFilter} GROUP BY ref.id, u.full_name ORDER BY races DESC, name`),
-            run(`SELECT h.id, h.name,
-                    COUNT(DISTINCT r.id)::int AS races,
-                    COUNT(DISTINCT r.id) FILTER (WHERE rr.final_position = 1 OR rr.position = 1)::int AS wins,
-                    COALESCE(SUM(pa.gross_amount) FILTER (WHERE pa.status <> 'cancelled'), 0)::numeric AS value
-                FROM horses h LEFT JOIN race_results rr ON rr.horse_id = h.id LEFT JOIN races r ON r.id = rr.race_id
+                LEFT JOIN horses h ON h.owner_id = ho.id
+                LEFT JOIN race_results rr ON rr.horse_id = h.id
+                LEFT JOIN races r ON r.id = rr.race_id
                 LEFT JOIN prize_awards pa ON pa.race_result_id = rr.id
-                WHERE h.deleted_at IS NULL AND (${resultFilter}) GROUP BY h.id, h.name ORDER BY races DESC, name`),
+                WHERE ho.deleted_at IS NULL GROUP BY ho.id, u.full_name, ho.stable_name ORDER BY name`, [fromDate, toDate, fromDate, toDate, fromDate, toDate, fromDate, toDate]),
+            run(`SELECT j.id, COALESCE(u.full_name, 'Unnamed jockey') AS name, j.weight_kg, j.experience_years, j.license_number,
+                    COUNT(DISTINCT r.id)::int AS races,
+                    COUNT(DISTINCT r.id) FILTER (WHERE rr.final_position = 1 OR rr.position = 1)::int AS wins,
+                    COALESCE(SUM(pa.jockey_amount) FILTER (WHERE pa.status <> 'cancelled'), 0)::numeric AS value,
+                    COALESCE(json_agg(json_build_object(
+                        'id', rr.id,
+                        'tournament_name', t.name,
+                        'race_name', r.name,
+                        'position', COALESCE(rr.final_position, rr.position),
+                        'participants', (SELECT COUNT(*) FROM race_results rr2 WHERE rr2.race_id = r.id AND rr2.deleted_at IS NULL)
+                    ) ORDER BY r.race_date DESC) FILTER (WHERE rr.id IS NOT NULL), '[]'::json) AS race_details
+                FROM jockeys j LEFT JOIN users u ON u.id = j.user_id LEFT JOIN race_results rr ON rr.jockey_id = j.id
+                LEFT JOIN races r ON r.id = rr.race_id LEFT JOIN tournaments t ON t.id = r.tournament_id LEFT JOIN prize_awards pa ON pa.race_result_id = rr.id
+                WHERE j.deleted_at IS NULL AND (${resultFilter}) GROUP BY j.id, u.full_name, j.weight_kg, j.experience_years, j.license_number ORDER BY races DESC, name`),
+            run(`SELECT ref.id, COALESCE(u.full_name, 'Unnamed referee') AS name,
+                    ref.license_number, ref.experience_years, ref.status,
+                    COUNT(DISTINCT CASE WHEN r.race_date BETWEEN ? AND ? THEN r.id END)::int AS races,
+                    COUNT(DISTINCT CASE WHEN r.race_date BETWEEN ? AND ? AND r.status = 'completed' THEN r.id END)::int AS completed_races,
+                    COALESCE((SELECT COUNT(*) FROM referee_reports rp WHERE rp.referee_id = ref.id AND rp.created_at BETWEEN ? AND ? AND rp.deleted_at IS NULL), 0)::int AS reports,
+                    COALESCE((SELECT COUNT(*) FROM referee_reports rp WHERE rp.referee_id = ref.id AND rp.created_at BETWEEN ? AND ? AND rp.deleted_at IS NULL AND rp.status NOT IN ('submitted', 'published')), 0)::int AS pending_reports,
+                    COALESCE((SELECT COUNT(*) FROM violations v WHERE v.referee_id = ref.id AND v.created_at BETWEEN ? AND ? AND v.deleted_at IS NULL AND v.status NOT IN ('confirmed', 'dismissed', 'resolved')), 0)::int AS open_incidents,
+                    GREATEST(MAX(r.updated_at), (SELECT MAX(rp.submitted_at) FROM referee_reports rp WHERE rp.referee_id = ref.id AND rp.deleted_at IS NULL)) AS last_activity,
+                    COALESCE(json_agg(json_build_object(
+                        'id', r.id,
+                        'race_name', r.name,
+                        'race_date', r.race_date,
+                        'status', r.status,
+                        'report_status', (SELECT rp.status FROM referee_reports rp WHERE rp.race_id = r.id AND rp.referee_id = ref.id AND rp.deleted_at IS NULL ORDER BY rp.created_at DESC LIMIT 1),
+                        'violations', (SELECT COUNT(*) FROM violations v WHERE v.race_id = r.id AND v.referee_id = ref.id AND v.deleted_at IS NULL),
+                        'result_status', (SELECT rr.status FROM race_results rr WHERE rr.race_id = r.id AND rr.deleted_at IS NULL ORDER BY rr.updated_at DESC LIMIT 1),
+                        'tournament_name', t.name
+                    ) ORDER BY r.race_date DESC) FILTER (WHERE r.id IS NOT NULL), '[]'::json) AS race_details
+                FROM race_referees ref LEFT JOIN users u ON u.id = ref.user_id
+                LEFT JOIN races r ON r.referee_id = ref.id AND r.deleted_at IS NULL
+                LEFT JOIN tournaments t ON t.id = r.tournament_id
+                WHERE ref.deleted_at IS NULL GROUP BY ref.id, u.full_name, ref.license_number, ref.experience_years, ref.status
+                ORDER BY completed_races DESC, races DESC, name`,
+                [fromDate, toDate, fromDate, toDate, fromDate, toDate, fromDate, toDate, fromDate, toDate]),
+            run(`SELECT h.id, h.name, h.breed, h.weight,
+                    COUNT(DISTINCT r.id)::int AS races,
+                    COUNT(DISTINCT r.id) FILTER (WHERE rr.final_position = 1 OR rr.position = 1)::int AS wins,
+                    COALESCE(SUM(pa.gross_amount) FILTER (WHERE pa.status <> 'cancelled'), 0)::numeric AS value,
+                    COALESCE(json_agg(json_build_object(
+                        'id', rr.id,
+                        'tournament_name', t.name,
+                        'race_name', r.name,
+                        'position', COALESCE(rr.final_position, rr.position),
+                        'participants', (SELECT COUNT(*) FROM race_results rr2 WHERE rr2.race_id = r.id AND rr2.deleted_at IS NULL)
+                    ) ORDER BY r.race_date DESC) FILTER (WHERE rr.id IS NOT NULL), '[]'::json) AS race_details
+                FROM horses h LEFT JOIN race_results rr ON rr.horse_id = h.id LEFT JOIN races r ON r.id = rr.race_id
+                LEFT JOIN tournaments t ON t.id = r.tournament_id LEFT JOIN prize_awards pa ON pa.race_result_id = rr.id
+                WHERE h.deleted_at IS NULL AND (${resultFilter}) GROUP BY h.id, h.name, h.breed, h.weight ORDER BY races DESC, name`),
             run(`SELECT u.id, u.full_name AS name,
                     COUNT(DISTINCT b.race_id)::int AS races,
                     COUNT(*) FILTER (WHERE b.status = 'won')::int AS wins,
-                    COALESCE(SUM(b.payout_amount) FILTER (WHERE b.status = 'won'), 0)::numeric AS value
+                    COALESCE(SUM(b.payout_amount) FILTER (WHERE b.status = 'won'), 0)::numeric AS value,
+                    COALESCE(SUM(b.stake_amount), 0)::numeric AS staked,
+                    COALESCE(SUM(b.payout_amount), 0)::numeric AS payout,
+                    COALESCE(json_agg(json_build_object(
+                        'id', b.id,
+                        'race_name', r.name,
+                        'stake', b.stake_amount,
+                        'status', b.status,
+                        'payout', b.payout_amount
+                    ) ORDER BY r.race_date DESC) FILTER (WHERE b.id IS NOT NULL), '[]'::json) AS bet_details,
+                    COALESCE((SELECT SUM(dr.total_token) FROM deposit_requests dr
+                        WHERE dr.user_id = u.id AND dr.status = 'success'
+                          AND dr.created_at BETWEEN ? AND ? AND dr.deleted_at IS NULL), 0)::numeric AS deposited
                 FROM users u JOIN bets b ON b.spectator_id = u.id JOIN races r ON r.id = b.race_id
-                WHERE b.deleted_at IS NULL AND ${raceFilter} GROUP BY u.id, u.full_name ORDER BY races DESC, name`)
+                WHERE b.deleted_at IS NULL AND ${raceFilter} GROUP BY u.id, u.full_name ORDER BY races DESC, name`, [fromDate, toDate, fromDate, toDate])
         ]);
 
         return { period: { from: win.from, to: win.to, timezone: ICT_TIMEZONE }, entities: { horseowner: owners, jockey: jockeys, referee: referees, horse: horses, bettor: bettors } };

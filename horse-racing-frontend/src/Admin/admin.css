@@ -1,4 +1,4 @@
-﻿/* Admin operational design system - shared shell and dashboard foundation */
+/* Admin operational design system - shared shell and dashboard foundation */
 .admin-page {
   --admin-bg: var(--racing-ink);
   --admin-surface: var(--racing-surface);
@@ -4740,6 +4740,14 @@
 .admin-entity-stat strong { color: var(--admin-text); font-family: "Sora", sans-serif; font-size: 23px; letter-spacing: -.04em; }
 .admin-entity-stat.is-accent strong { color: var(--admin-accent); }
 .admin-entity-workspace { display: grid; grid-template-columns: minmax(0, 1.65fr) minmax(260px, .7fr); gap: 12px; margin-top: 12px; }
+.admin-entity-workspace.is-bettor { grid-template-columns: 1fr; }
+.admin-entity-workspace.is-horse { grid-template-columns: 1fr; }
+.admin-entity-ranking__table.is-horse .admin-entity-ranking__head, .admin-entity-ranking__table.is-horse .admin-entity-ranking__row { grid-template-columns: 34px minmax(150px, 1.35fr) minmax(130px, 1fr) 90px 72px 72px minmax(120px, 1fr); }
+.admin-entity-ranking__table.is-horse .admin-entity-ranking__head > span:nth-child(n + 3), .admin-entity-ranking__table.is-horse .admin-entity-ranking__row > span, .admin-entity-ranking__table.is-horse .admin-entity-ranking__row > b, .admin-entity-ranking__table.is-horse .admin-entity-ranking__row > em { text-align: right; }
+.admin-entity-ranking__table.is-horse { max-height: 324px; overflow-y: auto; }
+.admin-entity-ranking__table.is-horse .admin-entity-ranking__head { position: sticky; top: 0; z-index: 1; background: var(--admin-panel); }
+.admin-entity-ranking__table.is-jockey .admin-entity-ranking__head, .admin-entity-ranking__table.is-jockey .admin-entity-ranking__row { grid-template-columns: 34px minmax(140px, 1.25fr) 88px 92px minmax(130px, 1fr) 72px 72px minmax(120px, 1fr); }
+.admin-entity-ranking__table.is-jockey .admin-entity-ranking__head > span:nth-child(n + 3), .admin-entity-ranking__table.is-jockey .admin-entity-ranking__row > span, .admin-entity-ranking__table.is-jockey .admin-entity-ranking__row > b, .admin-entity-ranking__table.is-jockey .admin-entity-ranking__row > em { text-align: right; }
 .admin-entity-ranking, .admin-entity-detail { min-width: 0; border: 1px solid var(--admin-line); background: var(--admin-panel); }
 .admin-entity-ranking > header { display: flex; align-items: end; justify-content: space-between; gap: 15px; padding: 18px; border-bottom: 1px solid var(--admin-line); }
 .admin-entity-ranking header p, .admin-entity-detail > p { margin: 0 0 4px; color: var(--admin-accent); font-size: 10px; font-weight: 900; letter-spacing: .1em; text-transform: uppercase; }
@@ -4747,7 +4755,10 @@
 .admin-entity-sort { display: grid; gap: 4px; color: var(--admin-muted); font-size: 10px; font-weight: 800; text-transform: uppercase; }
 .admin-entity-sort select { color: var(--admin-text); text-transform: none; }
 .admin-entity-ranking__table { overflow-x: auto; }
-.admin-entity-ranking__head, .admin-entity-ranking__row { display: grid; grid-template-columns: 38px minmax(150px, 1fr) 76px 65px 125px; align-items: center; gap: 10px; min-width: 560px; padding: 0 18px; }
+.admin-entity-ranking__head, .admin-entity-ranking__row { display: grid; grid-template-columns: 34px minmax(180px, 1fr) 72px 72px minmax(120px, 1fr); align-items: center; gap: 10px; width: 100%; min-width: 0; padding: 0 18px; box-sizing: border-box; }
+.admin-entity-ranking__table.is-bettor .admin-entity-ranking__head, .admin-entity-ranking__table.is-bettor .admin-entity-ranking__row { grid-template-columns: 34px minmax(180px, 1fr) repeat(2, 72px) repeat(3, minmax(120px, 1fr)); min-width: 0; }
+.admin-entity-workspace.is-owner .admin-entity-ranking__head, .admin-entity-workspace.is-owner .admin-entity-ranking__row { grid-template-columns: 34px minmax(150px, 1.4fr) 72px 72px 72px minmax(120px, 1fr); }
+.admin-entity-ranking__head > span:nth-child(n + 3), .admin-entity-ranking__row > span, .admin-entity-ranking__row > b, .admin-entity-ranking__row > em { text-align: right; }
 .admin-entity-ranking__head { min-height: 39px; color: var(--admin-muted); font-size: 9px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
 .admin-entity-ranking__row { width: 100%; min-height: 57px; border: 0; border-top: 1px solid var(--admin-line); background: transparent; color: var(--admin-copy); text-align: left; cursor: pointer; }
 .admin-entity-ranking__row:hover, .admin-entity-ranking__row.is-selected { background: var(--admin-panel-strong); }
@@ -4757,6 +4768,10 @@
 .admin-entity-ranking__row > b { color: var(--admin-accent); }
 .admin-entity-ranking__row > em { color: var(--admin-copy); font-style: normal; font-weight: 800; }
 .admin-entity-detail { padding: 20px; }
+.admin-entity-workspace.is-owner { align-items: start; }
+.admin-entity-workspace.is-owner .admin-entity-ranking__table { overflow-x: auto; }
+.admin-entity-workspace.is-owner .admin-entity-ranking__head, .admin-entity-workspace.is-owner .admin-entity-ranking__row { min-width: 560px; }
+.admin-entity-workspace.is-bettor .admin-entity-detail { width: 100%; box-sizing: border-box; }
 .admin-entity-detail h2 { font-size: 23px; }
 .admin-entity-detail__hero { display: flex; align-items: center; gap: 11px; margin: 21px 0; padding: 13px; border: 1px solid var(--admin-line); color: var(--admin-accent); font-size: 10px; line-height: 1.6; }
 .admin-entity-detail__hero strong { color: var(--admin-text); font-size: 11px; }
@@ -4765,6 +4780,102 @@
 .admin-entity-detail dt { color: var(--admin-muted); font-size: 11px; }
 .admin-entity-detail dd { margin: 0; color: var(--admin-text); font-size: 12px; font-weight: 800; text-align: right; }
 .admin-entity-detail dd.is-accent { color: var(--admin-accent); }
+.admin-owner-details { display: grid; gap: 16px; min-width: 0; }
+.admin-entity-detail__meta { display: grid; gap: 10px; }
+.admin-entity-detail__meta > div { display: grid; gap: 5px; padding: 11px 12px; border: 1px solid var(--admin-line); }
+.admin-entity-detail__meta span, .admin-owner-horse-list li span, .admin-owner-horse-list li small { color: var(--admin-muted); font-size: 10px; }
+.admin-entity-detail__meta strong { overflow-wrap: anywhere; color: var(--admin-text); font-size: 12px; line-height: 1.45; }
+.admin-owner-horse-list ul { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin: 0; padding: 0; list-style: none; }
+.admin-owner-horse-list li { display: grid; gap: 4px; min-width: 0; min-height: 62px; padding: 9px 10px; border: 1px solid var(--admin-line); background: var(--admin-panel-strong); }
+.admin-owner-horse-list li strong { overflow-wrap: anywhere; color: var(--admin-text); font-size: 12px; }
+.admin-owner-horse-list li small { font-size: 9px; text-transform: uppercase; }
+.admin-owner-race-history { grid-column: 1 / -1; min-width: 0; border: 1px solid var(--admin-line); background: var(--admin-panel); }
+.admin-owner-race-history > header { padding: 17px 18px; border-bottom: 1px solid var(--admin-line); }
+.admin-owner-race-history > header p { margin: 0 0 4px; color: var(--admin-accent); font-size: 10px; font-weight: 900; letter-spacing: .1em; text-transform: uppercase; }
+.admin-owner-race-history > header h2 { margin: 0; color: var(--admin-text); font-size: 18px; }
+.admin-owner-race-history .admin-horse-races { margin: 0; border: 0; }
+.admin-owner-race-history .admin-horse-races table { min-width: 640px; }
+.admin-owner-race-history .admin-horse-races thead th:nth-child(2), .admin-owner-race-history .admin-horse-races thead th:nth-child(3), .admin-owner-race-history .admin-horse-races tbody td:nth-child(2), .admin-owner-race-history .admin-horse-races tbody td:nth-child(3) { text-align: left; }
+.admin-referee-details dl { margin: 0 0 18px; }
+.admin-referee-history { overflow-x: auto; border: 1px solid var(--admin-line); }
+.admin-referee-history table { width: 100%; min-width: 760px; border-collapse: collapse; table-layout: fixed; }
+.admin-referee-history th:nth-child(1), .admin-referee-history td:nth-child(1) { width: 25%; }
+.admin-referee-history th:nth-child(2), .admin-referee-history td:nth-child(2) { width: 23%; }
+.admin-referee-history th:nth-child(3), .admin-referee-history td:nth-child(3) { width: 14%; }
+.admin-referee-history th:nth-child(4), .admin-referee-history td:nth-child(4) { width: 14%; }
+.admin-referee-history th:nth-child(5), .admin-referee-history td:nth-child(5) { width: 10%; text-align: center; }
+.admin-referee-history th:nth-child(6), .admin-referee-history td:nth-child(6) { width: 14%; text-align: center; }
+.admin-referee-history th, .admin-referee-history td { padding: 11px 12px; border-bottom: 1px solid var(--admin-line); color: var(--admin-text); font-size: 10px; text-align: left; vertical-align: top; }
+.admin-referee-history th { color: var(--admin-muted); font-size: 9px; font-weight: 900; letter-spacing: .07em; text-transform: uppercase; }
+.admin-referee-history tbody th { color: var(--admin-text); font-weight: 800; text-transform: none; letter-spacing: 0; }
+.admin-referee-history th:nth-child(3), .admin-referee-history td:nth-child(3), .admin-referee-history th:nth-child(4), .admin-referee-history td:nth-child(4) { text-align: center; }
+.admin-referee-history td:nth-child(3), .admin-referee-history td:nth-child(4), .admin-referee-history td:nth-child(6) { text-transform: capitalize; }
+.admin-referee-history tbody tr:last-child th, .admin-referee-history tbody tr:last-child td { border-bottom: 0; }
+.admin-referee-summary { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); margin-top: 12px; border: 1px solid var(--admin-line); background: var(--admin-panel); }
+.admin-referee-summary .admin-entity-stat { min-height: 96px; }
+.admin-entity-summary:has(+ .admin-entity-workspace.is-referee), .admin-entity-workspace.is-referee > .admin-entity-ranking:not(.admin-referee-ranking) { display: none; }
+.admin-referee-ranking__hint { color: var(--admin-muted); font-size: 10px; font-weight: 800; text-transform: uppercase; }
+.admin-referee-ranking__table { overflow-x: auto; }
+.admin-referee-ranking__head, .admin-referee-ranking__row { display: grid; grid-template-columns: 34px minmax(150px, 1.4fr) 82px 82px 82px 82px 92px; align-items: center; gap: 10px; min-width: 660px; padding: 0 18px; box-sizing: border-box; }
+.admin-referee-ranking__head { min-height: 39px; color: var(--admin-muted); font-size: 9px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
+.admin-referee-ranking__head span:nth-child(n + 3), .admin-referee-ranking__row > span:not(:first-child), .admin-referee-ranking__row > b, .admin-referee-ranking__row > em { text-align: right; }
+.admin-referee-ranking__row { width: 100%; min-height: 57px; border: 0; border-top: 1px solid var(--admin-line); background: transparent; color: var(--admin-copy); text-align: left; cursor: pointer; }
+.admin-referee-ranking__row:hover, .admin-referee-ranking__row.is-selected { background: var(--admin-panel-strong); }
+.admin-referee-ranking__row strong { overflow: hidden; color: var(--admin-text); font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
+.admin-referee-ranking__row span, .admin-referee-ranking__row b, .admin-referee-ranking__row em { font-size: 11px; }
+.admin-referee-ranking__row b { color: var(--admin-accent); }
+.admin-referee-ranking__row em { color: var(--admin-copy); font-style: normal; font-weight: 800; text-transform: capitalize; }
+.admin-entity-workspace.is-referee { grid-template-columns: minmax(0, 1.55fr) minmax(300px, .8fr); align-items: start; }
+.admin-entity-workspace.is-referee > .admin-referee-ranking, .admin-entity-workspace.is-referee > .admin-entity-detail { height: 520px; box-sizing: border-box; overflow: hidden; }
+.admin-entity-workspace.is-referee > .admin-referee-ranking .admin-referee-ranking__table { max-height: 420px; overflow: auto; }
+.admin-entity-workspace.is-referee > .admin-entity-detail { overflow-y: auto; }
+.admin-referee-history-block { grid-column: 1 / -1; min-width: 0; border: 1px solid var(--admin-line); background: var(--admin-panel); }
+.admin-referee-history-block > header { padding: 17px 18px; border-bottom: 1px solid var(--admin-line); }
+.admin-referee-history-block > header p { margin: 0 0 4px; color: var(--admin-accent); font-size: 10px; font-weight: 900; letter-spacing: .1em; text-transform: uppercase; }
+.admin-referee-history-block > header h2 { margin: 0; color: var(--admin-text); font-size: 18px; }
+.admin-referee-history-block .admin-referee-history { border: 0; }
+.admin-entity-workspace.is-referee .admin-entity-ranking__head > span:nth-child(4) { font-size: 0; }
+.admin-entity-workspace.is-referee .admin-entity-ranking__head > span:nth-child(4)::after { content: "Completed"; font-size: 9px; }
+.admin-entity-workspace.is-referee .admin-entity-ranking__head > span:nth-child(5) { font-size: 0; }
+.admin-entity-workspace.is-referee .admin-entity-ranking__head > span:nth-child(5)::after { content: "Reports"; font-size: 9px; }
+.admin-bettor-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border: 1px solid var(--admin-line); background: var(--admin-panel); }
+.admin-bettor-stats > div { display: grid; gap: 7px; min-width: 0; padding: 15px 17px; border-right: 1px solid var(--admin-line); }
+.admin-bettor-stats > div:last-child { border-right: 0; }
+.admin-bettor-stats span { color: var(--admin-muted); font-size: 10px; font-weight: 800; text-transform: uppercase; }
+.admin-bettor-stats strong { color: var(--admin-text); font-size: 16px; }
+.admin-entity-detail .admin-bettor-stats { grid-template-columns: 1fr; margin: 20px 0; }
+.admin-entity-detail .admin-bettor-stats > div { border-right: 0; border-bottom: 1px solid var(--admin-line); }
+.admin-entity-detail .admin-bettor-stats > div:last-child { border-bottom: 0; }
+.admin-bettor-bets { margin-top: 20px; border: 1px solid var(--admin-line); overflow-x: auto; }
+.admin-bettor-bets table { width: 100%; min-width: 680px; border-collapse: collapse; table-layout: fixed; }
+.admin-bettor-bets col.admin-bettor-bets__race { width: 52%; }
+.admin-bettor-bets th, .admin-bettor-bets td { padding: 12px 18px; border-bottom: 1px solid var(--admin-line); font-size: 11px; }
+.admin-bettor-bets thead th { color: var(--admin-muted); font-size: 9px; font-weight: 900; letter-spacing: .08em; text-align: right; text-transform: uppercase; }
+.admin-bettor-bets thead th:first-child { text-align: left; }
+.admin-bettor-bets tbody th { overflow: hidden; color: var(--admin-text); font-weight: 800; text-align: left; text-overflow: ellipsis; white-space: nowrap; }
+.admin-bettor-bets tbody td, .admin-bettor-bets tfoot td { color: var(--admin-text); font-weight: 800; text-align: right; }
+.admin-bettor-bets tbody td.is-won { color: #67d49f; }
+.admin-bettor-bets tbody td.is-lost { color: #ed7770; }
+.admin-bettor-bets tfoot th, .admin-bettor-bets tfoot td { padding-top: 13px; border-bottom: 0; background: var(--admin-panel-strong); font-weight: 900; }
+.admin-bettor-bets tfoot th { color: var(--admin-text); text-align: left; }
+.admin-bettor-bets tfoot td:last-child { color: var(--admin-accent); }
+.admin-horse-races { margin-top: 20px; border: 1px solid var(--admin-line); overflow-x: auto; }
+.admin-horse-races table { width: 100%; min-width: 720px; border-collapse: collapse; table-layout: fixed; }
+.admin-horse-races col.admin-horse-races__race { width: 30%; }
+.admin-horse-races th, .admin-horse-races td { padding: 12px 18px; border-bottom: 1px solid var(--admin-line); font-size: 11px; }
+.admin-horse-races thead th { color: var(--admin-muted); font-size: 9px; font-weight: 900; letter-spacing: .08em; text-align: right; text-transform: uppercase; }
+.admin-horse-races thead th:first-child, .admin-horse-races tbody th { text-align: left; }
+.admin-horse-races tbody th { color: var(--admin-text); font-weight: 800; }
+.admin-horse-races tbody td { color: var(--admin-text); font-weight: 800; text-align: right; }
+.admin-entity-workspace.is-jockey { grid-template-columns: 1fr; }
+.admin-jockey-races { margin-top: 20px; border: 1px solid var(--admin-line); overflow-x: auto; }
+.admin-jockey-races table { width: 100%; min-width: 720px; border-collapse: collapse; table-layout: fixed; }
+.admin-jockey-races col.admin-jockey-races__race { width: 30%; }
+.admin-jockey-races th, .admin-jockey-races td { padding: 12px 18px; border-bottom: 1px solid var(--admin-line); font-size: 11px; }
+.admin-jockey-races thead th { color: var(--admin-muted); font-size: 9px; font-weight: 900; letter-spacing: .08em; text-align: right; text-transform: uppercase; }
+.admin-jockey-races thead th:first-child, .admin-jockey-races tbody th { text-align: left; }
+.admin-jockey-races tbody th { color: var(--admin-text); font-weight: 800; }
+.admin-jockey-races tbody td { color: var(--admin-text); font-weight: 800; text-align: right; }
 .admin-analytics-layout { display: grid; grid-template-columns: minmax(0, 1.8fr) minmax(280px, .85fr); gap: 12px; margin-top: 12px; }
 .admin-analytics-charts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
 .admin-analytics-chart, .admin-analytics-alerts, .admin-analytics-table, .admin-analytics-status { border: 1px solid var(--admin-line); background: var(--admin-panel); }
@@ -4821,6 +4932,9 @@
 @media (max-width: 1180px) { .admin-entity-workspace { grid-template-columns: 1fr; } }
 @media (max-width: 760px) { .admin-analytics-metrics, .admin-analytics-charts { grid-template-columns: 1fr; } .admin-analytics-metric, .admin-analytics-metric:nth-child(3) { min-height: 118px; border-right: 0; border-bottom: 1px solid var(--admin-line); } .admin-analytics-metric:last-child { border-bottom: 0; } .admin-analytics-chart__plot { height: 246px; margin-inline: 4px; } .admin-analytics-chart__legend { padding-inline: 15px; } .admin-analytics-chart__legend span:last-child { display: none; } .admin-analytics-table__row { grid-template-columns: minmax(0, 1fr) auto; } .admin-analytics-table__row > em { display: none; } .admin-analytics-range { width: 100%; justify-content: space-between; } .admin-analytics-picker { flex: 1; min-width: 0; } .admin-analytics-picker__menu { width: 100%; } .admin-entity-analytics__header { align-items: start; flex-direction: column; gap: 9px; } .admin-entity-analytics__grid { grid-template-columns: 1fr; } .admin-entity-analytics__column, .admin-entity-analytics__column:nth-child(3) { border-right: 0; border-bottom: 1px solid var(--admin-line); } .admin-entity-analytics__column:last-child { border-bottom: 0; } }
 @media (max-width: 760px) { .admin-entity-toolbar { align-items: stretch; flex-direction: column; } .admin-entity-toolbar__period { align-items: stretch; flex-wrap: wrap; } .admin-entity-toolbar__period label { flex: 1; flex-direction: column; align-items: stretch; } .admin-entity-toolbar input { width: 100%; } .admin-entity-toolbar__period button { width: 100%; } .admin-entity-summary { grid-template-columns: repeat(2, 1fr); } .admin-entity-stat:nth-child(2) { border-right: 0; } .admin-entity-stat:nth-child(-n + 2) { border-bottom: 1px solid var(--admin-line); } .admin-entity-stat:nth-child(3) { border-right: 1px solid var(--admin-line); } .admin-entity-ranking > header { align-items: stretch; flex-direction: column; } }
+@media (max-width: 760px) { .admin-bettor-stats { grid-template-columns: 1fr; } .admin-bettor-stats > div { border-right: 0; border-bottom: 1px solid var(--admin-line); } .admin-bettor-stats > div:last-child { border-bottom: 0; } }
+@media (max-width: 760px) { .admin-entity-workspace.is-referee > .admin-referee-ranking, .admin-entity-workspace.is-referee > .admin-entity-detail { height: 440px; } .admin-entity-workspace.is-referee > .admin-referee-ranking .admin-referee-ranking__table { max-height: 340px; } }
+@media (max-width: 760px) { .admin-owner-horse-list ul { grid-template-columns: 1fr; } .admin-owner-race-history .admin-horse-races table { min-width: 600px; } }
 .admin-incident-penalty-review {
   display: grid;
   gap: 14px;
