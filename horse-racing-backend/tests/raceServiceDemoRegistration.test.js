@@ -10,6 +10,7 @@ const raceService = require('../services/raceService');
 const originalFindById = raceRepository.findById;
 const originalUpdateById = raceRepository.updateById;
 const originalUpdateMany = raceRepository.updateMany;
+const originalUpdateOne = raceRepository.updateOne;
 const originalFindMarketByRaceId = raceOddsMarketRepository.findByRaceId;
 const originalCaptureOpeningOdds = raceOddsMarketRepository.captureOpeningOdds;
 const originalUpdateMarketByRaceId = raceOddsMarketRepository.updateByRaceId;
@@ -22,6 +23,7 @@ test.afterEach(function() {
   raceRepository.findById = originalFindById;
   raceRepository.updateById = originalUpdateById;
   raceRepository.updateMany = originalUpdateMany;
+  raceRepository.updateOne = originalUpdateOne;
   raceOddsMarketRepository.findByRaceId = originalFindMarketByRaceId;
   raceOddsMarketRepository.captureOpeningOdds = originalCaptureOpeningOdds;
   raceOddsMarketRepository.updateByRaceId = originalUpdateMarketByRaceId;
@@ -373,7 +375,15 @@ test('start race auto closes betting market before race is running', async funct
   };
   raceEngineService.collectParticipants = async function() {
     return {
-      participants: [{ horse_id: 'horse-id' }]
+      participants: [{ horse_id: 'horse-id' }],
+      participant_statuses: [
+        { horse: { _id: 'horse-id' }, eligible: true, blockers: [] },
+        {
+          horse: { _id: 'failed-horse-id' },
+          eligible: false,
+          blockers: ['passed_pre_race_check_required']
+        }
+      ]
     };
   };
   raceEngineService.generateProvisionalRaceRun = async function() {
@@ -395,6 +405,51 @@ test('start race auto closes betting market before race is running', async funct
   assert.equal(finalUpdate.betting_status, 'closed');
   assert.equal(finalUpdate['betting_market.status'], 'closed');
   assert.equal(lockRaceCalled, false);
+  assert.deepEqual(result.engine, { race_run: { finish_order: ['horse-id'] } });
+});
+
+test('fire race excludes failed pre-race participants instead of blocking eligible runners', async function() {
+  const updates = [];
+
+  raceRepository.findById = async function() {
+    return {
+      _id: 'race-id',
+      status: 'starting',
+      starting_at: new Date(Date.now() - 4 * 1000),
+      referee_id: 'referee-id'
+    };
+  };
+  raceRepository.updateOne = async function(filter, payload) {
+    updates.push(payload.$set || payload);
+    return { _id: filter._id, ...(payload.$set || payload) };
+  };
+  raceEngineService.collectParticipants = async function() {
+    return {
+      participants: [{ horse_id: 'horse-id' }],
+      participant_statuses: [
+        { horse: { _id: 'horse-id' }, eligible: true, blockers: [] },
+        {
+          horse: { _id: 'failed-horse-id' },
+          eligible: false,
+          blockers: ['passed_pre_race_check_required']
+        }
+      ]
+    };
+  };
+  raceEngineService.generateProvisionalRaceRun = async function() {
+    return { race_run: { finish_order: ['horse-id'] } };
+  };
+
+  const result = await raceService.fireRace(
+    {
+      user: { _id: 'admin-id' },
+      roles: ['admin'],
+      auth: { roles: ['admin'] }
+    },
+    'race-id'
+  );
+
+  assert.equal(updates.at(-1).status, 'running');
   assert.deepEqual(result.engine, { race_run: { finish_order: ['horse-id'] } });
 });
 

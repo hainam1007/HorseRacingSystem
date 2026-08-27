@@ -765,21 +765,6 @@ async function startRace(req, id) {
     try {
         const participantData = await raceEngineService.collectParticipants(race._id);
 
-        const ineligibleParticipants = (participantData.participant_statuses || []).filter(function(participant) {
-            return !participant.eligible;
-        });
-
-        if (ineligibleParticipants.length) {
-            throw new ApiError(409, 'Race cannot start until every approved participant passes pre-race readiness', {
-                blocked_participants: ineligibleParticipants.map(function(participant) {
-                    return {
-                        horse_id: getDocumentId(participant.horse),
-                        blockers: participant.blockers
-                    };
-                })
-            });
-        }
-
         if (!participantData.participants.length) {
             throw new ApiError(400, 'Race has no eligible participants');
         }
@@ -864,21 +849,6 @@ async function fireRace(req, id) {
 
     try {
         const participantData = await raceEngineService.collectParticipants(race._id);
-
-        const ineligibleParticipants = (participantData.participant_statuses || []).filter(function(participant) {
-            return !participant.eligible;
-        });
-
-        if (ineligibleParticipants.length) {
-            throw new ApiError(409, 'Race cannot start until every approved participant passes pre-race readiness', {
-                blocked_participants: ineligibleParticipants.map(function(participant) {
-                    return {
-                        horse_id: getDocumentId(participant.horse),
-                        blockers: participant.blockers
-                    };
-                })
-            });
-        }
 
         if (!participantData.participants.length) {
             throw new ApiError(400, 'Race has no eligible participants');

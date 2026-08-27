@@ -5,7 +5,7 @@ const test = require('node:test');
 
 const { ROLE_NAMES } = require('../constants/roles');
 const { HORSE_CHECK_PHASE, HORSE_CHECK_STATUS } = require('../constants/statuses');
-const { Horse } = require('../models');
+const { Horse, HorseCheck } = require('../models');
 const { newObjectId } = require('../utils/objectId');
 const horseCheckRepository = require('../repositories/horseCheckRepository');
 const profileRepository = require('../repositories/profileRepository');
@@ -20,7 +20,9 @@ const HORSE_ID = newObjectId();
 const CHECK_ID = newObjectId();
 
 const originals = {
+  horseFindAll: Horse.findAll,
   horseFindByPk: Horse.findByPk,
+  horseCheckFindAll: HorseCheck.findAll,
   horseCheckCreate: horseCheckRepository.create,
   horseCheckFindById: horseCheckRepository.findById,
   horseCheckFindOne: horseCheckRepository.findOne,
@@ -72,13 +74,67 @@ function pendingBallastCheck() {
 }
 
 test.afterEach(() => {
+  Horse.findAll = originals.horseFindAll;
   Horse.findByPk = originals.horseFindByPk;
+  HorseCheck.findAll = originals.horseCheckFindAll;
   horseCheckRepository.create = originals.horseCheckCreate;
   horseCheckRepository.findById = originals.horseCheckFindById;
   horseCheckRepository.findOne = originals.horseCheckFindOne;
   horseCheckRepository.updateById = originals.horseCheckUpdateById;
   profileRepository.findRaceRefereeByUserId = originals.refereeFindByUserId;
   raceRepository.findById = originals.raceFindById;
+});
+
+test('bulk save updates an existing Sequelize horse check by its id field', async () => {
+  const checklist = {
+    identity_verified: true,
+    registration_valid: true,
+    jockey_assigned: true,
+    jockey_contract_confirmed: true,
+    horse_health_status_ok: true,
+    no_visible_lameness: true,
+    no_visible_injury: true,
+    normal_gait: true,
+    normal_breathing: true,
+    equipment_ok: true,
+    fit_to_race: true
+  };
+  let updatedId;
+  let updatedData;
+
+  raceRepository.findById = async () => raceFixture();
+  profileRepository.findRaceRefereeByUserId = async () => ({ _id: REFEREE_ID });
+  Horse.findAll = async () => [{ id: HORSE_ID, status: 'active', weight: 460 }];
+  HorseCheck.findAll = async () => [{
+    id: CHECK_ID,
+    race_id: RACE_ID,
+    horse_id: HORSE_ID,
+    referee_id: REFEREE_ID,
+    phase: HORSE_CHECK_PHASE.PRE_RACE,
+    status: HORSE_CHECK_STATUS.FAILED,
+    checklist: {}
+  }];
+  horseCheckRepository.updateById = async (id, data) => {
+    updatedId = id;
+    updatedData = data;
+    return { id, ...data };
+  };
+
+  const result = await horseCheckService.bulkSaveHorseChecks(refereeRequest(), {
+    race_id: RACE_ID,
+    phase: HORSE_CHECK_PHASE.PRE_RACE,
+    checks: [{
+      horse_id: HORSE_ID,
+      status: HORSE_CHECK_STATUS.PASSED,
+      checklist
+    }]
+  });
+
+  assert.equal(updatedId, CHECK_ID);
+  assert.equal(updatedData.status, HORSE_CHECK_STATUS.PASSED);
+  assert.deepEqual(updatedData.checklist, checklist);
+  assert.equal(result.summary.updated_count, 1);
+  assert.equal(result.summary.failed_count, 0);
 });
 
 test('pre-race checks ignore a client eligibility flag and require confirmed ballast', async () => {

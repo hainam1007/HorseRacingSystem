@@ -289,7 +289,6 @@ async function getRaceReadiness(req, raceId) {
     const ready = race.registration_locked === true &&
         raceCompleted &&
         eligibleParticipants.length > 0 &&
-        preRaceBlockedParticipants.length === 0 &&
         Boolean(submittedReport) &&
         missingPostCheckHorseIds.length === 0 &&
         underInvestigationHorseIds.length === 0 &&

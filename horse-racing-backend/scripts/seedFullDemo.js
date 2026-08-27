@@ -121,11 +121,11 @@ const participantNumbersByTrack = {
 };
 
 const tournamentFixtures = [
-  { title: 'Opening Stakes', date: '2026-08-20', tracks: ['PHU_THO', 'THIEN_MA', 'QUAN_NGUA'] },
-  { title: 'Mekong Classic', date: '2026-08-21', tracks: ['SOC_SON', 'PHU_THO', 'THIEN_MA'] },
-  { title: 'Saigon Derby', date: '2026-08-22', tracks: ['QUAN_NGUA', 'SOC_SON', 'PHU_THO'] },
-  { title: 'Heritage Sprint', date: '2026-08-23', tracks: ['THIEN_MA', 'QUAN_NGUA', 'SOC_SON'] },
-  { title: 'Grand Finale', date: '2026-08-25', tracks: ['PHU_THO', 'THIEN_MA', 'QUAN_NGUA'] }
+  { title: 'Opening Stakes', date: '2026-08-24', tracks: ['PHU_THO', 'THIEN_MA', 'QUAN_NGUA'] },
+  { title: 'Mekong Classic', date: '2026-08-25', tracks: ['SOC_SON', 'PHU_THO', 'THIEN_MA'] },
+  { title: 'Saigon Derby', date: '2026-08-26', tracks: ['QUAN_NGUA', 'SOC_SON', 'PHU_THO'] },
+  { title: 'Heritage Sprint', date: '2026-08-28', tracks: ['THIEN_MA', 'QUAN_NGUA', 'SOC_SON'] },
+  { title: 'Grand Finale', date: '2026-08-30', tracks: ['PHU_THO', 'THIEN_MA', 'QUAN_NGUA'] }
 ];
 
 const raceHours = ['06:00:00', '12:00:00', '18:00:00'];
@@ -460,7 +460,19 @@ async function createParticipantFlow(models, context) {
       referee_id: referee.id,
       phase: 'pre_race',
       status: 'passed',
-      checklist: { identity: true, health: true, equipment: true, weight: true, eligibility: true },
+      checklist: {
+        identity_verified: true,
+        registration_valid: true,
+        jockey_assigned: true,
+        jockey_contract_confirmed: true,
+        horse_health_status_ok: true,
+        no_visible_lameness: true,
+        no_visible_injury: true,
+        normal_gait: true,
+        normal_breathing: true,
+        equipment_ok: true,
+        fit_to_race: true
+      },
       health_status: 'fit',
       weight: horse.weight,
       check_note: requiresBallast ? 'Ballast verified by referee.' : 'All racetrack requirements passed.',
@@ -791,7 +803,7 @@ async function main() {
     }
   }
 
-  console.log('Seeded 5 tournaments, ' + raceCount + ' races through 2026-08-25, 75 valid registrations, 15 odds markets, referee reports, bets and completed payouts.');
+  console.log('Seeded 5 tournaments, ' + raceCount + ' races through 2026-08-30, 75 valid registrations, 15 odds markets, referee reports, bets and completed payouts.');
   console.log('Demo login password: ' + PASSWORD);
   await sequelize.close();
 }

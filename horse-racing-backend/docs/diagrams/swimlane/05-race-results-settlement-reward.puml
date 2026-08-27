@@ -1,0 +1,37 @@
+@startuml 05-race-results-settlement-reward
+title Flow 05 — Referee Completes and Publishes Race Results
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam ArrowColor #475569
+skinparam wrapWidth 0
+skinparam activity {
+  BackgroundColor #F8FAFC
+  BorderColor #475569
+  DiamondBackgroundColor #FEF3C7
+  DiamondBorderColor #D97706
+  StartColor #16A34A
+  EndColor #0F172A
+}
+|Referee|
+start
+:Complete the race;
+:Record post-race checks;
+:Submit referee report and resolve violations;
+|System|
+:Validate closure requirements;
+if (Closure ready?) then (Yes)
+  |Referee|
+  :Apply confirmed penalties;
+  :Review draft results;
+  :Finalize draft results;
+  :Confirm results;
+  :Publish results;
+  |System|
+  :Update ratings and calculate prize awards;
+else (No)
+  |System|
+  :Return missing closure requirements;
+endif
+stop
+@enduml

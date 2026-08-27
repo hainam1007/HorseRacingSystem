@@ -79,23 +79,25 @@ function mapRaceEngineContenders(engine) {
 }
 
 function mapLiveParticipantContenders(participants = []) {
-  return participants.map((participant, index) => {
-    const horse = participant.horse || participant.horse_id || {};
-    const jockey = participant.jockey || participant.jockey_id || {};
-    const horseId = getId(participant.horse_id || horse);
-    return {
-      id: horseId,
-      horse: horse?.name || "Unknown horse",
-      jockey: participant.jockey_name || getJockeyName(jockey),
-      owner: participant.owner_name || participant.owner?.stable_name || participant.horse?.owner?.stable_name || "Horse Owner",
-      lane: participant.lane != null ? Number(participant.lane) : index + 1,
-      weight: horse?.weight ? `${horse.weight}kg` : "56kg",
-      form: participant.eligible ? "Eligible" : "Pending check",
-      image: getHorseJockeyImage(horseId),
-      color: RUNNER_COLORS[index % RUNNER_COLORS.length],
-      position: index + 1,
-    };
-  });
+  return participants
+    .filter((participant) => participant.eligible === true)
+    .map((participant, index) => {
+      const horse = participant.horse || participant.horse_id || {};
+      const jockey = participant.jockey || participant.jockey_id || {};
+      const horseId = getId(participant.horse_id || horse);
+      return {
+        id: horseId,
+        horse: horse?.name || "Unknown horse",
+        jockey: participant.jockey_name || getJockeyName(jockey),
+        owner: participant.owner_name || participant.owner?.stable_name || participant.horse?.owner?.stable_name || "Horse Owner",
+        lane: participant.lane != null ? Number(participant.lane) : index + 1,
+        weight: horse?.weight ? `${horse.weight}kg` : "56kg",
+        form: "Eligible",
+        image: getHorseJockeyImage(horseId),
+        color: RUNNER_COLORS[index % RUNNER_COLORS.length],
+        position: index + 1,
+      };
+    });
 }
 
 export default function RefereeRaceLiveViewer({ raceId, race }) {

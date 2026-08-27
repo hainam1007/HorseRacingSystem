@@ -30,7 +30,9 @@ function sameId(first, second) {
 }
 
 function getDocumentId(value) {
-  return value && (value._id || value);
+  if (!value) return value;
+  if (typeof value === 'string') return value;
+  return value._id || value.id || (typeof value.get === 'function' ? value.get('id') : value);
 }
 
 function idString(value) {
@@ -164,8 +166,8 @@ async function ensurePassedPreRaceCheck(race, horse, phase) {
   }
 
   const preRaceCheck = await horseCheckRepository.findOne({
-    race_id: race._id,
-    horse_id: horse._id,
+    race_id: getDocumentId(race),
+    horse_id: getDocumentId(horse),
     phase: HORSE_CHECK_PHASE.PRE_RACE
   });
 
@@ -201,8 +203,8 @@ async function createHorseCheck(req, payload) {
 
   if (payload.phase === HORSE_CHECK_PHASE.DURING_RACE && payload.requires_violation) {
     const lockedResults = await raceResultRepository.find({
-      race_id: race._id,
-      status: { $in: ['confirmed', 'published'] }
+      race_id: getDocumentId(race),
+      status: { [Op.in]: ['confirmed', 'published'] }
     });
 
     if (lockedResults.length) {
@@ -212,8 +214,8 @@ async function createHorseCheck(req, payload) {
 
   if ([HORSE_CHECK_PHASE.PRE_RACE, HORSE_CHECK_PHASE.POST_RACE].includes(phase)) {
     const existingCheck = await horseCheckRepository.findOne({
-      race_id: race._id,
-      horse_id: horse._id,
+      race_id: getDocumentId(race),
+      horse_id: getDocumentId(horse),
       phase: phase
     });
 
@@ -223,7 +225,7 @@ async function createHorseCheck(req, payload) {
       }
 
       const updatedHorseCheck = await horseCheckRepository.updateById(
-        existingCheck._id,
+        getDocumentId(existingCheck),
         buildHorseCheckData(
           race,
           refereeId,
@@ -232,6 +234,10 @@ async function createHorseCheck(req, payload) {
           existingCheck
         )
       );
+
+      if (!updatedHorseCheck) {
+        throw new ApiError(404, 'Horse check not found');
+      }
 
       return {
         horse_check: updatedHorseCheck
@@ -253,11 +259,11 @@ async function createHorseCheck(req, payload) {
       horseCheck.severity || VIOLATION_SEVERITY.MINOR
     );
     const violationData = {
-      race_id: race._id,
-      horse_id: horse._id,
+      race_id: getDocumentId(race),
+      horse_id: getDocumentId(horse),
       jockey_id: payload.jockey_id,
       referee_id: refereeId,
-      horse_check_id: horseCheck._id,
+      horse_check_id: getDocumentId(horseCheck),
       violation_type: horseCheck.event_type,
       description: horseCheck.description || horseCheck.check_note,
       severity: horseCheck.severity || VIOLATION_SEVERITY.MINOR,
@@ -271,8 +277,8 @@ async function createHorseCheck(req, payload) {
 
     const violation = await violationRepository.create(violationData);
 
-    const updatedHorseCheck = await horseCheckRepository.updateById(horseCheck._id, {
-      linked_violation_id: violation._id
+    const updatedHorseCheck = await horseCheckRepository.updateById(getDocumentId(horseCheck), {
+      linked_violation_id: getDocumentId(violation)
     });
 
     return {
@@ -293,7 +299,7 @@ function buildHorseCheckData(race, refereeId, payload, horse, existingCheck) {
     ? payload.status === HORSE_CHECK_STATUS.PASSED
     : true;
   const checkData = {
-    race_id: race._id,
+    race_id: getDocumentId(race),
     horse_id: payload.horse_id,
     jockey_id: payload.jockey_id,
     referee_id: refereeId,
@@ -357,7 +363,9 @@ async function bulkSaveHorseChecks(req, payload) {
 
   const refereeId = await resolveRefereeId(req, race, payload);
 
-  await ensureBulkPostRaceIsOpen(race._id, payload.phase);
+  const raceId = getDocumentId(race);
+
+  await ensureBulkPostRaceIsOpen(raceId, payload.phase);
 
   const horseIds = payload.checks.map(function(check) {
     return check.horse_id;
@@ -370,11 +378,11 @@ async function bulkSaveHorseChecks(req, payload) {
     Horse.findAll({ where: { id: { [Op.in]: horseIds } } }),
     jockeyIds.length ? Jockey.findAll({ where: { id: { [Op.in]: jockeyIds } } }) : Promise.resolve([]),
     HorseCheck.findAll({
-      where: { race_id: race._id, horse_id: { [Op.in]: horseIds }, phase: payload.phase }
+      where: { race_id: raceId, horse_id: { [Op.in]: horseIds }, phase: payload.phase }
     }),
     payload.phase === HORSE_CHECK_PHASE.POST_RACE
       ? HorseCheck.findAll({
-        where: { race_id: race._id, horse_id: { [Op.in]: horseIds }, phase: HORSE_CHECK_PHASE.PRE_RACE }
+        where: { race_id: raceId, horse_id: { [Op.in]: horseIds }, phase: HORSE_CHECK_PHASE.PRE_RACE }
       })
       : Promise.resolve([])
   ]);
@@ -424,7 +432,11 @@ async function bulkSaveHorseChecks(req, payload) {
           throw new ApiError(403, 'Only the assigned race referee can take over this horse check');
         }
 
-        const updatedHorseCheck = await horseCheckRepository.updateById(existingCheck._id, checkData);
+        const updatedHorseCheck = await horseCheckRepository.updateById(getDocumentId(existingCheck), checkData);
+
+        if (!updatedHorseCheck) {
+          throw new ApiError(404, 'Horse check not found');
+        }
 
         updated.push(updatedHorseCheck);
       } else {
