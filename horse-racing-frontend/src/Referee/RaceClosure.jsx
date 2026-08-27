@@ -240,10 +240,12 @@ function RaceClosure() {
   }
 
   const hasResults = race.result.length > 0;
-  const penaltiesApplied = readiness?.penalties_applied === true ||
-    (hasResults && race.result.every((result) => result.penaltyApplied));
-  const resultsFinalized = readiness?.results_finalized === true ||
-    (hasResults && race.result.every((result) => result.submittedToAdmin));
+  const penaltiesApplied = readiness
+    ? readiness.penalties_applied === true
+    : hasResults && race.result.every((result) => result.penaltyApplied);
+  const resultsFinalized = readiness
+    ? readiness.results_finalized === true
+    : hasResults && race.result.every((result) => result.submittedToAdmin);
   const resultsPublished = race.resultStatus === RESULT_STATUSES.PUBLISHED;
   const lockedResults = resultsFinalized ||
     [RESULT_STATUSES.CONFIRMED, RESULT_STATUSES.PUBLISHED].includes(race.resultStatus);

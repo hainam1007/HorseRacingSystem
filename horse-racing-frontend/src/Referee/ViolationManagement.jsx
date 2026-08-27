@@ -8,6 +8,7 @@ import PenaltyDecisionEditor, {
   penaltiesEqual,
 } from "../components/PenaltyDecisionEditor";
 import RefereeLayout from "./RefereeLayout";
+import { getId } from "./refereeAdapters";
 import { formatStatus } from "./refereeConstants";
 import { useRefereeData } from "./useRefereeData";
 import { readFileAsDataUri } from "../utils/fileData";
@@ -51,9 +52,9 @@ function statusTone(status) {
 }
 
 function getDetailSubject(violation) {
-  const jockey = violation?.jockey_id;
-  const horse = violation?.horse_id;
-  return jockey?.user_id?.full_name || jockey?.full_name || horse?.name || "Unlinked subject";
+  const jockey = violation?.jockey || violation?.jockey_id;
+  const horse = violation?.horse || violation?.horse_id;
+  return jockey?.user?.full_name || jockey?.user_id?.full_name || jockey?.full_name || horse?.name || "Unlinked subject";
 }
 
 function effectivePenalty(violation, policy) {
@@ -309,10 +310,15 @@ function ViolationManagement() {
       return setDetailError("Explain why the selected penalty differs from policy.");
     }
     try {
+      const violationId = getId(selectedViolation);
+      if (!violationId) {
+        return setDetailError("This violation does not have a valid ID. Reload the page and try again.");
+      }
+
       setDecisionAction(action);
       setDetailError("");
       if (action === "confirm") {
-        await refereeApi.confirmViolation(selectedViolation._id, {
+        await refereeApi.confirmViolation(violationId, {
           decision: decision.trim(),
           penalty: penaltyDecision,
           deviation_reason: deviationReason.trim() || undefined,
@@ -320,7 +326,7 @@ function ViolationManagement() {
         addMsg("Penalty decision confirmed.");
       }
       else {
-        await refereeApi.dismissViolation(selectedViolation._id, decision.trim());
+        await refereeApi.dismissViolation(violationId, decision.trim());
         addMsg("Incident dismissed with a recorded decision.");
       }
       await reload();

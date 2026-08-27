@@ -54,20 +54,52 @@ const LABELS = {
 
 const NOTE_REQUIRED_STATUSES = ["failed", "scratched", "injury_detected", "requires_vet_follow_up"];
 
+function normalizeChecklist(checklist, phase) {
+  const source = checklist || {};
+
+  if (
+    phase !== RACE_PHASES.PRE_RACE ||
+    PRE_FIELDS.some((field) => Object.prototype.hasOwnProperty.call(source, field))
+  ) {
+    return source;
+  }
+
+  const hasLegacyPreRaceChecklist = ["identity", "health", "equipment", "weight", "eligibility"]
+    .some((field) => Object.prototype.hasOwnProperty.call(source, field));
+
+  if (!hasLegacyPreRaceChecklist) return source;
+
+  return {
+    identity_verified: Boolean(source.identity),
+    registration_valid: Boolean(source.eligibility),
+    jockey_assigned: Boolean(source.eligibility),
+    jockey_contract_confirmed: Boolean(source.eligibility),
+    horse_health_status_ok: Boolean(source.health),
+    no_visible_lameness: Boolean(source.health),
+    no_visible_injury: Boolean(source.health),
+    normal_gait: Boolean(source.health),
+    normal_breathing: Boolean(source.health),
+    equipment_ok: Boolean(source.equipment),
+    fit_to_race: Boolean(source.eligibility && source.weight),
+  };
+}
+
 function initialRows(race, phase, fields) {
   return Object.fromEntries(
     (race?.participants || []).map((participant) => {
       const saved = race.checks.find(
         (check) => check.horseId === participant.horseId && check.phase === phase
       );
+      const savedChecklist = normalizeChecklist(saved?.checklist, phase);
+      const normalizedSaved = saved ? { ...saved, checklist: savedChecklist } : saved;
       return [
         participant.horseId,
         {
           status: saved?.status || "",
           note: saved?.note || "",
           weight: saved?.weight ?? participant.weight ?? "",
-          checklist: Object.fromEntries(fields.map((field) => [field, Boolean(saved?.checklist?.[field])])),
-          saved
+          checklist: Object.fromEntries(fields.map((field) => [field, Boolean(savedChecklist?.[field])])),
+          saved: normalizedSaved
         }
       ];
     })

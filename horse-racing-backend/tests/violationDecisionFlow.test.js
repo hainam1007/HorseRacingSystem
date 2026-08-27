@@ -1,5 +1,6 @@
 const assert = require('node:assert/strict');
 const test = require('node:test');
+const { Op } = require('sequelize');
 
 const { ROLE_NAMES } = require('../constants/roles');
 const {
@@ -150,6 +151,7 @@ async function dismissAsReferee(violation, payload) {
 
 test('creation snapshots policy and ignores auto confirmation', async function() {
   let createData;
+  let lockedResultFilter;
   const result = await withPatches([
     {
       target: raceRepository,
@@ -161,7 +163,8 @@ test('creation snapshots policy and ignores auto confirmation', async function()
     {
       target: raceResultRepository,
       key: 'find',
-      value: async function() {
+      value: async function(filter) {
+        lockedResultFilter = filter;
         return [];
       }
     },
@@ -195,6 +198,8 @@ test('creation snapshots policy and ignores auto confirmation', async function()
   });
 
   assert.equal(result.auto_confirmed, false);
+  assert.deepEqual(lockedResultFilter[Op.or][0].status[Op.in], ['confirmed', 'published']);
+  assert.equal(lockedResultFilter[Op.or][1].submitted_to_admin_at[Op.ne], null);
   assert.equal(createData.status, VIOLATION_STATUS.RECORDED);
   assert.equal(createData.suggested_penalty.time_penalty_seconds, 3);
   assert.equal(createData.penalty, undefined);
@@ -203,6 +208,7 @@ test('creation snapshots policy and ignores auto confirmation', async function()
 
 test('during-race horse check never auto-confirms its linked violation', async function() {
   let violationData;
+  let lockedResultFilter;
   const result = await withPatches([
     {
       target: raceRepository,
@@ -228,7 +234,8 @@ test('during-race horse check never auto-confirms its linked violation', async f
     {
       target: raceResultRepository,
       key: 'find',
-      value: async function() {
+      value: async function(filter) {
+        lockedResultFilter = filter;
         return [];
       }
     },
@@ -281,6 +288,8 @@ test('during-race horse check never auto-confirms its linked violation', async f
   });
 
   assert.equal(result.auto_confirmed, false);
+  assert.deepEqual(lockedResultFilter.status[Op.in], ['confirmed', 'published']);
+  assert.equal(lockedResultFilter.status.$in, undefined);
   assert.equal(violationData.status, VIOLATION_STATUS.RECORDED);
   assert.equal(violationData.suggested_penalty.time_penalty_seconds, 3);
   assert.equal(violationData.penalty, undefined);

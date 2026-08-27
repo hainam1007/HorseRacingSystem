@@ -1,4 +1,5 @@
 const ApiError = require('../utils/ApiError');
+const { Op } = require('sequelize');
 const { ROLE_NAMES } = require('../constants/roles');
 const {
   PENALTY_TYPE,
@@ -34,7 +35,9 @@ function sameId(first, second) {
 }
 
 function getDocumentId(value) {
-  return value && (value._id || value);
+  if (!value) return value;
+  if (typeof value === 'string') return value;
+  return value._id || value.id || (typeof value.get === 'function' ? value.get('id') : value);
 }
 
 function plainPenalty(value) {
@@ -128,9 +131,9 @@ function policyWithSnapshot(policy, suggestedPenalty) {
 async function ensureRaceResultsOpen(raceId) {
   const lockedResults = await raceResultRepository.find({
     race_id: raceId,
-    $or: [
-      { status: { $in: ['confirmed', 'published'] } },
-      { submitted_to_admin_at: { $ne: null } }
+    [Op.or]: [
+      { status: { [Op.in]: ['confirmed', 'published'] } },
+      { submitted_to_admin_at: { [Op.ne]: null } }
     ]
   });
 
